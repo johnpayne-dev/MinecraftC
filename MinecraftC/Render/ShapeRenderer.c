@@ -1,6 +1,7 @@
 #include <OpenGL.h>
 #include "ShapeRenderer.h"
 #include "../Utilities/Memory.h"
+#include "../Utilities/Log.h"
 
 struct ShapeRenderer ShapeRenderer = { 0 };
 static int MaxFloats = 524288;
@@ -8,7 +9,12 @@ static int MaxFloats = 524288;
 void ShapeRendererInitialize()
 {
 	ShapeRenderer.Buffer = MemoryAllocate(MaxFloats * sizeof(float));
-	ShapeRenderer.Length = 3;
+	ShapeRenderer.Vertices = 0;
+	ShapeRenderer.HasColor = false;
+	ShapeRenderer.HasTexture = false;
+	ShapeRenderer.VertexLength = 3;
+	ShapeRenderer.Length = 0;
+	ShapeRenderer.NoColor = false;
 }
 
 void ShapeRendererBegin()
@@ -44,14 +50,14 @@ void ShapeRendererEnd()
 void ShapeRendererClear()
 {
 	ShapeRenderer.Vertices = 0;
-	ShapeRenderer.Counter = 0;
+	ShapeRenderer.Length = 0;
 }
 
 void ShapeRendererColor(float3 color)
 {
 	if (!ShapeRenderer.NoColor)
 	{
-		if (!ShapeRenderer.HasColor) { ShapeRenderer.Length += 3; }
+		if (!ShapeRenderer.HasColor) { ShapeRenderer.VertexLength += 3; }
 		ShapeRenderer.HasColor = true;
 		ShapeRenderer.RGB = color;
 	}
@@ -59,7 +65,7 @@ void ShapeRendererColor(float3 color)
 
 void ShapeRendererVertexUV(float3 vertex, float2 uv)
 {
-	if (!ShapeRenderer.HasTexture) { ShapeRenderer.Length += 2; }
+	if (!ShapeRenderer.HasTexture) { ShapeRenderer.VertexLength += 2; }
 	ShapeRenderer.HasTexture = true;
 	ShapeRenderer.UV = uv;
 	ShapeRendererVertex(vertex);
@@ -69,25 +75,26 @@ void ShapeRendererVertex(float3 vertex)
 {
 	if (ShapeRenderer.HasTexture)
 	{
-		ShapeRenderer.Buffer[ShapeRenderer.Counter++] = ShapeRenderer.UV.x;
-		ShapeRenderer.Buffer[ShapeRenderer.Counter++] = ShapeRenderer.UV.y;
+		ShapeRenderer.Buffer[ShapeRenderer.Length++] = ShapeRenderer.UV.x;
+		ShapeRenderer.Buffer[ShapeRenderer.Length++] = ShapeRenderer.UV.y;
 	}
 	
 	if (ShapeRenderer.HasColor)
 	{
-		ShapeRenderer.Buffer[ShapeRenderer.Counter++] = ShapeRenderer.RGB.r;
-		ShapeRenderer.Buffer[ShapeRenderer.Counter++] = ShapeRenderer.RGB.g;
-		ShapeRenderer.Buffer[ShapeRenderer.Counter++] = ShapeRenderer.RGB.b;
+		ShapeRenderer.Buffer[ShapeRenderer.Length++] = ShapeRenderer.RGB.r;
+		ShapeRenderer.Buffer[ShapeRenderer.Length++] = ShapeRenderer.RGB.g;
+		ShapeRenderer.Buffer[ShapeRenderer.Length++] = ShapeRenderer.RGB.b;
 	}
 	
-	ShapeRenderer.Buffer[ShapeRenderer.Counter++] = vertex.x;
-	ShapeRenderer.Buffer[ShapeRenderer.Counter++] = vertex.y;
-	ShapeRenderer.Buffer[ShapeRenderer.Counter++] = vertex.z;
+	ShapeRenderer.Buffer[ShapeRenderer.Length++] = vertex.x;
+	ShapeRenderer.Buffer[ShapeRenderer.Length++] = vertex.y;
+	ShapeRenderer.Buffer[ShapeRenderer.Length++] = vertex.z;
 	
 	ShapeRenderer.Vertices++;
-	if (ShapeRenderer.Vertices % 4 == 0 && ShapeRenderer.Counter >= MaxFloats - ShapeRenderer.Length * 4)
+	if (ShapeRenderer.Vertices % 4 == 0 && ShapeRenderer.Length >= MaxFloats - (ShapeRenderer.VertexLength * 4))
 	{
 		ShapeRendererEnd();
+		ShapeRenderer.VertexLength = 3;
 	}
 }
 

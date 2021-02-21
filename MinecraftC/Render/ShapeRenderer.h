@@ -10,8 +10,8 @@ extern struct ShapeRenderer
 	float3 RGB;
 	bool HasColor;
 	bool HasTexture;
+	int VertexLength;
 	int Length;
-	int Counter;
 	bool NoColor;
 } ShapeRenderer;
 
