@@ -68,7 +68,7 @@ bool BasicAttackAIAttack(BasicAttackAI ai, Entity entity)
 void BasicAttackAIHurt(BasicAttackAI ai, Entity entity, int var)
 {
 	BasicAIData basicAI = ai->TypeData;
-	if (entity->Type == EntityTypeArrow) { entity = ArrowGetOwner(entity); }
+	if (entity != NULL && entity->Type == EntityTypeArrow) { entity = ArrowGetOwner(entity); }
 	if (entity != NULL && entity->Type != basicAI->Mob->Type) { basicAI->AttackTarget = entity; }
 }
 

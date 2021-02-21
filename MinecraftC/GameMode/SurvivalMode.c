@@ -5,12 +5,14 @@ SurvivalMode SurvivalModeCreate(Minecraft minecraft)
 {
 	GameMode mode = GameModeCreate(minecraft);
 	mode->TypeData = malloc(sizeof(struct SurvivalModeData));
-	return GameModeCreate(minecraft);
+	mode->Type = GameModeTypeSurvival;
+	*(SurvivalModeData)mode->TypeData = (struct SurvivalModeData){ 0 };
+	return mode;
 }
 
 void SurvivalModePreparePlayer(SurvivalMode mode, Player player)
 {
-	PlayerData playerData = player->TypeData;
+	PlayerData playerData = ((MobData)player->TypeData)->TypeData;
 	playerData->Inventory->Slots[8] = BlockTypeTNT;
 	playerData->Inventory->Count[8] = 10;
 }
@@ -23,7 +25,7 @@ void SurvivalModeBreakBlock(SurvivalMode mode, int x, int y, int z)
 
 bool SurvivalModeCanPlace(SurvivalMode mode, BlockType blockType)
 {
-	return InventoryRemoveResource(((PlayerData)mode->Minecraft->Level->Player->TypeData)->Inventory, blockType);
+	return InventoryRemoveResource(((PlayerData)((MobData)mode->Minecraft->Level->Player->TypeData)->TypeData)->Inventory, blockType);
 }
 
 void SurvivalModeHitBlock(SurvivalMode mode, int x, int y, int z)

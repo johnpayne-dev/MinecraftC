@@ -35,7 +35,7 @@ void PrimedTNTHurt(PrimedTNT tnt, Entity entity, int damage)
 		tnt->Type = EntityTypeNone;
 		EntityHurt(tnt, entity, damage);
 		tnt->Type = EntityTypePrimedTNT;
-		if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer)
+		if (entity != NULL && entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer)
 		{
 			EntityRemove(tnt);
 			LevelAddEntity(tnt->Level, ItemCreate(tnt->Level, tnt->Position, BlockTypeTNT));
