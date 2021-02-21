@@ -20,7 +20,7 @@ Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fu
 {
 	Minecraft minecraft = MemoryAllocate(sizeof(struct Minecraft));
 	*minecraft = (struct Minecraft){ 0 };
-	minecraft->GameMode = SurvivalModeCreate(minecraft);
+	minecraft->GameMode = CreativeModeCreate(minecraft);
 	minecraft->Timer = TimerCreate(20.0);
 	minecraft->ProgressBar = ProgressBarDisplayCreate(minecraft);
 	minecraft->Renderer = RendererCreate(minecraft);
