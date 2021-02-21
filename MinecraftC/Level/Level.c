@@ -179,7 +179,7 @@ bool LevelNetSetTile(Level level, int x, int y, int z, BlockType tile)
 
 bool LevelSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType tile)
 {
-	return level->NetworkMode ? false : LevelNetSetTile(level, x, y, z, tile);
+	return level->NetworkMode ? false : LevelNetSetTileNoNeighborChange(level, x, y, z, tile);
 }
 
 bool LevelNetSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType tile)
