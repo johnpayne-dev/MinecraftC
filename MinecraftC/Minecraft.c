@@ -656,7 +656,7 @@ void MinecraftRun(Minecraft minecraft)
 					qsort(lrenderer->Chunks, ListCount(lrenderer->Chunks), sizeof(Chunk), ChunkVisibleDistanceComparator);
 					
 					int limit = ListCount(lrenderer->Chunks);
-					if (limit > 20) { limit = 20; }
+					if (limit > 10) { limit = 10; }
 					for (int j = 0; j < limit; j++)
 					{
 						Chunk chunk = lrenderer->Chunks[0];
