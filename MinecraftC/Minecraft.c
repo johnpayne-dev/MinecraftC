@@ -456,7 +456,7 @@ void MinecraftRun(Minecraft minecraft)
 	if(this.server != null && this.session != null) {
 		this.networkManager = new NetworkManager(this, this.server, this.port, this.session.username, this.session.mppass);
 	}*/
-	//LevelAddEntity(minecraft->Level, SheepCreate(minecraft->Level, minecraft->Player->Position + up3f));
+	
 	int frame = 0;
 	uint64_t start = TimeMilli();
 	list(SDL_Event) events = ListCreate(sizeof(SDL_Event));

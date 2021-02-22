@@ -82,7 +82,7 @@ float SurvivalModeGetReachDistance(SurvivalMode mode)
 
 bool SurvivalModeUseItem(SurvivalMode mode, Player player, BlockType blockType)
 {
-	PlayerData playerData = mode->Minecraft->Player->TypeData;
+	PlayerData playerData = ((MobData)mode->Minecraft->Player->TypeData)->TypeData;
 	if (blockType == BlockTypeRedMushroom && InventoryRemoveResource(playerData->Inventory, blockType))
 	{
 		EntityHurt(player, NULL, 3);

@@ -63,7 +63,7 @@ Frustum FrustumUpdate()
 
 bool FrustumContainsBox(Frustum frustum, float3 v0, float3 v1)
 {
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		bool b = true;
 		b = b && frustum.Planes[i][0] * v0.x + frustum.Planes[i][1] * v0.y + frustum.Planes[i][2] * v0.z + frustum.Planes[i][3] <= 0.0;

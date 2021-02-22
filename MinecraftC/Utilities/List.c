@@ -103,7 +103,7 @@ list(void) ListRemoveAll(list(void) list, void * value)
 {
 	for (int i = 0; i < ListCount(list); i++)
 	{
-		if (memcmp(list + i, value, ListElementSize(list)) == 0)
+		if (memcmp(list + i * ListElementSize(list), value, ListElementSize(list)) == 0)
 		{
 			list = ListRemove(list, i);
 			i--;
@@ -116,7 +116,7 @@ _Bool ListContains(list(void) list, void * value)
 {
 	for (int i = 0; i < ListCount(list); i++)
 	{
-		if (memcmp(list + i, value, ListElementSize(list))) { return true; }
+		if (memcmp(list + i * ListElementSize(list), value, ListElementSize(list))) { return true; }
 	}
 	return false;
 }

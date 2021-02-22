@@ -48,7 +48,7 @@ void BlockMapMoved(BlockMap map, Entity entity)
 {
 	BlockMapSlot slot1 = BlockMapSlotInitialize(map->Slot1, entity->OldPosition);
 	BlockMapSlot slot2 = BlockMapSlotInitialize(map->Slot2, entity->Position);
-	if (memcmp(slot1, slot2, sizeof(struct BlockMapSlot)) == 0)
+	if (memcmp(slot1, slot2, sizeof(struct BlockMapSlot)) != 0)
 	{
 		BlockMapSlotRemove(slot1, entity);
 		BlockMapSlotAdd(slot2, entity);
@@ -168,14 +168,14 @@ void BlockMapRender(BlockMap map, float3 v, Frustum frustum, TextureManager text
 					int c = 0;
 					while (c < 6)
 					{
-						if (frustum.Planes[c][0] * v0.x + frustum.Planes[i][1] * v0.y + frustum.Planes[i][2] * v0.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v1.x + frustum.Planes[i][1] * v0.y + frustum.Planes[i][2] * v0.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v0.x + frustum.Planes[i][1] * v1.y + frustum.Planes[i][2] * v0.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v1.x + frustum.Planes[i][1] * v1.y + frustum.Planes[i][2] * v0.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v0.x + frustum.Planes[i][1] * v0.y + frustum.Planes[i][2] * v1.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v1.x + frustum.Planes[i][1] * v0.y + frustum.Planes[i][2] * v1.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v0.x + frustum.Planes[i][1] * v1.y + frustum.Planes[i][2] * v1.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
-						if (frustum.Planes[c][0] * v1.x + frustum.Planes[i][1] * v1.y + frustum.Planes[i][2] * v1.z + frustum.Planes[i][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v0.x + frustum.Planes[c][1] * v0.y + frustum.Planes[c][2] * v0.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v1.x + frustum.Planes[c][1] * v0.y + frustum.Planes[c][2] * v0.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v0.x + frustum.Planes[c][1] * v1.y + frustum.Planes[c][2] * v0.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v1.x + frustum.Planes[c][1] * v1.y + frustum.Planes[c][2] * v0.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v0.x + frustum.Planes[c][1] * v0.y + frustum.Planes[c][2] * v1.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v1.x + frustum.Planes[c][1] * v0.y + frustum.Planes[c][2] * v1.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v0.x + frustum.Planes[c][1] * v1.y + frustum.Planes[c][2] * v1.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
+						if (frustum.Planes[c][0] * v1.x + frustum.Planes[c][1] * v1.y + frustum.Planes[c][2] * v1.z + frustum.Planes[c][3] <= 0.0) { b = false; break; }
 						c++;
 					}
 					for (int l = 0; l < ListCount(list); l++)

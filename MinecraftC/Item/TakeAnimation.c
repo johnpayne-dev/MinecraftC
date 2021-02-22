@@ -1,4 +1,5 @@
 #include "TakeAnimation.h"
+#include "Item.h"
 #include "../Utilities/Memory.h"
 
 TakeAnimation TakeAnimationCreate(Level level, Entity item, Entity player)
@@ -6,6 +7,7 @@ TakeAnimation TakeAnimationCreate(Level level, Entity item, Entity player)
 	Entity entity = EntityCreate(level);
 	entity->Type = EntityTypeTakeAnimation;
 	EntitySetSize(entity, 1.0, 1.0);
+	EntitySetPosition(entity, item->Position);
 	TakeAnimationData take = MemoryAllocate(sizeof(struct TakeAnimationData));
 	*take = (struct TakeAnimationData)
 	{
@@ -25,8 +27,10 @@ void TakeAnimationTick(TakeAnimation take)
 	if (this->Time >= 3) { EntityRemove(take); }
 	
 	float t = pow(this->Time / 3.0, 2.0);
-	take->OldPosition = this->Item->OldPosition = this->Item->Position;
-	take->Position = this->Item->Position = this->Original + (this->Player->Position - this->Original - up3f) * t;
+	this->Item->OldPosition = this->Item->Position;
+	take->OldPosition = this->Item->OldPosition;
+	this->Item->Position = this->Original + (this->Player->Position - this->Original - up3f) * t;
+	take->Position = this->Item->Position;
 	EntitySetPosition(take, take->Position);
 }
 
