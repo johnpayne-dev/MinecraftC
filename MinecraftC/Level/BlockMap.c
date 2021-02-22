@@ -52,7 +52,6 @@ void BlockMapMoved(BlockMap map, Entity entity)
 	{
 		BlockMapSlotRemove(slot1, entity);
 		BlockMapSlotAdd(slot2, entity);
-		entity->OldPosition = entity->Position;
 	}
 }
 
