@@ -12,7 +12,7 @@
 static inline int gettimeofday(struct timeval * tp, void * tzp)
 {
 	FILETIME file_time;
-	SYSSTEMTIME system_time;
+	SYSTEMTIME system_time;
 	ULARGE_INTEGER ularge;
 	GetSystemTime(&system_time);
 	SystemTimeToFileTime(&system_time, &file_time);
