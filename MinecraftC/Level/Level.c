@@ -75,7 +75,7 @@ void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1)
 		{
 			int blocker = level->LightBlockers[i + j * level->Width];
 			int k = level->Depth - 1;
-			while (!LevelIsLightBlocker(level, i, k, j)) { k--; }
+			while (!LevelIsLightBlocker(level, i, k, j) && k > 0) { k--; }
 			level->LightBlockers[i + j * level->Width] = k;
 			if (blocker != k)
 			{
