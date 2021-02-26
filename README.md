@@ -23,4 +23,4 @@
 - MinecraftC Server
 - MinecraftC Raytraced Edition
 ### Discord
-Find any bugs? Want to show off something cool? Join our discord:
+Find any bugs? Want to show off something cool? Join our discord: https://discord.gg/2BVnXdU5rB
