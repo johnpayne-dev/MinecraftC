@@ -101,7 +101,7 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos)
 			if (player->Inventory->Count[i] > 1)
 			{
 				String string = StringCreateFromInt(player->Inventory->Count[i]);
-				FontRendererRender(hud->Minecraft->Font, string, 19 - FontRendererGetWidth(hud->Minecraft->Font, string), y + 6, ColorWhite);
+				FontRendererRender(hud->Minecraft->Font, string, x + 19 - FontRendererGetWidth(hud->Minecraft->Font, string), y + 6, ColorWhite);
 				StringDestroy(string);
 			}
 		}
