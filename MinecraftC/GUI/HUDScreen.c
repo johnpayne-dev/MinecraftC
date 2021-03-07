@@ -48,20 +48,20 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos)
 			ScreenDrawImage((int2){ x, y }, (int2){ 16 + state * 9, 0 }, (int2){ 9, 9 }, -90.0);
 			if (blink)
 			{
-				if (i / 2 + 1 < playerMob->LastHealth) { ScreenDrawImage((int2){ x, y }, (int2){ 70, 0 }, (int2){ 9, 9 }, -90.0); }
-				if (i / 2 + 1 == playerMob->LastHealth) { ScreenDrawImage((int2){ x, y }, (int2){ 79, 0 }, (int2){ 9, 9 }, -90.0); }
+				if (i * 2 + 1 < playerMob->LastHealth) { ScreenDrawImage((int2){ x, y }, (int2){ 70, 0 }, (int2){ 9, 9 }, -90.0); }
+				if (i * 2 + 1 == playerMob->LastHealth) { ScreenDrawImage((int2){ x, y }, (int2){ 79, 0 }, (int2){ 9, 9 }, -90.0); }
 			}
-			if (i / 2 + 1 < playerMob->Health) { ScreenDrawImage((int2){ x, y }, (int2){ 52, 0 }, (int2){ 9, 9 }, -90.0); }
-			if (i / 2 + 1 == playerMob->Health) { ScreenDrawImage((int2){ x, y }, (int2){ 61, 0 }, (int2){ 9, 9 }, -90.0); }
+			if (i * 2 + 1 < playerMob->Health) { ScreenDrawImage((int2){ x, y }, (int2){ 52, 0 }, (int2){ 9, 9 }, -90.0); }
+			if (i * 2 + 1 == playerMob->Health) { ScreenDrawImage((int2){ x, y }, (int2){ 61, 0 }, (int2){ 9, 9 }, -90.0); }
 		}
 		
 		if (EntityIsUnderWater(hud->Minecraft->Player))
 		{
-			int a1 = ceil((playerMob->AirSupply - 2) * 10.0 / 300.0);
-			int a2 = ceil(playerMob->AirSupply * 10.0 / 300.0) - a1;
+			int a1 = (int)ceil((playerMob->AirSupply - 2) / 30.0);
+			int a2 = (int)ceil(playerMob->AirSupply / 30.0) - a1;
 			for (int i = 0; i < a1 + a2; i++)
 			{
-				if (a1 < a2) { ScreenDrawImage((int2){ hud->Width / 2 - 91 + i * 8, hud->Height - 32 - 9 }, (int2){ 16, 18 }, (int2){ 9, 9 }, -90.0); }
+				if (i < a1) { ScreenDrawImage((int2){ hud->Width / 2 - 91 + i * 8, hud->Height - 32 - 9 }, (int2){ 16, 18 }, (int2){ 9, 9 }, -90.0); }
 				else { ScreenDrawImage((int2){ hud->Width / 2 - 91 + i * 8, hud->Height - 32 - 9 }, (int2){ 25, 18 }, (int2){ 9, 9 }, -90.0); }
 			}
 		}
