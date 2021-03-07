@@ -23,7 +23,7 @@ void ModelPartSetBounds(ModelPart part, float3 v1, int3 v2, float v3)
 	a += v3;
 	if (part->Mirror)
 	{
-		int _ = a.x;
+		float _ = a.x;
 		a.x = v1.x;
 		v1.x = _;
 	}
@@ -35,12 +35,12 @@ void ModelPartSetBounds(ModelPart part, float3 v1, int3 v2, float v3)
 	part->Vertices[5] = (Vertex){ .Position = { a.x, v1.y, a.z }, .UV = { 0.0, 8.0 } };
 	part->Vertices[6] = (Vertex){ .Position = { a.x, a.y, a.z }, .UV = { 8.0, 8.0 } };
 	part->Vertices[7] = (Vertex){ .Position = { v1.x, a.y, a.z }, .UV = { 8.0, 0.0 } };
-	part->Quads[0] = TexturedQuadCreateUV((Vertex[]){ part->Vertices[5], part->Vertices[1], part->Vertices[2], part->Vertices[6] }, float2i(part->UV) + (float2){ v2.x, 0.0 } + v3, float2i(part->UV) + (float2){ v2.x + v3, v2.y } + v3);
-	part->Quads[1] = TexturedQuadCreateUV((Vertex[]){ part->Vertices[0], part->Vertices[4], part->Vertices[7], part->Vertices[3] }, float2i(part->UV) + (float2){ 0.0, v3 }, float2i(part->UV) + (float2){ 0.0, v2.y } + v3);
-	part->Quads[2] = TexturedQuadCreateUV((Vertex[]){ part->Vertices[5], part->Vertices[4], part->Vertices[0], part->Vertices[1] }, float2i(part->UV) + (float2){ v3, 0.0 }, float2i(part->UV) + (float2){ v2.x, 0.0 } + v3);
-	part->Quads[3] = TexturedQuadCreateUV((Vertex[]){ part->Vertices[2], part->Vertices[3], part->Vertices[7], part->Vertices[6] }, float2i(part->UV) + (float2){ v2.x + v3, 0.0 }, float2i(part->UV) + (float2){ v2.x + v2.x, 0.0 } + v3);
-	part->Quads[4] = TexturedQuadCreateUV((Vertex[]){ part->Vertices[1], part->Vertices[0], part->Vertices[3], part->Vertices[2] }, float2i(part->UV) + (float2){ 0.0, 0.0 } + v3, float2i(part->UV) + (float2){ v2.x, v2.y } + v3);
-	part->Quads[5] = TexturedQuadCreateUV((Vertex[]){ part->Vertices[4], part->Vertices[5], part->Vertices[6], part->Vertices[7] }, float2i(part->UV) + (float2){ v2.x + v3, 0.0 } + v3, float2i(part->UV) + (float2){ v2.x + v2.x + v3, v2.y } + v3);
+	part->Quads[0] = TexturedQuadCreate((Vertex[]){ part->Vertices[5], part->Vertices[1], part->Vertices[2], part->Vertices[6] }, part->UV + (int2){ v2.x, 0.0 } + v2.z, part->UV + (int2){ v2.x + v2.z, v2.y } + v2.z);
+	part->Quads[1] = TexturedQuadCreate((Vertex[]){ part->Vertices[0], part->Vertices[4], part->Vertices[7], part->Vertices[3] }, part->UV + (int2){ 0.0, v2.z }, part->UV + (int2){ 0.0, v2.y } + v2.z);
+	part->Quads[2] = TexturedQuadCreate((Vertex[]){ part->Vertices[5], part->Vertices[4], part->Vertices[0], part->Vertices[1] }, part->UV + (int2){ v2.z, 0.0 }, part->UV + (int2){ v2.x, 0.0 } + v2.z);
+	part->Quads[3] = TexturedQuadCreate((Vertex[]){ part->Vertices[2], part->Vertices[3], part->Vertices[7], part->Vertices[6] }, part->UV + (int2){ v2.x + v2.z, 0.0 }, part->UV + (int2){ v2.x + v2.x, 0.0 } + v2.z);
+	part->Quads[4] = TexturedQuadCreate((Vertex[]){ part->Vertices[1], part->Vertices[0], part->Vertices[3], part->Vertices[2] }, part->UV + (int2){ 0.0, 0.0 } + v2.z, part->UV + (int2){ v2.x, v2.y } + v2.z);
+	part->Quads[5] = TexturedQuadCreate((Vertex[]){ part->Vertices[4], part->Vertices[5], part->Vertices[6], part->Vertices[7] }, part->UV + (int2){ v2.x + v2.z, 0.0 } + v2.z, part->UV + (int2){ v2.x + v2.x + v2.z, v2.y } + v2.z);
 	if (part->Mirror)
 	{
 		for (int i = 0; i < 6; i++)
@@ -93,7 +93,7 @@ void ModelPartGenerateList(ModelPart part, float scale)
 	for (int i = 0; i < 6; i++)
 	{
 		TexturedQuad quad = part->Quads[i];
-		float3 c = cross3f(normalize3f(quad.Vertices[1].Position - quad.Vertices[0].Position), normalize3f(quad.Vertices[1].Position - quad.Vertices[2].Position));
+		float3 c = normalize3f(cross3f(normalize3f(quad.Vertices[1].Position - quad.Vertices[0].Position), normalize3f(quad.Vertices[1].Position - quad.Vertices[2].Position)));
 		glNormal3f(c.x, c.y, c.z);
 		
 		for (int j = 0; j < 4; j++)
