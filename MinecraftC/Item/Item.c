@@ -73,7 +73,7 @@ void ItemRender(Item item, TextureManager textures, float t)
 	glRotatef(rotation, 0.0, 1.0, 0.0);
 	ItemModelGenerateList(Models[this->Resource]);
 	float s = pow(sin(rotation / 10.0) * 0.5 + 0.5, 4.0);
-	glColor4f(1.0, 1.0, 1.0, s * 0.4);
+	glColor4f(s * 0.4, s * 0.4, s * 0.4, s * 0.4);
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
