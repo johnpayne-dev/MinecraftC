@@ -319,7 +319,6 @@ void MobTravel(Mob mob, float x, float y)
 		EntityMoveRelative(mob, (float2){ x, y }, mob->OnGround ? 0.1 : 0.02);
 		EntityMove(mob, mob->Delta);
 		mob->Delta *= (float3){ 0.91, 0.98, 0.91 };
-		//mob->Delta.x += 0.01;
 		mob->Delta.y -= 0.08;
 		if (mob->OnGround) { mob->Delta.xz *= 0.6; }
 	}

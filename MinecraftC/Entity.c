@@ -263,7 +263,7 @@ bool EntityIsUnderWater(Entity entity)
 
 bool EntityIsInLava(Entity entity)
 {
-	return LevelContainsLiquid(entity->Level, AABBGrow(entity->AABB, one3f * -0.4), LiquidTypeLava);
+	return LevelContainsLiquid(entity->Level, AABBGrow(entity->AABB, up3f * -0.4), LiquidTypeLava);
 }
 
 void EntityMoveRelative(Entity entity, float2 xz, float speed)
