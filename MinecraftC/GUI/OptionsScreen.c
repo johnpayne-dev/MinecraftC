@@ -18,6 +18,8 @@ OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings)
 void OptionsScreenOnOpen(OptionsScreen screen)
 {
 	OptionsScreenData this = screen->TypeData;
+	for (int i = 0; i < ListCount(screen->Buttons); i++) { ButtonDestroy(screen->Buttons[i]); }
+	screen->Buttons = ListClear(screen->Buttons);
 	for (int i = 0; i < this->Settings->SettingsCount; i++)
 	{
 		screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreateSize(i, screen->Width / 2 - 155 + i % 2 * 160, screen->Height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, GameSettingsGetSetting(this->Settings, i)) });
