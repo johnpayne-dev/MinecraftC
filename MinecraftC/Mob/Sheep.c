@@ -8,6 +8,7 @@ Sheep SheepCreate(Level level, float3 pos)
 	Sheep entity = MobCreate(level);
 	EntitySetSize(entity, 1.4, 1.72);
 	EntitySetPosition(entity, pos);
+	entity->HeightOffset = 1.72f;
 	MobData mob = entity->TypeData;
 	mob->Type = MobTypeSheep;
 	mob->ModelName = "Sheep";
