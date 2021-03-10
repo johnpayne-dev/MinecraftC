@@ -10,6 +10,7 @@ FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManag
 {
 	FontRenderer font = MemoryAllocate(sizeof(struct FontRenderer));
 	font->Settings = settings;
+	font->TextureName = name;
 	
 	SDL_RWops * file = SDL_RWFromFile("Default.png", "rb");
 	if (file == NULL) { LogFatal("Fialed to open file %s: %s\n", name, SDL_GetError()); }

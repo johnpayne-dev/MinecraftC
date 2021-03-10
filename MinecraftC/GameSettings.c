@@ -142,7 +142,8 @@ void GameSettingsToggleSetting(GameSettings settings, int setting, int var2)
 	if (setting == 6)
 	{
 		settings->Anaglyph = !settings->Anaglyph;
-		
+		TextureManagerReload(settings->Minecraft->TextureManager);
+		settings->Minecraft->Font->Texture = TextureManagerLoad(settings->Minecraft->TextureManager, settings->Minecraft->Font->TextureName);
 	}
 	if (setting == 7)
 	{

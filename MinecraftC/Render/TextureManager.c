@@ -11,7 +11,7 @@ TextureManager TextureManagerCreate(GameSettings settings)
 		.Settings = settings,
 		.Animations = ListCreate(sizeof(AnimatedTexture)),
 		.TextureBuffer = MemoryAllocate(512 * 512),
-		.Textures = ListCreate(sizeof(int)),
+		.Textures = ListCreate(sizeof(unsigned int)),
 		.TextureNames = ListCreate(sizeof(char *)),
 	};
 	return manager;
@@ -36,55 +36,36 @@ int TextureManagerLoad(TextureManager manager, char * resource)
 	SDL_RWclose(file);
 	
 	int width, height, channels;
-	unsigned char * pixels = stbi_load_from_memory(fileData, fileSize, &width, &height, &channels, 4);
-	if (pixels == NULL) { LogFatal("Failed to open file %s: %s\n", resource, stbi_failure_reason()); }
+	unsigned char * p = stbi_load_from_memory(fileData, fileSize, &width, &height, &channels, 4);
+	if (p == NULL) { LogFatal("Failed to open file %s: %s\n", resource, stbi_failure_reason()); }
 	MemoryFree(fileData);
+	
+	if (manager->Settings->Anaglyph)
+	{
+		for (int i = 0; i < 4 * width * height; i += 4)
+		{
+			Color color = { (p[i + 0] * 30 + p[i + 1] * 59 + p[i + 2] * 11) / 100, (p[i + 0] * 30 + p[i + 1] * 70) / 100, (p[i + 0] * 30 + p[i + 2] * 70) / 100, p[i + 3] };
+			memcpy(p + i, &color, sizeof(Color));
+		}
+	}
 	
 	glGenTextures(1, &manager->IDBuffer);
 	glBindTexture(GL_TEXTURE_2D, manager->IDBuffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	stbi_image_free(pixels);
-	/*
-	 GL11.glBindTexture(3553, var2);
-	       GL11.glTexParameteri(3553, 10241, 9728);
-	       GL11.glTexParameteri(3553, 10240, 9728);
-	       var2 = var1.getWidth();
-	       int var3 = var1.getHeight();
-	       int[] var4 = new int[var2 * var3];
-	       byte[] var5 = new byte[var2 * var3 << 2];
-	       var1.getRGB(0, 0, var2, var3, var4, 0, var2);
-
-	       for(int var11 = 0; var11 < var4.length; ++var11) {
-		  int var6 = var4[var11] >>> 24;
-		  int var7 = var4[var11] >> 16 & 255;
-		  int var8 = var4[var11] >> 8 & 255;
-		  int var9 = var4[var11] & 255;
-		  if(this.settings.anaglyph) {
-		     int var10 = (var7 * 30 + var8 * 59 + var9 * 11) / 100;
-		     var8 = (var7 * 30 + var8 * 70) / 100;
-		     var9 = (var7 * 30 + var9 * 70) / 100;
-		     var7 = var10;
-		     var8 = var8;
-		     var9 = var9;
-		  }
-
-		  var5[var11 << 2] = (byte)var7;
-		  var5[(var11 << 2) + 1] = (byte)var8;
-		  var5[(var11 << 2) + 2] = (byte)var9;
-		  var5[(var11 << 2) + 3] = (byte)var6;
-	       }
-
-	       this.textureBuffer.clear();
-	       this.textureBuffer.put(var5);
-	       this.textureBuffer.position(0).limit(var5.length);
-	       GL11.glTexImage2D(3553, 0, 6408, var2, var3, 0, 6408, 5121, this.textureBuffer);
-	 */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, p);
+	stbi_image_free(p);
 	
 	manager->TextureNames = ListPush(manager->TextureNames, &resource);
 	manager->Textures = ListPush(manager->Textures, &manager->IDBuffer);
 	return manager->IDBuffer;
+}
+
+void TextureManagerReload(TextureManager manager)
+{
+	for (int i = 0; i < ListCount(manager->Textures); i++) { glDeleteTextures(1, &manager->Textures[i]); }
+	manager->Textures = ListClear(manager->Textures);
+	manager->TextureNames = ListClear(manager->TextureNames);
 }
 
 void TextureManagerRegisterAnimation(TextureManager manager, AnimatedTexture texture)

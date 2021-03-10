@@ -5,7 +5,7 @@
 
 typedef struct TextureManager
 {
-	list(int) Textures;
+	list(unsigned int) Textures;
 	list(char *) TextureNames;
 	unsigned char * TextureBuffer;
 	unsigned int IDBuffer;
@@ -15,5 +15,6 @@ typedef struct TextureManager
 
 TextureManager TextureManagerCreate(GameSettings settings);
 int TextureManagerLoad(TextureManager textures, char * resource);
+void TextureManagerReload(TextureManager manager);
 void TextureManagerRegisterAnimation(TextureManager textures, AnimatedTexture texture);
 void TextureManagerDestroy(TextureManager textures);

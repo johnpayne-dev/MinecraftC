@@ -621,7 +621,7 @@ void MinecraftRun(Minecraft minecraft)
 					}
 					if (minecraft->Settings->Anaglyph)
 					{
-						renderer->FogColor.rgb = (float3){ renderer->FogColor.r * 30.0 + renderer->FogColor.b * 59.0 + renderer->FogColor.g * 100.0, renderer->FogColor.r * 30.0 + renderer->FogColor.b * 70.0, renderer->FogColor.r * 30.0 + renderer->FogColor.g * 70.0 } / 100.0;
+						renderer->FogColor.rgb = (float3){ renderer->FogColor.r * 30.0 + renderer->FogColor.g * 59.0 + renderer->FogColor.b * 11.0, renderer->FogColor.r * 30.0 + renderer->FogColor.g * 70.0, renderer->FogColor.r * 30.0 + renderer->FogColor.b * 70.0 } / 100.0;
 					}
 					
 					glClearColor(renderer->FogColor.r, renderer->FogColor.g, renderer->FogColor.b, 0.0);
@@ -736,7 +736,7 @@ void MinecraftRun(Minecraft minecraft)
 					float4 cloud = ColorToFloat4(level->CloudColor);
 					if (minecraft->Settings->Anaglyph)
 					{
-						cloud.rgb = (float3){ cloud.r * 30.0 + cloud.b * 59.0 + cloud.g * 11.0, cloud.r * 30.0 + cloud.b * 70.0, cloud.r * 30.0 + cloud.g * 70.0 } / 100.0;
+						cloud.rgb = (float3){ cloud.r * 30.0 + cloud.g * 59.0 + cloud.b * 11.0, cloud.r * 30.0 + cloud.g * 70.0, cloud.r * 30.0 + cloud.b * 70.0 } / 100.0;
 					}
 					float z = level->Depth + 2.0;
 					float t = 0.03 * (lrenderer->Ticks + delta);
@@ -763,7 +763,7 @@ void MinecraftRun(Minecraft minecraft)
 					sky = ColorToFloat4(level->SkyColor);
 					if (minecraft->Settings->Anaglyph)
 					{
-						sky.rgb = (float3){ sky.r * 30.0 + sky.b * 59.0 + sky.g * 11.0, sky.r * 30.0 + sky.b * 70.0, sky.r * 30.0 + sky.g * 70.0 } / 100.0;
+						sky.rgb = (float3){ sky.r * 30.0 + sky.g * 59.0 + sky.b * 11.0, sky.r * 30.0 + sky.g * 70.0, sky.r * 30.0 + sky.b * 70.0 } / 100.0;
 					}
 					ShapeRendererColor(sky.rgb);
 					z = level->Depth + 10.0;

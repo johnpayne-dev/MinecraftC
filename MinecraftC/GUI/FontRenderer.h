@@ -7,6 +7,7 @@
 typedef struct FontRenderer
 {
 	int WidthMap[256];
+	char * TextureName;
 	int Texture;
 	GameSettings Settings;
 } * FontRenderer;
