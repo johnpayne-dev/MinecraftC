@@ -212,7 +212,7 @@ void MobRenderModel(Mob mob, TextureManager textures, float anim, float t, float
 {
 	MobData this = mob->TypeData;
 	if (this->Type == MobTypeSheep) { return SheepRenderModel(mob, textures, anim, t, run, rot, offset); }
-	ModelRender(ModelManagerGetModel(MobModelCache, this->ModelName), anim, t, this->TickCount + t, rot, offset);
+	ModelRender(ModelManagerGetModel(MobModelCache, this->ModelName), anim, run, this->TickCount + t, rot, offset);
 	if (this->Type == MobTypeHumanoid || this->Type == MobTypeSkeleton || this->Type == MobTypeZombie) { HumanoidRenderModel(mob, textures, anim, t, run, rot, offset); }
 }
 

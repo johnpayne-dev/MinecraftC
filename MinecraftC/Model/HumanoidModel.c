@@ -1,4 +1,6 @@
 #include "HumanoidModel.h"
+#include "ZombieModel.h"
+#include "SkeletonModel.h"
 #include "../Utilities/Memory.h"
 
 HumanoidModel HumanoidModelCreate(float offset)
@@ -52,6 +54,7 @@ void HumanoidModelSetRotationAngles(HumanoidModel model, float anim, float t, fl
 	this->LeftLeg->Rotation.x = cos(anim * 0.6662 + pi) * 1.4 * t;
 	this->RightArm->Rotation.xz += (float2){ sin(run * 0.067) * 0.05, cos(run * 0.09) * 0.05 + 0.05 };
 	this->LeftArm->Rotation.xz -= (float2){ sin(run * 0.067) * 0.05, cos(run * 0.09) * 0.05 + 0.05 };
+	if (model->Type == ModelTypeZombie || model->Type == ModelTypeSkeleton) { ZombieModelSetRotationAngles(model, anim, t, run, rot, offset); }
 }
 
 void HumanoidModelDestroy(HumanoidModel model)

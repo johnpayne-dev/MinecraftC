@@ -10,7 +10,6 @@ ZombieModel ZombieModelCreate()
 void ZombieModelSetRotationAngles(ZombieModel model, float anim, float t, float run, float2 rot, float offset)
 {
 	HumanoidModelData this = model->TypeData;
-	HumanoidModelSetRotationAngles(model, anim, t, run, rot, offset);
 	float a = sin(model->AttackOffset * pi);
 	float b = sin((1.0 - (1.0 - model->AttackOffset) * (1.0 - model->AttackOffset)) * pi);
 	this->RightArm->Rotation = (float3){ -pi / 2.0, -(0.1 - a * 0.6), 0.0 };
