@@ -88,6 +88,7 @@ Block BlockCreate(BlockType type, int textureID)
 	{
 		.Type = type,
 		.TextureID = textureID,
+		.Explodable = true,
 	};
 	Blocks.Table[type] = block;
 	BlockSetBounds(block, zero3f, one3f);

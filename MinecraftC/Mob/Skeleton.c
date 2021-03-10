@@ -21,7 +21,7 @@ Skeleton SkeletonCreate(Level level, float3 pos)
 
 void SkeletonShootArrow(Skeleton skeleton, Level level)
 {
-	LevelAddEntity(level, ArrowCreate(level, skeleton, skeleton->Position, skeleton->Rotation + (float2){ -RandomUniform() * 45.0 - 10.0, RandomUniform() * 45.0 - 22.5 + 180.0 }, 2.0));
+	LevelAddEntity(level, ArrowCreate(level, skeleton, skeleton->Position, skeleton->Rotation.yx + (float2){ RandomUniform() * 45.0 - 22.5 + 180.0, -(RandomUniform() * 45.0 - 10.0) }, 1.0));
 }
 
 void SkeletonShootRandomArrow(Skeleton skeleton)
