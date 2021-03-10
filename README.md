@@ -1,5 +1,4 @@
-# MinecraftC
-## A 0.0.30a implementation in C
+# MinecraftC - A 0.0.30a implementation in C
 
 ## Features
 - True to the original version
@@ -28,4 +27,4 @@
 - [MinecraftC Raytraced Edition (WIP)](https://github.com/johnpayne-dev/MinecraftC-Raytraced)
 - MinecraftC Server (Future project)
 ## Discord
-Find any bugs? Want to show off something cool? Join our discord: https://discord.gg/2BVnXdU5rB
+Find any bugs? Want to show off something cool? Join our [discord server](https://discord.gg/2BVnXdU5rB).
