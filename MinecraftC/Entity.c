@@ -247,7 +247,7 @@ void EntityMove(Entity entity, float3 a)
 
 void EntityCauseFallDamage(Entity entity, float height)
 {
-	
+	if (entity->Type == EntityTypeMob) { MobCauseFallDamage(entity, height); }
 }
 
 bool EntityIsInWater(Entity entity)
