@@ -71,7 +71,7 @@ static void Render(FontRenderer font, char * str, int x, int y, Color color, boo
 				col.g = ((index & 2) >> 1) * 191 + col.r;
 				col.r = ((index & 4) >> 2) * 191 + col.r;
 				if (font->Settings->Anaglyph) { col.rgb = (int3){ col.r * 30 + col.g * 59 + col.b * 11, col.r * 30 + col.g * 70, col.r * 30 + col.b * 70 } / 100; }
-				Color color = ColorFromHex(col.r << 16 | col.g << 8 | col.b);
+				Color color = ColorFromHex(col.r << 24 | col.g << 16 | col.b << 8);
 				i += 2;
 				if (darken) { color.rgb >>= 2; }
 				ShapeRendererColor(ColorToFloat4(color).rgb);
