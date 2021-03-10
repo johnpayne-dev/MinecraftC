@@ -9,7 +9,8 @@ Arrow ArrowCreate(Level level, Entity owner, float3 pos, float2 rot, float g)
 {
 	Entity entity = EntityCreate(level);
 	entity->Type = EntityTypeArrow;
-	entity->HeightOffset = 0.25;
+	EntitySetSize(entity, 0.3, 0.5);
+	entity->HeightOffset = 0.25f;
 	entity->Slide = false;
 	entity->MakeStepSound = false;
 	float2 a1 = { cos(-rot.x * rad - pi), sin(-rot.x * rad - pi) };
@@ -17,7 +18,6 @@ Arrow ArrowCreate(Level level, Entity owner, float3 pos, float2 rot, float g)
 	entity->OldPosition.xz += (float2){ -a1.x, a1.y } * 0.2;
 	pos.xz += (float2){ -a1.x, a1.y } * 0.2;
 	EntitySetPosition(entity, pos);
-	EntitySetSize(entity, 0.3, 0.5);
 	ArrowData arrow = MemoryAllocate(sizeof(struct ArrowData));
 	*arrow = (struct ArrowData)
 	{
@@ -59,7 +59,7 @@ void ArrowTick(Arrow arrow)
 		this->Delta *= 0.998;
 		this->Delta.y -= 0.02 * this->Gravity;
 		int r = length3f(this->Delta) / 0.2 + 1.0;
-		float3 radius = this->Delta / r;
+		float3 radius = this->Delta / (float)r;
 		for (int i = 0; i < r && !arrow->Collision; i++)
 		{
 			AABB aabb = AABBExpand(arrow->AABB, radius);
