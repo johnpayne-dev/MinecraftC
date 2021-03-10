@@ -8,4 +8,6 @@
 	#include <gl/GL.h>
 	#include <gl/GLU.h>
 #elif defined(__linux)
+	#include <GL/gl.h>
+	#include <GL/glu.h>
 #endif
