@@ -1,3 +1,4 @@
+#include <string.h>
 #include <OpenGL.h>
 #include "Minecraft.h"
 #include "GameMode/CreativeMode.h"
