@@ -1,3 +1,4 @@
+#include <string.h>
 #include "GameSettings.h"
 #include "Minecraft.h"
 #include "KeyBinding.h"

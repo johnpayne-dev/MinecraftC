@@ -1,3 +1,4 @@
+#include <string.h>
 #include "LoadLevelScreen.h"
 #include "SaveLevelScreen.h"
 #include "../Minecraft.h"

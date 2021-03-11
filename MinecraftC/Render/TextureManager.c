@@ -1,3 +1,4 @@
+#include <string.h>
 #include <OpenGL.h>
 #include <stb_image.h>
 #include "TextureManager.h"
