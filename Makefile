@@ -8,7 +8,7 @@ CC := clang
 # flags -Og -g are currently here for debug, replace with -O2 or -O3 for release
 CFLAGS = -I$(CURDIR)/Include -Og -g -std=c11
 
-LDFLAGS = -L$(CURDIR)/Libraries -lm -lGL -lSDL2 -lGLU
+LDFLAGS = -L$(CURDIR)/Libraries -flto -lm -lGL -lSDL2 -lGLU
 
 .PHONY: all clean objs copy_resources
 
