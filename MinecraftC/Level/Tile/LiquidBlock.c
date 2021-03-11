@@ -61,7 +61,7 @@ static bool Flow(LiquidBlock block, Level level, int x, int y, int z)
 
 void LiquidBlockUpdate(LiquidBlock block, Level level, int x, int y, int z, RandomGenerator random)
 {
-	if (block->Type == BlockTypeStillWater || block->Type == BlockTypeStillLava) { return StillLiquidBlockUpdate(block, level, x, y, z, random); }
+	if (block->Type == BlockTypeStillWater || block->Type == BlockTypeStillLava) { StillLiquidBlockUpdate(block, level, x, y, z, random); return; }
 		
 	LiquidBlockData liquid = block->TypeData;
 	bool set = false;
@@ -133,7 +133,7 @@ LiquidType LiquidBlockGetLiquidType(LiquidBlock block)
 
 void LiquidBlockOnNeighborChanged(LiquidBlock block, Level level, int x, int y, int z, BlockType tile)
 {
-	if (block->Type == BlockTypeStillWater || block->Type == BlockTypeStillLava) { return StillLiquidBlockOnNeighborChanged(block, level, x, y, z, tile); }
+	if (block->Type == BlockTypeStillWater || block->Type == BlockTypeStillLava) { StillLiquidBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
 	
 	LiquidBlockData this = block->TypeData;
 	if (tile != BlockTypeNone)
