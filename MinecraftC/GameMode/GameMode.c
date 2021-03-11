@@ -23,12 +23,12 @@ void GameModeApply(GameMode mode, Level level)
 
 void GameModeOpenInventory(GameMode mode)
 {
-	if (mode->Type == GameModeTypeCreative) { return CreativeModeOpenInventory(mode); }
+	if (mode->Type == GameModeTypeCreative) { CreativeModeOpenInventory(mode); return; }
 }
 
 void GameModeHitBlock(GameMode mode, int x, int y, int z)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModeHitBlock(mode, x, y, z); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModeHitBlock(mode, x, y, z); return; }
 	GameModeBreakBlock(mode, x, y, z);
 }
 
@@ -63,17 +63,17 @@ void GameModeBreakBlock(GameMode mode, int x, int y, int z)
 
 void GameModeHitBlockSide(GameMode mode, int x, int y, int z, int side)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModeHitBlockSide(mode, x, y, z, side); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModeHitBlockSide(mode, x, y, z, side); return; }
 }
 
 void GameModeResetHits(GameMode mode)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModeResetHits(mode); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModeResetHits(mode); return; }
 }
 
 void GameModeApplyCracks(GameMode mode, float cracks)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModeApplyCracks(mode, cracks); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModeApplyCracks(mode, cracks); return; }
 }
 
 float GameModeGetReachDistance(GameMode mode)
@@ -90,17 +90,17 @@ bool GameModeUseItem(GameMode mode, Player player, BlockType blockType)
 
 void GameModePreparePlayer(GameMode mode, Player player)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModePreparePlayer(mode, player); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModePreparePlayer(mode, player); return; }
 }
 
 void GameModeSpawnMob(GameMode mode)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModeSpawnMob(mode); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModeSpawnMob(mode); return; }
 }
 
 void GameModePrepareLevel(GameMode mode, Level level)
 {
-	if (mode->Type == GameModeTypeSurvival) { return SurvivalModePrepareLevel(mode, level); }
+	if (mode->Type == GameModeTypeSurvival) { SurvivalModePrepareLevel(mode, level); return; }
 }
 
 bool GameModeIsSurvival(GameMode mode)
@@ -111,7 +111,7 @@ bool GameModeIsSurvival(GameMode mode)
 
 void GameModeApplyPlayer(GameMode mode, Player player)
 {
-	if (mode->Type == GameModeTypeCreative) { return CreativeModeApplyPlayer(mode, player); }
+	if (mode->Type == GameModeTypeCreative) { CreativeModeApplyPlayer(mode, player); return; }
 }
 
 void GameModeDestroy(GameMode mode)

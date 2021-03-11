@@ -125,7 +125,7 @@ void MobTick(Mob mob)
 void MobStepAI(Mob mob)
 {
 	MobData this = mob->TypeData;
-	if (this->Type == MobTypePlayer) { return PlayerStepAI(mob); }
+	if (this->Type == MobTypePlayer) { PlayerStepAI(mob); return; }
 	if (this->AI != NULL) { AITick(this->AI, mob->Level, mob); }
 	if (this->Type == MobTypeSheep) { SheepStepAI(mob); }
 }
@@ -133,7 +133,7 @@ void MobStepAI(Mob mob)
 void MobBindTexture(Mob mob, TextureManager textures)
 {
 	MobData this = mob->TypeData;
-	if (this->Type == MobTypePlayer) { return PlayerBindTexture(mob, textures); }
+	if (this->Type == MobTypePlayer) { PlayerBindTexture(mob, textures); return; }
 	mob->TextureID = TextureManagerLoad(textures, (char *)this->TextureName);
 	glBindTexture(GL_TEXTURE_2D, mob->TextureID);
 }
@@ -141,7 +141,7 @@ void MobBindTexture(Mob mob, TextureManager textures)
 void MobRender(Mob mob, TextureManager textures, float t)
 {
 	MobData this = mob->TypeData;
-	if (this->Type == MobTypePlayer) { return PlayerRender(mob, textures, t); }
+	if (this->Type == MobTypePlayer) { PlayerRender(mob, textures, t); return; }
 	if (this->ModelName == NULL) { return; }
 	
 	float attack = this->AttackTime - t;
@@ -211,7 +211,7 @@ void MobRender(Mob mob, TextureManager textures, float t)
 void MobRenderModel(Mob mob, TextureManager textures, float anim, float t, float run, float2 rot, float offset)
 {
 	MobData this = mob->TypeData;
-	if (this->Type == MobTypeSheep) { return SheepRenderModel(mob, textures, anim, t, run, rot, offset); }
+	if (this->Type == MobTypeSheep) { SheepRenderModel(mob, textures, anim, t, run, rot, offset); return; }
 	ModelRender(ModelManagerGetModel(MobModelCache, this->ModelName), anim, run, this->TickCount + t, rot, offset);
 	if (this->Type == MobTypeHumanoid || this->Type == MobTypeSkeleton || this->Type == MobTypeZombie) { HumanoidRenderModel(mob, textures, anim, t, run, rot, offset); }
 }
@@ -230,8 +230,8 @@ void MobHeal(Mob mob, int health)
 void MobHurt(Mob mob, Entity entity, int damage)
 {
 	MobData this = mob->TypeData;
-	if (this->Type == MobTypeSheep && ((SheepData)this->TypeData)->HasFur && entity != NULL && ((MobData)entity->TypeData)->Type == MobTypePlayer) { return SheepHurt(mob, entity, damage); }
-	if (this->Type == MobTypePlayer) { return PlayerHurt(mob, entity, damage); }
+	if (this->Type == MobTypeSheep && ((SheepData)this->TypeData)->HasFur && entity != NULL && ((MobData)entity->TypeData)->Type == MobTypePlayer) { SheepHurt(mob, entity, damage); return; }
+	if (this->Type == MobTypePlayer) { PlayerHurt(mob, entity, damage); return; }
 	
 	if (mob->Level->CreativeMode) { return; }
 	if (this->Health <= 0) { return; }
@@ -276,7 +276,7 @@ void MobDie(Mob mob, Entity entity)
 	MobData this = mob->TypeData;
 	if (this->Type == MobTypePig) { PigDie(mob, entity); }
 	if (this->Type == MobTypeSheep) { SheepDie(mob, entity); }
-	if (this->Type == MobTypePlayer) { return PlayerDie(mob, entity); }
+	if (this->Type == MobTypePlayer) { PlayerDie(mob, entity); return; }
 	
 	if (!mob->Level->CreativeMode)
 	{

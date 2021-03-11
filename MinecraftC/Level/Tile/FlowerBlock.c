@@ -16,8 +16,8 @@ FlowerBlock FlowerBlockCreate(BlockType type, int textureID)
 
 void FlowerBlockUpdate(FlowerBlock block, Level level, int x, int y, int z, RandomGenerator random)
 {
-	if (block->Type == BlockTypeRedMushroom || block->Type == BlockTypeBrownMushroom) { return MushroomBlockUpdate(block, level, x, y, z, random); }
-	if (block->Type == BlockTypeSapling) { return SaplingBlockUpdate(block, level, x, y, z, random); }
+	if (block->Type == BlockTypeRedMushroom || block->Type == BlockTypeBrownMushroom) { MushroomBlockUpdate(block, level, x, y, z, random); return; }
+	if (block->Type == BlockTypeSapling) { SaplingBlockUpdate(block, level, x, y, z, random); return; }
 	
 	if (!level->GrowTrees)
 	{

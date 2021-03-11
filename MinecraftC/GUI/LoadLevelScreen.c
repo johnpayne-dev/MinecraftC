@@ -29,7 +29,7 @@ void LoadLevelScreenRun(LoadLevelScreen screen)
 
 void LoadLevelScreenSetLevels(LoadLevelScreen screen, char * levels[5])
 {
-	if (screen->Type == GUIScreenTypeSaveLevel) { return SaveLevelScreenSetLevels(screen, levels); }
+	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenSetLevels(screen, levels); return; }
 	for (int i = 0; i < 5; i++)
 	{
 		screen->Buttons[i]->Active = !(strcmp(levels[i], "-") == 0);
@@ -49,7 +49,7 @@ void LoadLevelScreenOnOpen(LoadLevelScreen screen)
 	}
 	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(5, screen->Width / 2 - 100, screen->Height / 6 + 132, "Load file...") });
 	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(6, screen->Width / 2 - 100, screen->Height / 6 + 168, "Cancel") });
-	if (screen->Type == GUIScreenTypeSaveLevel) { return SaveLevelScreenOnOpen(screen); }
+	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenOnOpen(screen); return; }
 }
 
 void LoadLevelScreenOnButtonClicked(LoadLevelScreen screen, Button button)
@@ -78,7 +78,7 @@ void LoadLevelScreenOnButtonClicked(LoadLevelScreen screen, Button button)
 
 void LoadLevelScreenOpenLevel(LoadLevelScreen screen, int level)
 {
-	if (screen->Type == GUIScreenTypeSaveLevel) { return SaveLevelScreenOpenLevel(screen, level); }
+	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevel(screen, level); return; }
 	MinecraftLoadOnlineLevel(screen->Minecraft, screen->Minecraft->Session->UserName, level);
 	MinecraftSetCurrentScreen(screen->Minecraft, NULL);
 	MinecraftGrabMouse(screen->Minecraft);
@@ -86,7 +86,7 @@ void LoadLevelScreenOpenLevel(LoadLevelScreen screen, int level)
 
 void LoadLevelScreenOpenLevelFromFile(LoadLevelScreen screen, char * file)
 {
-	if (screen->Type == GUIScreenTypeSaveLevel) { return SaveLevelScreenOpenLevelFromFile(screen, file); }
+	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevelFromFile(screen, file); return; }
 	LoadLevelScreenData this = screen->TypeData;
 	Level level = LevelIOLoad(screen->Minecraft->LevelIO, SDL_RWFromFile(file, "rb"));
 	if (level != NULL) { MinecraftSetLevel(screen->Minecraft, level); }
@@ -126,7 +126,7 @@ void LoadLevelScreenRender(LoadLevelScreen screen, int2 mousePos)
 		GUIScreenRender(screen, mousePos);
 		screen->Type = GUIScreenTypeLoadLevel;
 	}
-	if (screen->Type == GUIScreenTypeSaveLevel) { return SaveLevelScreenRender(screen, mousePos); }
+	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenRender(screen, mousePos); return; }
 }
 
 void LoadLevelScreenDestroy(LoadLevelScreen screen)

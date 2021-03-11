@@ -72,15 +72,15 @@ void BasicAITick(BasicAI ai, Level level, Entity mob)
 void BasicAIJumpFromGround(BasicAI ai)
 {
 	BasicAIData this = ai->TypeData;
-	if (this->Type == BasicAITypeBasicAttack && ((BasicAttackAIData)this->TypeData)->Type == BasicAttackAIJumpAttack && this->AttackTarget != NULL) { return JumpAttackAIJumpFromGround(ai); }
+	if (this->Type == BasicAITypeBasicAttack && ((BasicAttackAIData)this->TypeData)->Type == BasicAttackAIJumpAttack && this->AttackTarget != NULL) { JumpAttackAIJumpFromGround(ai); return; }
 	this->Mob->Delta.y = 0.42;
 }
 
 void BasicAIUpdate(BasicAI ai)
 {
 	BasicAIData this = ai->TypeData;
-	if (this->Type == BasicAITypeSheep) { return SheepAIUpdate(ai); }
-	if (this->Type == BasicAITypePlayer) { return PlayerAIUpdate(ai); }
+	if (this->Type == BasicAITypeSheep) { SheepAIUpdate(ai); return; }
+	if (this->Type == BasicAITypePlayer) { PlayerAIUpdate(ai); return; }
 	
 	if (RandomGeneratorUniform(this->Random) < 0.07) { this->XY = (float2){ RandomGeneratorUniform(this->Random) - 0.5, RandomGeneratorUniform(this->Random) } * this->RunSpeed; }
 	this->Jumping = RandomGeneratorUniform(this->Random) < 0.01;
@@ -101,8 +101,8 @@ void BasicAIUpdate(BasicAI ai)
 void BasicAIBeforeRemove(BasicAI ai)
 {
 	BasicAIData this = ai->TypeData;
-	if (this->Type == BasicAITypeBasicAttack && ((BasicAttackAIData)this->TypeData)->Type == BasicAttackAITypeCreeper) { return CreeperAIBeforeRemove(ai); }
-	if (this->Type == BasicAITypeBasicAttack && ((BasicAttackAIData)this->TypeData)->Type == BasicAttackAITypeSkeleton) { return SkeletonAIBeforeRemove(ai); }
+	if (this->Type == BasicAITypeBasicAttack && ((BasicAttackAIData)this->TypeData)->Type == BasicAttackAITypeCreeper) { CreeperAIBeforeRemove(ai); return; }
+	if (this->Type == BasicAITypeBasicAttack && ((BasicAttackAIData)this->TypeData)->Type == BasicAttackAITypeSkeleton) { SkeletonAIBeforeRemove(ai); return; }
 }
 
 void BasicAIHurt(BasicAI ai, Entity entity, int damage)

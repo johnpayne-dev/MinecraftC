@@ -27,17 +27,17 @@ GUIScreen GUIScreenCreate()
 
 void GUIScreenRender(GUIScreen screen, int2 m)
 {
-	if (screen->Type == GUIScreenTypeBlockSelect) { return BlockSelectScreenRender(screen, m); }
-	if (screen->Type == GUIScreenTypeChatInput) { return ChatInputScreenRender(screen, m); }
+	if (screen->Type == GUIScreenTypeBlockSelect) { BlockSelectScreenRender(screen, m); return; }
+	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenRender(screen, m); return; }
 	if (screen->Type == GUIScreenTypeControls) { ControlsScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeError) { ErrorScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeGameOver) { GameOverScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenRender(screen, m); }
-	if (screen->Type == GUIScreenTypeLoadLevel) { return LoadLevelScreenRender(screen, m); }
+	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenRender(screen, m); return; }
 	if (screen->Type == GUIScreenTypeOptions) { OptionsScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypePause) { PauseScreenRender(screen, m); }
-	if (screen->Type == GUIScreenTypeSaveLevel) { return LoadLevelScreenRender(screen, m); }
+	if (screen->Type == GUIScreenTypeSaveLevel) { LoadLevelScreenRender(screen, m); return; }
 	
 	for (int i = 0; i < ListCount(screen->Buttons); i++)
 	{
@@ -62,10 +62,10 @@ void GUIScreenRender(GUIScreen screen, int2 m)
 
 void GUIScreenOnKeyPressed(GUIScreen screen, char eventChar, int eventKey)
 {
-	if (screen->Type == GUIScreenTypeChatInput) { return ChatInputScreenOnKeyPressed(screen, eventChar, eventKey); }
-	if (screen->Type == GUIScreenTypeControls) { return ControlsScreenOnKeyPressed(screen, eventChar, eventKey); }
-	if (screen->Type == GUIScreenTypeError) { return ErrorScreenOnKeyPressed(screen, eventChar, eventKey); }
-	if (screen->Type == GUIScreenTypeLevelName) { return LevelNameScreenOnKeyPressed(screen, eventChar, eventKey); }
+	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenOnKeyPressed(screen, eventChar, eventKey); return; }
+	if (screen->Type == GUIScreenTypeControls) { ControlsScreenOnKeyPressed(screen, eventChar, eventKey); return; }
+	if (screen->Type == GUIScreenTypeError) { ErrorScreenOnKeyPressed(screen, eventChar, eventKey); return; }
+	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenOnKeyPressed(screen, eventChar, eventKey); return; }
 	if (eventKey == SDL_SCANCODE_ESCAPE)
 	{
 		MinecraftGrabMouse(screen->Minecraft);
@@ -75,8 +75,8 @@ void GUIScreenOnKeyPressed(GUIScreen screen, char eventChar, int eventKey)
 
 void GUIScreenOnMouseClicked(GUIScreen screen, int x, int y, int button)
 {
-	if (screen->Type == GUIScreenTypeBlockSelect) { return BlockSelectScreenOnMouseClicked(screen, x, y, button); }
-	if (screen->Type == GUIScreenTypeChatInput) { return ChatInputScreenOnMouseClicked(screen, x, y, button); }
+	if (screen->Type == GUIScreenTypeBlockSelect) { BlockSelectScreenOnMouseClicked(screen, x, y, button); return; }
+	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenOnMouseClicked(screen, x, y, button); return; }
 	if (button == SDL_BUTTON_LEFT)
 	{
 		for (int i = 0; i < ListCount(screen->Buttons); i++)
@@ -89,14 +89,14 @@ void GUIScreenOnMouseClicked(GUIScreen screen, int x, int y, int button)
 
 void GUIScreenOnButtonClicked(GUIScreen screen, Button button)
 {
-	if (screen->Type == GUIScreenTypeControls) { return ControlsScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypeGameOver) { return GameOverScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypeGenerateLevel) { return GenerateLevelScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypeLevelName) { return LevelNameScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypeLoadLevel) { return LoadLevelScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypeOptions) { return OptionsScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypePause) { return PauseScreenOnButtonClicked(screen, button); }
-	if (screen->Type == GUIScreenTypeSaveLevel) { return LoadLevelScreenOnButtonClicked(screen, button); }
+	if (screen->Type == GUIScreenTypeControls) { ControlsScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypeGameOver) { GameOverScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypeOptions) { OptionsScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypePause) { PauseScreenOnButtonClicked(screen, button); return; }
+	if (screen->Type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnButtonClicked(screen, button); return; }
 }
 
 void GUIScreenOpen(GUIScreen screen, Minecraft minecraft, int width, int height)
@@ -110,16 +110,16 @@ void GUIScreenOpen(GUIScreen screen, Minecraft minecraft, int width, int height)
 
 void GUIScreenOnOpen(GUIScreen screen)
 {
-	if (screen->Type == GUIScreenTypeChatInput) { return ChatInputScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeControls) { return ControlsScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeError) { return ErrorScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeGameOver) { return GameOverScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeGenerateLevel) { return GenerateLevelScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeLevelName) { return LevelNameScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeLoadLevel) { return LoadLevelScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeOptions) { return OptionsScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypePause) { return PauseScreenOnOpen(screen); }
-	if (screen->Type == GUIScreenTypeSaveLevel) { return LoadLevelScreenOnOpen(screen); }
+	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeControls) { ControlsScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeError) { ErrorScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeGameOver) { GameOverScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeOptions) { OptionsScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypePause) { PauseScreenOnOpen(screen); return; }
+	if (screen->Type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnOpen(screen); return; }
 }
 
 void GUIScreenDoInput(GUIScreen screen, list(SDL_Event) events)
@@ -151,18 +151,18 @@ void GUIScreenKeyboardEvent(GUIScreen screen, SDL_Event event)
 
 void GUIScreenTick(GUIScreen screen)
 {
-	if (screen->Type == GUIScreenTypeChatInput) { return ChatInputScreenTick(screen); }
-	if (screen->Type == GUIScreenTypeLevelName) { return LevelNameScreenTick(screen); }
-	if (screen->Type == GUIScreenTypeLoadLevel) { return LoadLevelScreenTick(screen); }
-	if (screen->Type == GUIScreenTypeSaveLevel) { return LoadLevelScreenTick(screen); }
+	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenTick(screen); return; }
+	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenTick(screen); return; }
+	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenTick(screen); return; }
+	if (screen->Type == GUIScreenTypeSaveLevel) { LoadLevelScreenTick(screen); return; }
 }
 
 void GUIScreenOnClose(GUIScreen screen)
 {
-	if (screen->Type == GUIScreenTypeChatInput) { return ChatInputScreenOnClose(screen); }
-	if (screen->Type == GUIScreenTypeLevelName) { return LevelNameScreenOnClose(screen); }
-	if (screen->Type == GUIScreenTypeLoadLevel) { return LoadLevelScreenOnClose(screen); }
-	if (screen->Type == GUIScreenTypeSaveLevel) { return LoadLevelScreenOnClose(screen); }
+	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenOnClose(screen); return; }
+	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenOnClose(screen); return; }
+	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnClose(screen); return; }
+	if (screen->Type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnClose(screen); return; }
 }
 
 void GUIScreenDestroy(GUIScreen screen)

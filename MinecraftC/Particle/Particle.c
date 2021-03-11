@@ -63,7 +63,7 @@ void ParticleTick(Particle particle)
 void ParticleRender(Particle particle, float t, float3 v1, float v6, float v7)
 {
 	ParticleData this = particle->TypeData;
-	if (this->Type == ParticleTypeTerrain) { return TerrainParticleRender(particle, t, v1, v6, v7); }
+	if (this->Type == ParticleTypeTerrain) { TerrainParticleRender(particle, t, v1, v6, v7); return; }
 
 	float2 uv0 = { ((this->Texture % 16) + this->UV.x / 4.0F) / 16.0F, ((this->Texture / 16) + this->UV.y / 4.0F) / 16.0F };
 	float2 uv1 = uv0 + 0.0624375;

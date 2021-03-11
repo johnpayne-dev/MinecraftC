@@ -14,15 +14,15 @@ Model ModelCreate()
 
 void ModelRender(Model model, float anim, float t, float run, float2 rot, float offset)
 {
-	if (model->Type == ModelTypeAnimal) { return AnimalModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeCreeper) { return CreeperModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeHumanoid) { return HumanoidModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypePig) { return AnimalModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeSheepFur) { return AnimalModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeSheep) { return AnimalModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeSkeleton) { return HumanoidModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeSpider) { return SpiderModelRender(model, anim, t, run, rot, offset); }
-	if (model->Type == ModelTypeZombie) { return HumanoidModelRender(model, anim, t, run, rot, offset); }
+	if (model->Type == ModelTypeAnimal) { AnimalModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeCreeper) { CreeperModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeHumanoid) { HumanoidModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypePig) { AnimalModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeSheepFur) { AnimalModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeSheep) { AnimalModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeSkeleton) { HumanoidModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeSpider) { SpiderModelRender(model, anim, t, run, rot, offset); return; }
+	if (model->Type == ModelTypeZombie) { HumanoidModelRender(model, anim, t, run, rot, offset); return; }
 }
 
 void ModelDestroy(Model model)

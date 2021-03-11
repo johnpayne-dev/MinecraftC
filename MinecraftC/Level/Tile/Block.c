@@ -139,7 +139,7 @@ void BlockSetTickDelay(Block block, int tickDelay)
 
 void BlockRenderFullBrightness(Block block)
 {
-	if (IsFlowerBlock(block->Type)) { return FlowerBlockRenderFullBrightness(block); }
+	if (IsFlowerBlock(block->Type)) { FlowerBlockRenderFullBrightness(block); return; }
 	
 	ShapeRendererColor(one3f * 0.5);
 	BlockRenderInside(block, -2, 0, 0, 0);
@@ -291,9 +291,9 @@ bool BlockIsSolid(Block block)
 
 void BlockUpdate(Block block, Level level, int x, int y, int z, RandomGenerator random)
 {
-	if (IsFlowerBlock(block->Type)) { return FlowerBlockUpdate(block, level, x, y, z, random); }
-	if (block->Type == BlockTypeGrass) { return GrassBlockUpdate(block, level, x, y, z, random); }
-	if (IsLiquidBlock(block->Type)) { return LiquidBlockUpdate(block, level, x, y, z, random); }
+	if (IsFlowerBlock(block->Type)) { FlowerBlockUpdate(block, level, x, y, z, random); return; }
+	if (block->Type == BlockTypeGrass) { GrassBlockUpdate(block, level, x, y, z, random); return; }
+	if (IsLiquidBlock(block->Type)) { LiquidBlockUpdate(block, level, x, y, z, random); return; }
 }
 
 void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, ParticleManager particles)
@@ -337,15 +337,15 @@ LiquidType BlockGetLiquidType(Block block)
 
 void BlockOnNeighborChanged(Block block, Level level, int x, int y, int z, BlockType tile)
 {
-	if (IsLiquidBlock(block->Type)) { return LiquidBlockOnNeighborChanged(block, level, x, y, z, tile); }
-	if (IsSandBlock(block->Type)) { return SandBlockOnNeighborChanged(block, level, x, y, z, tile); }
-	if (IsSlabBlock(block->Type)) { return SlabBlockOnNeighborChanged(block, level, x, y, z, tile); }
+	if (IsLiquidBlock(block->Type)) { LiquidBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
+	if (IsSandBlock(block->Type)) { SandBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
+	if (IsSlabBlock(block->Type)) { SlabBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
 }
 
 void BlockOnPlaced(Block block, Level level, int x, int y, int z)
 {
-	if (IsLiquidBlock(block->Type)) { return LiquidBlockOnPlaced(block, level, x, y, z); }
-	if (IsSandBlock(block->Type)) { return SandBlockOnPlaced(block, level, x, y, z); }
+	if (IsLiquidBlock(block->Type)) { LiquidBlockOnPlaced(block, level, x, y, z); return; }
+	if (IsSandBlock(block->Type)) { SandBlockOnPlaced(block, level, x, y, z); return; }
 }
 
 int BlockGetTickDelay(Block block)
@@ -356,13 +356,13 @@ int BlockGetTickDelay(Block block)
 
 void BlockOnAdded(Block block, Level level, int x, int y, int z)
 {
-	if (IsSlabBlock(block->Type)) { return SlabBlockOnAdded(block, level, x, y, z); }
-	if (block->Type == BlockTypeSponge) { return SpongeBlockOnAdded(block, level, x, y, z); }
+	if (IsSlabBlock(block->Type)) { SlabBlockOnAdded(block, level, x, y, z); return; }
+	if (block->Type == BlockTypeSponge) { SpongeBlockOnAdded(block, level, x, y, z); return; }
 }
 
 void BlockOnRemoved(Block block, Level level, int x, int y, int z)
 {
-	if (block->Type == BlockTypeSponge) { return SpongeBlockOnRemoved(block, level, x, y, z); }
+	if (block->Type == BlockTypeSponge) { SpongeBlockOnRemoved(block, level, x, y, z); return; }
 }
 
 int BlockGetDropCount(Block block)
@@ -394,13 +394,13 @@ int BlockGetHardness(Block block)
 
 void BlockOnBreak(Block block, Level level, int x, int y, int z)
 {
-	if (IsLiquidBlock(block->Type)) { return LiquidBlockOnBreak(block, level, x, y, z); }
+	if (IsLiquidBlock(block->Type)) { LiquidBlockOnBreak(block, level, x, y, z); return; }
 	BlockDropItems(block, level, x, y, z, 1.0);
 }
 
 void BlockDropItems(Block block, Level level, int x, int y, int z, float probability)
 {
-	if (IsLiquidBlock(block->Type)) { return LiquidBlockDropItems(block, level, x, y, z, probability); }
+	if (IsLiquidBlock(block->Type)) { LiquidBlockDropItems(block, level, x, y, z, probability); return; }
 	
 	if (!level->CreativeMode)
 	{
@@ -419,7 +419,7 @@ void BlockDropItems(Block block, Level level, int x, int y, int z, float probabi
 
 void BlockRenderPreview(Block block)
 {
-	if (IsFlowerBlock(block->Type)) { return FlowerBlockRenderPreview(block); }
+	if (IsFlowerBlock(block->Type)) { FlowerBlockRenderPreview(block); return; }
 	ShapeRendererBegin();
 	for (int i = 0; i < 6; i++)
 	{
@@ -452,7 +452,7 @@ MovingObjectPosition BlockClip(Block block, int x, int y, int z, float3 v1, floa
 
 void BlockExplode(Block block, Level level, int x, int y, int z)
 {
-	if (block->Type == BlockTypeTNT) { return TNTBlockExplode(block, level, x, y, z); }
+	if (block->Type == BlockTypeTNT) { TNTBlockExplode(block, level, x, y, z); return; }
 }
 
 bool BlockRender(Block block, Level level, int x, int y, int z)

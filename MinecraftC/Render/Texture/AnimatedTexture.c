@@ -15,8 +15,8 @@ AnimatedTexture AnimatedTextureCreate(int textureID)
 
 void AnimatedTextureAnimate(AnimatedTexture texture)
 {
-	if (texture->Type == AnimatedTextureTypeLava) { return LavaTextureAnimate(texture); }
-	if (texture->Type == AnimatedTextureTypeWater) { return WaterTextureAnimate(texture); }
+	if (texture->Type == AnimatedTextureTypeLava) { LavaTextureAnimate(texture); return; }
+	if (texture->Type == AnimatedTextureTypeWater) { WaterTextureAnimate(texture); return; }
 }
 
 void AnimatedTextureDestroy(AnimatedTexture texture)

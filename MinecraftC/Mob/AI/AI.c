@@ -10,17 +10,17 @@ AI AICreate(void)
 
 void AITick(AI ai, Level level, Entity mob)
 {
-	if (ai->Type == AITypeBasic) { return BasicAITick(ai, level, mob); }
+	if (ai->Type == AITypeBasic) { BasicAITick(ai, level, mob); return; }
 }
 
 void AIBeforeRemove(AI ai)
 {
-	if (ai->Type == AITypeBasic) { return BasicAIBeforeRemove(ai); }
+	if (ai->Type == AITypeBasic) { BasicAIBeforeRemove(ai); return; }
 }
 
 void AIHurt(AI ai, Entity entity, int damage)
 {
-	if (ai->Type == AITypeBasic) { return BasicAIHurt(ai, entity, damage); }
+	if (ai->Type == AITypeBasic) { BasicAIHurt(ai, entity, damage); return; }
 }
 
 void AIDestroy(AI ai)

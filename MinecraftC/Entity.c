@@ -40,7 +40,7 @@ Entity EntityCreate(Level level)
 
 void EntityResetPosition(Entity entity)
 {
-	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { return PlayerResetPosition(entity); }
+	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { PlayerResetPosition(entity); return; }
 	if (entity->Level != NULL)
 	{
 		float2 spawn = { entity->Level->Spawn.x + 0.5, entity->Level->Spawn.y };
@@ -65,7 +65,7 @@ void EntityResetPosition(Entity entity)
 
 void EntityRemove(Entity entity)
 {
-	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { return PlayerRemove(entity); }
+	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { PlayerRemove(entity); return; }
 	entity->Removed = true;
 }
 
@@ -99,17 +99,17 @@ void EntityInterpolateTurn(Entity entity, float2 angle)
 
 void EntityTick(Entity entity)
 {
-	if (entity->Type == EntityTypeItem) { return ItemTick(entity); }
-	if (entity->Type == EntityTypeTakeAnimation) { return TakeAnimationTick(entity); }
-	if (entity->Type == EntityTypePrimedTNT) { return PrimedTNTTick(entity); }
-	if (entity->Type == EntityTypeArrow) { return ArrowTick(entity); }
-	if (entity->Type == EntityTypeParticle) { return ParticleTick(entity); }
+	if (entity->Type == EntityTypeItem) { ItemTick(entity); return; }
+	if (entity->Type == EntityTypeTakeAnimation) { TakeAnimationTick(entity); return; }
+	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
+	if (entity->Type == EntityTypeArrow) { ArrowTick(entity); return; }
+	if (entity->Type == EntityTypeParticle) { ParticleTick(entity); return; }
 	
 	entity->OldWalkDistance = entity->WalkDistance;
 	entity->OldPosition = entity->Position;
 	entity->OldRotation = entity->Rotation;
 	
-	if (entity->Type == EntityTypeMob) { return MobTick(entity); }
+	if (entity->Type == EntityTypeMob) { MobTick(entity); return; }
 }
 
 bool EntityIsFree(Entity entity, float3 a)
@@ -294,11 +294,11 @@ float EntityGetBrightness(Entity entity, float t)
 
 void EntityRender(Entity entity, TextureManager textures, float t)
 {
-	if (entity->Type == EntityTypeItem) { return ItemRender(entity, textures, t); }
-	if (entity->Type == EntityTypeTakeAnimation) { return TakeAnimationRender(entity, textures, t); }
-	if (entity->Type == EntityTypePrimedTNT) { return PrimedTNTRender(entity, textures, t); }
-	if (entity->Type == EntityTypeArrow) { return ArrowRender(entity, textures, t); }
-	if (entity->Type == EntityTypeMob) { return MobRender(entity, textures, t); }
+	if (entity->Type == EntityTypeItem) { ItemRender(entity, textures, t); return; }
+	if (entity->Type == EntityTypeTakeAnimation) { TakeAnimationRender(entity, textures, t); return; }
+	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTRender(entity, textures, t); return; }
+	if (entity->Type == EntityTypeArrow) { ArrowRender(entity, textures, t); return; }
+	if (entity->Type == EntityTypeMob) { MobRender(entity, textures, t); return; }
 }
 
 void EntitySetLevel(Entity entity, Level level)
@@ -336,9 +336,9 @@ float EntitySquaredDistanceTo(Entity entityA, Entity entityB)
 
 void EntityPlayerTouch(Entity entity, Entity player)
 {
-	if (entity->Type == EntityTypeItem) { return ItemPlayerTouch(entity, player); }
-	if (entity->Type == EntityTypePrimedTNT) { return PrimedTNTPlayerTouch(entity, player); }
-	if (entity->Type == EntityTypeArrow) { return ArrowPlayerTouch(entity, player); }
+	if (entity->Type == EntityTypeItem) { ItemPlayerTouch(entity, player); return; }
+	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTPlayerTouch(entity, player); return; }
+	if (entity->Type == EntityTypeArrow) { ArrowPlayerTouch(entity, player); return; }
 }
 
 void EntityPush(Entity entityA, Entity entityB)
@@ -359,8 +359,8 @@ void EntityPushTowards(Entity entity, float3 point)
 
 void EntityHurt(Entity entityA, Entity entityB, int damage)
 {
-	if (entityA->Type == EntityTypePrimedTNT) { return PrimedTNTHurt(entityA, entityB, damage); }
-	if (entityA->Type == EntityTypeMob) { return MobHurt(entityA, entityB, damage); }
+	if (entityA->Type == EntityTypePrimedTNT) { PrimedTNTHurt(entityA, entityB, damage); return; }
+	if (entityA->Type == EntityTypeMob) { MobHurt(entityA, entityB, damage); return; }
 }
 
 bool EntityIntersects(Entity entity, float3 v0, float3 v1)
@@ -389,8 +389,8 @@ bool EntityIsShootable(Entity entity)
 
 void EntityAwardKillScore(Entity entityA, Entity entityB, int score)
 {
-	if (entityA->Type == EntityTypeArrow) { return ArrowAwardKillScore(entityA, entityB, score); }
-	if (entityA->Type == EntityTypeMob && ((MobData)entityA->TypeData)->Type == MobTypePlayer) { return PlayerAwardKillScore(entityA, entityB, score); }
+	if (entityA->Type == EntityTypeArrow) { ArrowAwardKillScore(entityA, entityB, score); return; }
+	if (entityA->Type == EntityTypeMob && ((MobData)entityA->TypeData)->Type == MobTypePlayer) { PlayerAwardKillScore(entityA, entityB, score); return; }
 }
 
 bool EntityShouldRender(Entity entity, float3 v)
