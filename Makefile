@@ -10,19 +10,19 @@ CFLAGS = -I$(CURDIR)/Include -Og -g -std=c11
 
 LDFLAGS = -L$(CURDIR)/Libraries -lm -lGL -lSDL2 -lGLU
 
-.PHONY: all clean
+.PHONY: all clean objs copy_resources
 
-all: ./bin $(OBJS) ./bin/MinecraftC
+all: ./bin ./bin/MinecraftC 
 
 %.o: %.c
 	cd bin/obj; $(CC) $(CFLAGS) -c ../../$^
 
-./bin/MinecraftC:
+./bin/MinecraftC: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ ./bin/obj/*.o
+	cp -vr Resources/* bin/
 
 ./bin:
 	mkdir -p bin/obj
 
-clean: 
-	rm -rf bin/obj
-	rm -f bin/MinecraftC
+clean:
+	rm -rf bin
