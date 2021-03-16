@@ -14,7 +14,7 @@ BasicAI BasicAICreate()
 	BasicAIData basicAI = MemoryAllocate(sizeof(struct BasicAIData));
 	*basicAI = (struct BasicAIData)
 	{
-		.Random = RandomGeneratorCreate(TimeNano()),
+		.Random = RandomGeneratorCreate(time(NULL)),
 		.Jumping = false,
 		.AttackDelay = 0,
 		.RunSpeed = 0.7,

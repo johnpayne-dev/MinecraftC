@@ -9,7 +9,7 @@ Level LevelCreate()
 	*level = (struct Level)
 	{
 		.Renderers = ListCreate(sizeof(LevelRenderer)),
-		.Random = RandomGeneratorCreate(TimeNano()),
+		.Random = RandomGeneratorCreate(time(NULL)),
 		.TickList = ListCreate(sizeof(NextTickListEntry)),
 		.NetworkMode = false,
 		.Unprocessed = 0,

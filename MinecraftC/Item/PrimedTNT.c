@@ -63,7 +63,7 @@ void PrimedTNTTick(PrimedTNT tnt)
 		else
 		{
 			EntityRemove(tnt);
-			RandomGenerator random = RandomGeneratorCreate(TimeNano());
+			RandomGenerator random = RandomGeneratorCreate(time(NULL));
 			float radius = 4.0;
 			LevelExplode(tnt->Level, NULL, tnt->Position, radius);
 			

@@ -11,7 +11,7 @@ LevelGenerator LevelGeneratorCreate(ProgressBarDisplay progressBar)
 	*generator = (struct LevelGenerator)
 	{
 		.ProgressBar = progressBar,
-		.Random = RandomGeneratorCreate(TimeNano()),
+		.Random = RandomGeneratorCreate(time(NULL)),
 		.FloodData = MemoryAllocate(1024 * 1024 * sizeof(int)),
 	};
 	return generator;

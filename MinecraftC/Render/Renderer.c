@@ -13,7 +13,7 @@ Renderer RendererCreate(Minecraft minecraft)
 		.FogEnd = 0.0,
 		.HeldBlock = (HeldBlock){ .Minecraft = minecraft },
 		.Entity = NULL,
-		.Random = RandomGeneratorCreate(TimeNano()),
+		.Random = RandomGeneratorCreate(time(NULL)),
 	};
 	return renderer;
 }

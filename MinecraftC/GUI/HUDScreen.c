@@ -11,7 +11,7 @@ HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height)
 	*hud = (struct HUDScreen)
 	{
 		.Chat = ListCreate(sizeof(ChatLine)),
-		.Random = RandomGeneratorCreate(TimeNano()),
+		.Random = RandomGeneratorCreate(time(NULL)),
 		.HoveredPlayer = NULL,
 		.Minecraft = minecraft,
 		.Width = width * 240 / height,
