@@ -24,36 +24,14 @@ float3 RendererGetPlayerVector(Renderer renderer, float t)
 	return entity->OldPosition + (entity->Position - entity->Position) * t;
 }
 
-void RendererHurtEffect(Renderer renderer, float t)
-{
-	Player entity = renderer->Minecraft->Player;
-	MobData playerMob = entity->TypeData;
-	float hurt = playerMob->HurtTime - t;
-	if (playerMob->Health <= 0)
-	{
-		t += playerMob->DeathTime;
-		glRotatef(40.0 - 8000.0 / (t + 200.0), 0.0, 0.0, 1.0);
-	}
-	
-	if (hurt >= 0.0)
-	{
-		hurt /= playerMob->HurtDuration;
-		hurt = sin(hurt * hurt * hurt * hurt * pi);
-		glRotatef(-playerMob->HurtDirection, 0.0, 1.0, 0.0);
-		glRotatef(-hurt * 14.0, 0.0, 0.0, 1.0);
-		glRotatef(playerMob->HurtDirection, 0.0, 1.0, 0.0);
-	}
-}
-
 void RendererApplyBobbing(Renderer renderer, float t)
 {
 	Player entity = renderer->Minecraft->Player;
-	MobData playerMob = entity->TypeData;
-	PlayerData player = playerMob->TypeData;
+	PlayerData player = entity->TypeData;
 	float walk = entity->WalkDistance - entity->OldWalkDistance;
 	walk = entity->WalkDistance + walk * t;
 	float bob = player->OldBobbing + (player->Bobbing - player->OldBobbing) * t;
-	float tilt = playerMob->OldTilt + (playerMob->Tilt - playerMob->OldTilt) * t;
+	float tilt = player->OldTilt + (player->Tilt - player->OldTilt) * t;
 	glTranslatef(sin(walk * pi) * bob * 0.5, -fabs(cos(walk * pi) * bob), 0.0);
 	glRotatef(sin(walk * pi) * bob * 3.0, 0.0, 0.0, 1.0);
 	glRotatef(fabs(cos(walk * pi + 0.2) * bob) * 5.0, 1.0, 0.0, 0.0);

@@ -19,7 +19,6 @@
 #include "../../Level/Level.h"
 #include "../../Render/ShapeRenderer.h"
 #include "../../Particle/TerrainParticle.h"
-#include "../../Item/Item.h"
 
 struct Blocks Blocks = { 0 };
 
@@ -101,7 +100,6 @@ Block BlockCreate(BlockType type, int textureID)
 static bool IsFlowerBlock(BlockType type) { return type == BlockTypeSapling || type == BlockTypeRose || type == BlockTypeDandelion || type == BlockTypeBrownMushroom || type == BlockTypeRedMushroom; }
 static bool IsLiquidBlock(BlockType type) { return Blocks.Liquid[type]; }
 static bool IsMetalBlock(BlockType type) { return type == BlockTypeGold || type == BlockTypeIron; }
-static bool IsOreBlock(BlockType type) { return type == BlockTypeGoldOre || type == BlockTypeIronOre || type == BlockTypeCoalOre; }
 static bool IsSandBlock(BlockType type) { return type == BlockTypeSand || type == BlockTypeGravel; }
 static bool IsSlabBlock(BlockType type) { return type == BlockTypeSlab || type == BlockTypeDoubleSlab; }
 
@@ -365,56 +363,9 @@ void BlockOnRemoved(Block block, Level level, int x, int y, int z)
 	if (block->Type == BlockTypeSponge) { SpongeBlockOnRemoved(block, level, x, y, z); return; }
 }
 
-int BlockGetDropCount(Block block)
-{
-	if (block->Type == BlockTypeBookshelf) { return BookshelfBlockGetDropCount(block); }
-	if (block->Type == BlockTypeLeaves) { return LeavesBlockGetDropCount(block); }
-	if (IsLiquidBlock(block->Type)) { return LiquidBlockGetDropCount(block); }
-	if (IsOreBlock(block->Type)) { return OreBlockGetDropCount(block); }
-	if (block->Type == BlockTypeTNT) { return TNTBlockGetDropCount(block); }
-	if (block->Type == BlockTypeLog) { return WoodBlockGetDropCount(block); }
-	return 1;
-}
-
-BlockType BlockGetDrop(Block block)
-{
-	if (block->Type == BlockTypeGrass) { return GrassBlockGetDrop(block); }
-	if (block->Type == BlockTypeLeaves) { return LeavesBlockGetDrop(block); }
-	if (IsOreBlock(block->Type)) { return OreBlockGetDrop(block); }
-	if (IsSlabBlock(block->Type)) { return SlabBlockGetDrop(block); }
-	if (block->Type == BlockTypeStone) { return StoneBlockGetDrop(block); }
-	if (block->Type == BlockTypeLog) { return WoodBlockGetDrop(block); }
-	return block->Type;
-}
-
 int BlockGetHardness(Block block)
 {
 	return block->Hardness;
-}
-
-void BlockOnBreak(Block block, Level level, int x, int y, int z)
-{
-	if (IsLiquidBlock(block->Type)) { LiquidBlockOnBreak(block, level, x, y, z); return; }
-	BlockDropItems(block, level, x, y, z, 1.0);
-}
-
-void BlockDropItems(Block block, Level level, int x, int y, int z, float probability)
-{
-	if (IsLiquidBlock(block->Type)) { LiquidBlockDropItems(block, level, x, y, z, probability); return; }
-	
-	if (!level->CreativeMode)
-	{
-		int count = BlockGetDropCount(block);
-		for (int i = 0; i < count; i++)
-		{
-			if (RandomUniform() <= probability)
-			{
-				float range = 0.7;
-				float3 v = (float3){ RandomUniform(), RandomUniform(), RandomUniform() } * range + (1.0 - range) * 0.5;
-				LevelAddEntity(level, ItemCreate(level, (float3){ x, y, z } + v, BlockGetDrop(block)));
-			}
-		}
-	}
 }
 
 void BlockRenderPreview(Block block)

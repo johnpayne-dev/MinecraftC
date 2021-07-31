@@ -5,4 +5,3 @@ typedef Block BookshelfBlock;
 
 BookshelfBlock BookshelfBlockCreate(void);
 int BookshelfBlockGetTextureID(BookshelfBlock block, int face);
-int BookshelfBlockGetDropCount(BookshelfBlock block);

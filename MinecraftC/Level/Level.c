@@ -33,7 +33,6 @@ void LevelInitializeTransient(Level level)
 	level->FogColor = ColorWhite;
 	level->CloudColor = ColorWhite;
 	LevelFindSpawn(level);
-	if (level->BlockMap == NULL) { level->BlockMap = BlockMapCreate(level->Width, level->Depth, level->Height); }
 }
 
 void LevelSetData(Level level, int w, int d, int h, unsigned char * blocks)
@@ -245,7 +244,7 @@ bool LevelIsSolidTile(Level level, int x, int y, int z)
 
 void LevelTickEntities(Level level)
 {
-	BlockMapTickAll(level->BlockMap);
+	EntityTick(level->Player);
 }
 
 void LevelTick(Level level)
@@ -293,16 +292,6 @@ void LevelTick(Level level)
 		BlockType tile = level->Blocks[(y * level->Height + z) * level->Width + x];
 		if (Blocks.Physics[tile]) { BlockUpdate(Blocks.Table[tile], level, x, y, z, level->Random); }
 	}
-}
-
-int LevelCountInstancesOf(Level level, EntityType type)
-{
-	int count = 0;
-	for (int i = 0; i < ListCount(level->BlockMap->All); i++)
-	{
-		if (level->BlockMap->All[i]->Type == type) { count++; }
-	}
-	return count;
 }
 
 bool LevelIsInBounds(Level level, int x, int y, int z)
@@ -381,19 +370,6 @@ void LevelAddToNextTick(Level level, int x, int y, int z, BlockType tile)
 	NextTickListEntry tick = { .Position = { x, y, z }, .Tile = tile };
 	if (tile != BlockTypeNone) { tick.Ticks = BlockGetTickDelay(Blocks.Table[tile]); }
 	level->TickList = ListPush(level->TickList, &tick);
-}
-
-bool LevelIsFree(Level level, AABB aabb)
-{
-	list(Entity) entities = BlockMapGetEntitiesAABB(level->BlockMap, NULL, aabb);
-	int count = ListCount(entities);
-	ListDestroy(entities);
-	return count == 0;
-}
-
-list(Entity) LevelFindEntities(Level level, AABB aabb)
-{
-	return BlockMapGetEntitiesAABB(level->BlockMap, NULL, aabb);
 }
 
 static bool IsSolid(Level level, float x, float y, float z)
@@ -658,13 +634,7 @@ Entity LevelGetPlayer(Level level)
 
 void LevelAddEntity(Level level, Entity entity)
 {
-	BlockMapInsert(level->BlockMap, entity);
 	EntitySetLevel(entity, level);
-}
-
-void LevelRemoveEntity(Level level, Entity entity)
-{
-	BlockMapRemove(level->BlockMap, entity);
 }
 
 void LevelExplode(Level level, Entity entity, float3 pos, float radius)
@@ -682,35 +652,17 @@ void LevelExplode(Level level, Entity entity, float3 pos, float radius)
 				BlockType tile = LevelGetTile(level, i, j, k);
 				if (i >= 0 && j >= 0 && k >= 0 && i < level->Width && j < level->Depth && k < level->Height && length3f(v) < radius && tile > 0 && BlockCanExplode(Blocks.Table[tile]))
 				{
-					BlockDropItems(Blocks.Table[tile], level, i, j, k, 0.3);
 					LevelSetTile(level, i, j, k, BlockTypeNone);
 					BlockExplode(Blocks.Table[tile], level, i, j, k);
 				}
 			}
 		}
 	}
-	
-	list(Entity) entities = BlockMapGetEntities(level->BlockMap, entity, float3i(v0), float3i(v1));
-	for (int i = 0; i < ListCount(entities); i++)
-	{
-		float d = EntityDistanceToPoint(entities[i], pos) / radius;
-		if (d <= 1.0) { EntityHurt(entities[i], entity, (1.0 - d) * 15.0 + 1.0); }
-	}
 }
 
 Entity LevelFindPlayer(Level level)
 {
-	for (int i = 0; i < ListCount(level->BlockMap->All); i++)
-	{
-		Entity entity = level->BlockMap->All[i];
-		if (((MobData)entity->TypeData)->Type == MobTypePlayer) { return entity; }
-	}
-	return NULL;
-}
-
-void LevelRemoveAllNonCreativeModeEntities(Level level)
-{
-	BlockMapRemoveAllNonCreativeModeEntities(level->BlockMap);
+	return level->Player;
 }
 
 void LevelDestroy(Level level)
@@ -719,7 +671,6 @@ void LevelDestroy(Level level)
 	RandomGeneratorDestroy(level->Random);
 	ListDestroy(level->TickList);
 	if (level->LightBlockers != NULL) { MemoryFree(level->LightBlockers); }
-	if (level->BlockMap != NULL) { BlockMapDestroy(level->BlockMap); }
 	if (level->Blocks != NULL) { MemoryFree(level->Blocks); }
 	MemoryFree(level);
 }

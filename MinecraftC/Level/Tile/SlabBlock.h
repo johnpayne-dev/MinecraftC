@@ -13,7 +13,6 @@ int SlabBlockGetTextureID(SlabBlock block, int face);
 bool SlabBlockIsSolid(SlabBlock block);
 void SlabBlockOnNeighborChanged(SlabBlock block, struct Level * level, int x, int y, int z, int side);
 void SlabBlockOnAdded(SlabBlock block, struct Level * level, int x, int y, int z);
-BlockType SlabBlockGetDrop(SlabBlock block);
 bool SlabBlockIsCube(SlabBlock block);
 bool SlabBlockCanRenderSide(SlabBlock block, struct Level * level, int x, int y, int z, int side);
 void SlabBlockDestroy(SlabBlock block);

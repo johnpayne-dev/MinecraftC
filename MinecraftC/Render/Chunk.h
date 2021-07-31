@@ -1,6 +1,7 @@
 #pragma once
 #include "../Level/Level.h"
 #include "../Player/Player.h"
+#include "../Render/Frustum.h"
 
 typedef struct Chunk
 {

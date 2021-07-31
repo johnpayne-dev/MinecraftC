@@ -17,7 +17,6 @@ typedef struct Renderer
 
 Renderer RendererCreate(struct Minecraft * minecraft);
 float3 RendererGetPlayerVector(Renderer renderer, float t);
-void RendererHurtEffect(Renderer renderer, float t);
 void RendererApplyBobbing(Renderer renderer, float t);
 void RendererSetLighting(Renderer renderer, bool lighting);
 void RendererEnableGUIMode(Renderer renderer);

@@ -23,8 +23,7 @@ HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height)
 
 void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos)
 {
-	MobData playerMob = hud->Minecraft->Player->TypeData;
-	PlayerData player = playerMob->TypeData;
+	PlayerData player = hud->Minecraft->Player->TypeData;
 	RendererEnableGUIMode(hud->Minecraft->Renderer);
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->Minecraft->TextureManager, "GUI/GUI.png"));
 	glColor4f(1.0, 1.0, 1.0, 1.0);
@@ -33,39 +32,6 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos)
 	ScreenDrawImage((int2){ hud->Width / 2 - 92 + player->Inventory->Selected * 20, hud->Height - 23 }, (int2){ 0, 22 }, (int2){ 24, 22 }, -90.0);
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->Minecraft->TextureManager, "GUI/Icons.png"));
 	ScreenDrawImage((int2){ hud->Width / 2 - 7, hud->Height / 2 - 7 }, (int2){ 0, 0 }, (int2){ 16, 16 }, -90.0);
-	bool blink = playerMob->InvulnerableTime / 3 % 2 == 1;
-	if (playerMob->InvulnerableTime < 10) { blink = false; }
-	
-	if (GameModeIsSurvival(hud->Minecraft->GameMode))
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			int state = 0;
-			if (blink) { state = 1; }
-			int x = hud->Width / 2 - 91 + i * 8;
-			int y = hud->Height - 32;
-			if (playerMob->Health <= 4) { y += RandomGeneratorIntegerRange(hud->Random, 0, 1); }
-			ScreenDrawImage((int2){ x, y }, (int2){ 16 + state * 9, 0 }, (int2){ 9, 9 }, -90.0);
-			if (blink)
-			{
-				if (i * 2 + 1 < playerMob->LastHealth) { ScreenDrawImage((int2){ x, y }, (int2){ 70, 0 }, (int2){ 9, 9 }, -90.0); }
-				if (i * 2 + 1 == playerMob->LastHealth) { ScreenDrawImage((int2){ x, y }, (int2){ 79, 0 }, (int2){ 9, 9 }, -90.0); }
-			}
-			if (i * 2 + 1 < playerMob->Health) { ScreenDrawImage((int2){ x, y }, (int2){ 52, 0 }, (int2){ 9, 9 }, -90.0); }
-			if (i * 2 + 1 == playerMob->Health) { ScreenDrawImage((int2){ x, y }, (int2){ 61, 0 }, (int2){ 9, 9 }, -90.0); }
-		}
-		
-		if (EntityIsUnderWater(hud->Minecraft->Player))
-		{
-			int a1 = (int)ceil((playerMob->AirSupply - 2) / 30.0);
-			int a2 = (int)ceil(playerMob->AirSupply / 30.0) - a1;
-			for (int i = 0; i < a1 + a2; i++)
-			{
-				if (i < a1) { ScreenDrawImage((int2){ hud->Width / 2 - 91 + i * 8, hud->Height - 32 - 9 }, (int2){ 16, 18 }, (int2){ 9, 9 }, -90.0); }
-				else { ScreenDrawImage((int2){ hud->Width / 2 - 91 + i * 8, hud->Height - 32 - 9 }, (int2){ 25, 18 }, (int2){ 9, 9 }, -90.0); }
-			}
-		}
-	}
 	
 	glDisable(GL_BLEND);
 	for (int i = 0; i < 9; i++)
@@ -109,15 +75,6 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos)
 		
 	FontRendererRender(hud->Minecraft->Font, "0.30", 2, 2, ColorWhite);
 	if (hud->Minecraft->Settings->ShowFrameRate) { FontRendererRender(hud->Minecraft->Font, hud->Minecraft->Debug, 2, 12, ColorWhite); }
-	if (hud->Minecraft->GameMode->Type == GameModeTypeSurvival)
-	{
-		String score = StringConcatFront("Score: &e", StringCreateFromInt(PlayerGetScore(hud->Minecraft->Player)));
-		String arrows = StringConcatFront("Arrows: ", StringCreateFromInt(player->Arrows));
-		FontRendererRender(hud->Minecraft->Font, score, hud->Width - FontRendererGetWidth(hud->Minecraft->Font, score) - 2, 2, ColorWhite);
-		FontRendererRender(hud->Minecraft->Font, arrows, hud->Width / 2 + 8, hud->Height - 33, ColorWhite);
-		StringDestroy(score);
-		StringDestroy(arrows);
-	}
 		
 	int maxLines = 10;
 	bool chatScreen = false;

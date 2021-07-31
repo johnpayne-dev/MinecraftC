@@ -28,8 +28,3 @@ void GrassBlockUpdate(GrassBlock block, Level level, int x, int y, int z, Random
 		}
 	}
 }
-
-BlockType GrassBlockGetDrop(GrassBlock block)
-{
-	return BlockGetDrop(Blocks.Table[BlockTypeDirt]);
-}

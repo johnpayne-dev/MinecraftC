@@ -4,140 +4,157 @@
 
 Player PlayerCreate(Level level)
 {
-	Entity player = MobCreate(level);
-	player->HeightOffset = 1.62;
-	MobData mob = player->TypeData;
-	mob->Health = 20;
-	mob->ModelName = "Humanoid";
-	mob->RotationOffset = 180.0;
-	AIDestroy(mob->AI);
-	mob->AI = PlayerAICreate(player);
-	mob->Type = MobTypePlayer;
-	PlayerData this = MemoryAllocate(sizeof(struct PlayerData));
-	*this = (struct PlayerData)
+	Entity entity = EntityCreate(level);
+	entity->Type = EntityTypePlayer;
+	entity->FootSize = 0.5;
+	entity->HeightOffset = 1.62;
+	EntitySetPosition(entity, entity->Position);
+	PlayerData player = MemoryAllocate(sizeof(struct PlayerData));
+	*player = (struct PlayerData)
 	{
+		.RotationA = (RandomUniform() + 1.0) * 0.01,
+		.BodyRotation = 0.0,
+		.OldBodyRotation = 0.0,
+		.TickCount = 0,
+		.AllowAlpha = true,
+		.BobbingStrength = 1.0,
+		.RenderOffset = 0.0,
+		.TimeOffset = RandomUniform() * 12398.0,
+		.Rotation = 2.0 * pi * RandomUniform(),
+		.Speed = 1.0,
+		.AI = PlayerAICreate(entity),
+		.RotationOffset = 180.0,
 		.Inventory = InventoryCreate(),
 		.UserType = 0,
-		.Score = 0,
-		.Arrows = 20,
 	};
-	mob->TypeData = this;
+	entity->TypeData = player;
 	if (level != NULL)
 	{
-		level->Player = player;
-		LevelRemoveEntity(level, player);
-		LevelAddEntity(level, player);
+		level->Player = entity;
+		LevelAddEntity(level, entity);
 	}
-	return player;
+	return entity;
 }
 
-void PlayerResetPosition(Player player)
+void PlayerTick(Player player)
 {
-	MobData mob = player->TypeData;
-	player->HeightOffset = 1.62;
-	EntitySetSize(player, 0.6, 1.8);
-	mob->Type = MobTypeNone;
-	EntityResetPosition(player);
-	mob->Type = MobTypePlayer;
-	if (player->Level != NULL) { player->Level->Player = player; }
-	mob->Health = 20;
-	mob->DeathTime = 0;
+	PlayerData this = player->TypeData;
+	this->OldTilt = this->Tilt;
+	if (EntityIsInWater(player)) { player->FallDistance = 0.0; }
+	
+	this->OldAnimationStep = this->AnimationStep;
+	this->OldBodyRotation = this->BodyRotation;
+	player->OldRotation = player->Rotation;
+	this->TickCount++;
+	PlayerStepAI(player);
+	this->OldRun = this->Run;
+	float2 d = player->Position.xz - player->OldPosition.xz;
+	float len = length2f(d);
+	float rot = this->BodyRotation;
+	float f1 = 0.0, f2 = 0.0;
+	if (len > 0.05)
+	{
+		f2 = 1.0;
+		f1 = len * 3.0;
+		rot = atan2(d.y, d.x) * deg - 90.0;
+	}
+	if (!player->OnGround) { f2 = 0.0; }
+	this->Run += (f2 - this->Run) * 0.3;
+	
+	float a;
+	for (a = rot - this->BodyRotation; a < -180.0; a += 360.0);
+	while (a >= 180.0) { a -= 360.0; }
+	this->BodyRotation += a * 0.1;
+	for (a = player->Rotation.y - this->BodyRotation; a < -180.0; a += 360.0);
+	while (a >= 180.0) { a -= 360.0; }
+	bool b = a < -90.0 || a >= 90.0;
+	if (a < -75.0) { a = -75.0; }
+	if (a > 75.0) { a = 75.0; }
+	this->BodyRotation = player->Rotation.y - a;
+	this->BodyRotation += a * 0.1;
+	if (b) { f1 = -f1; }
+	while (player->Rotation.y - player->OldRotation.y < -180.0) { player->OldRotation.y -= 360.0; }
+	while (player->Rotation.y - player->OldRotation.y >= 180.0) { player->OldRotation.y += 360.0; }
+	while (this->BodyRotation - this->OldBodyRotation < -180.0) { this->OldBodyRotation -= 360.0; }
+	while (this->BodyRotation - this->OldBodyRotation >= 180.0) { this->OldBodyRotation += 360.0; }
+	while (player->Rotation.x - player->OldRotation.x < -180.0) { player->OldRotation.x -= 360.0; }
+	while (player->Rotation.x - player->OldRotation.x >= 180.0) { player->OldRotation.x += 360.0; }
+
+	this->AnimationStep += f1;
+}
+
+void PlayerTravel(Player player, float x, float y)
+{
+	if (EntityIsInWater(player))
+	{
+		float z = player->Position.y;
+		EntityMoveRelative(player, (float2){ x, y }, 0.02);
+		EntityMove(player, player->Delta);
+		player->Delta *= 0.8;
+		player->Delta.y -= 0.02;
+		if (player->HorizontalCollision && EntityIsFree(player, player->Delta + up3f * (0.6 - player->Position.y + z))) { player->Delta.y = 0.3; }
+	}
+	else if (EntityIsInLava(player))
+	{
+		float z = player->Position.y;
+		EntityMoveRelative(player, (float2){ x, y }, 0.02);
+		EntityMove(player, player->Delta);
+		player->Delta *= 0.5;
+		player->Delta.y -= 0.02;
+		if (player->HorizontalCollision && EntityIsFree(player, player->Delta + up3f * (0.6 - player->Position.y + z))) { player->Delta.y = 0.3; }
+	}
+	else
+	{
+		EntityMoveRelative(player, (float2){ x, y }, player->OnGround ? 0.1 : 0.02);
+		EntityMove(player, player->Delta);
+		player->Delta *= (float3){ 0.91, 0.98, 0.91 };
+		player->Delta.y -= 0.08;
+		if (player->OnGround) { player->Delta.xz *= 0.6; }
+	}
+}
+
+void PlayerResetPosition(Player entity)
+{
+	entity->HeightOffset = 1.62;
+	EntitySetSize(entity, 0.6, 1.8);
+	entity->Type = EntityTypeNone;
+	EntityResetPosition(entity);
+	entity->Type = EntityTypePlayer;
+	if (entity->Level != NULL) { entity->Level->Player = entity; }
 }
 
 void PlayerStepAI(Player player)
 {
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
+	PlayerData this = player->TypeData;
 	InventoryTick(this->Inventory);
 	this->OldBobbing = this->Bobbing;
 	InputHandlerUpdateMovement(this->Input);
-	mob->Type = MobTypeNone;
-	MobStepAI(player);
-	mob->Type = MobTypePlayer;
+	PlayerAITick(this->AI, player->Level, player);
 	float bob = length2f(player->Delta.xz);
 	float tilt = atan(-player->Delta.y * 0.2) * 15.0;
 	if (bob > 0.1) { bob = 0.1; }
-	if (!player->OnGround || mob->Health <= 0) { bob = 0.0; }
-	if (player->OnGround || mob->Health <= 0) { tilt = 0.0; }
+	if (!player->OnGround) { bob = 0.0; }
+	if (player->OnGround) { tilt = 0.0; }
 	this->Bobbing += (bob - this->Bobbing) * 0.4;
-	mob->Tilt += (tilt - mob->Tilt) * 0.8;
-	
-	list(Entity) entities = LevelFindEntities(player->Level, AABBGrow(player->AABB, (float3){ 1.0, 0.0, 1.0 }));
-	if (mob->Health > 0 && entities != NULL)
-	{
-		for (int i = 0; i < ListCount(entities); i++) { EntityPlayerTouch(entities[i], player); }
-	}
-	ListDestroy(entities);
-}
-
-void PlayerRender(Player player, TextureManager textures, float t)
-{
-	
+	this->Tilt += (tilt - this->Tilt) * 0.8;
 }
 
 void PlayerReleaseAllKeys(Player player)
 {
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
+	PlayerData this = player->TypeData;
 	InputHandlerResetKeys(this->Input);
 }
 
 void PlayerSetKey(Player player, int key, bool state)
 {
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
+	PlayerData this = player->TypeData;
 	InputHandlerSetKeyState(this->Input, key, state);
 }
 
 bool PlayerAddResource(Player player, BlockType resource)
 {
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
+	PlayerData this = player->TypeData;
 	return InventoryAddResource(this->Inventory, resource);
-}
-
-int PlayerGetScore(Player player)
-{
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
-	return this->Score;
-}
-
-HumanoidModel PlayerGetModel(Player player)
-{
-	MobData mob = player->TypeData;
-	return ModelManagerGetModel(MobModelCache, mob->ModelName);
-}
-
-void PlayerDie(Player player, Entity entity)
-{
-	MobData mob = player->TypeData;
-	EntitySetSize(player, 0.2, 0.2);
-	EntitySetPosition(player, player->Position);
-	player->Delta.y = 0.1;
-	if (entity != NULL)
-	{
-		player->Delta.xz = (float2){ cos((mob->HurtDirection + player->Rotation.y) * rad), sin((mob->HurtDirection + player->Rotation.y) * rad) } * 0.1;
-	}
-	else { player->Delta.xz = zero2f; }
-	player->HeightOffset = 0.1;
-}
-
-void PlayerRemove(Player player)
-{
-	
-}
-
-void PlayerAwardKillScore(Player player, Entity entity, int score)
-{
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
-	this->Score += score;
-}
-
-bool PlayerIsShootable(Player player)
-{
-	return true;
 }
 
 void PlayerBindTexture(Player player, TextureManager textures)
@@ -151,26 +168,9 @@ void PlayerBindTexture(Player player, TextureManager textures)
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(textures, "Char.png"));
 }
 
-void PlayerHurt(Player player, Entity entity, int damage)
-{
-	MobData mob = player->TypeData;
-	if (!player->Level->CreativeMode)
-	{
-		mob->Type = MobTypeNone;
-		MobHurt(player, entity, damage);
-		mob->Type = MobTypePlayer;
-	}
-}
-
-bool PlayerIsCreativeModeAllowed(Player player)
-{
-	return true;
-}
-
 void PlayerDestroy(Player player)
 {
-	MobData mob = player->TypeData;
-	PlayerData this = mob->TypeData;
+	PlayerData this = player->TypeData;
 	InventoryDestroy(this->Inventory);
 	MemoryFree(this);
 }

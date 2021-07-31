@@ -1,11 +1,5 @@
 #include "Entity.h"
 #include "Level/Level.h"
-#include "Item/Item.h"
-#include "Item/TakeAnimation.h"
-#include "Item/PrimedTNT.h"
-#include "Item/Arrow.h"
-#include "Mob/Mob.h"
-#include "Mob/Creeper.h"
 #include "Player/Player.h"
 
 Entity EntityCreate(Level level)
@@ -40,7 +34,7 @@ Entity EntityCreate(Level level)
 
 void EntityResetPosition(Entity entity)
 {
-	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { PlayerResetPosition(entity); return; }
+	if (entity->Type == EntityTypePlayer) { return PlayerResetPosition(entity); }
 	if (entity->Level != NULL)
 	{
 		float2 spawn = { entity->Level->Spawn.x + 0.5, entity->Level->Spawn.y };
@@ -65,7 +59,6 @@ void EntityResetPosition(Entity entity)
 
 void EntityRemove(Entity entity)
 {
-	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { PlayerRemove(entity); return; }
 	entity->Removed = true;
 }
 
@@ -99,17 +92,13 @@ void EntityInterpolateTurn(Entity entity, float2 angle)
 
 void EntityTick(Entity entity)
 {
-	if (entity->Type == EntityTypeItem) { ItemTick(entity); return; }
-	if (entity->Type == EntityTypeTakeAnimation) { TakeAnimationTick(entity); return; }
-	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
-	if (entity->Type == EntityTypeArrow) { ArrowTick(entity); return; }
 	if (entity->Type == EntityTypeParticle) { ParticleTick(entity); return; }
 	
 	entity->OldWalkDistance = entity->WalkDistance;
 	entity->OldPosition = entity->Position;
 	entity->OldRotation = entity->Rotation;
 	
-	if (entity->Type == EntityTypeMob) { MobTick(entity); return; }
+	if (entity->Type == EntityTypePlayer) { PlayerTick(entity); return; }
 }
 
 bool EntityIsFree(Entity entity, float3 a)
@@ -213,11 +202,7 @@ void EntityMove(Entity entity, float3 a)
 		entity->Collision = entity->HorizontalCollision || old.y != a.y;
 		if (entity->OnGround)
 		{
-			if (entity->FallDistance > 0.0)
-			{
-				EntityCauseFallDamage(entity, entity->FallDistance);
-				entity->FallDistance = 0.0;
-			}
+			if (entity->FallDistance > 0.0) { entity->FallDistance = 0.0; }
 		}
 		else if (a.y < 0.0) { entity->FallDistance -= a.y; }
 		
@@ -243,11 +228,6 @@ void EntityMove(Entity entity, float3 a)
 		}
 		entity->YSlideOffset *= 0.4;
 	}
-}
-
-void EntityCauseFallDamage(Entity entity, float height)
-{
-	if (entity->Type == EntityTypeMob) { MobCauseFallDamage(entity, height); }
 }
 
 bool EntityIsInWater(Entity entity)
@@ -288,17 +268,7 @@ bool EntityIsLit(Entity entity)
 
 float EntityGetBrightness(Entity entity, float t)
 {
-	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypeCreeper) { return CreeperGetBrightness(entity, t); }
 	return LevelGetBrightness(entity->Level, entity->Position.x, entity->Position.y, entity->Position.z);
-}
-
-void EntityRender(Entity entity, TextureManager textures, float t)
-{
-	if (entity->Type == EntityTypeItem) { ItemRender(entity, textures, t); return; }
-	if (entity->Type == EntityTypeTakeAnimation) { TakeAnimationRender(entity, textures, t); return; }
-	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTRender(entity, textures, t); return; }
-	if (entity->Type == EntityTypeArrow) { ArrowRender(entity, textures, t); return; }
-	if (entity->Type == EntityTypeMob) { MobRender(entity, textures, t); return; }
 }
 
 void EntitySetLevel(Entity entity, Level level)
@@ -334,63 +304,14 @@ float EntitySquaredDistanceTo(Entity entityA, Entity entityB)
 	return sqdistance3f(entityA->Position, entityB->Position);
 }
 
-void EntityPlayerTouch(Entity entity, Entity player)
-{
-	if (entity->Type == EntityTypeItem) { ItemPlayerTouch(entity, player); return; }
-	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTPlayerTouch(entity, player); return; }
-	if (entity->Type == EntityTypeArrow) { ArrowPlayerTouch(entity, player); return; }
-}
-
-void EntityPush(Entity entityA, Entity entityB)
-{
-	float2 xz = entityB->Position.xz - entityA->Position.xz;
-	if (dot2f(xz, xz) >= 0.01)
-	{
-		xz *= 0.05 * (1.0 - entityA->PushThrough) / dot2f(xz, xz);
-		EntityPushTowards(entityA, (float3){ -xz.x, 0.0, -xz.y });
-		EntityPushTowards(entityB, (float3){ xz.x, 0.0, xz.y });
-	}
-}
-
 void EntityPushTowards(Entity entity, float3 point)
 {
 	entity->Delta += point;
 }
 
-void EntityHurt(Entity entityA, Entity entityB, int damage)
-{
-	if (entityA->Type == EntityTypePrimedTNT) { PrimedTNTHurt(entityA, entityB, damage); return; }
-	if (entityA->Type == EntityTypeMob) { MobHurt(entityA, entityB, damage); return; }
-}
-
 bool EntityIntersects(Entity entity, float3 v0, float3 v1)
 {
 	return AABBIntersects(entity->AABB, (AABB){ v0, v1 });
-}
-
-bool EntityIsPickable(Entity entity)
-{
-	if (entity->Type == EntityTypePrimedTNT) { return PrimedTNTIsPickable(entity); }
-	if (entity->Type == EntityTypeMob) { return MobIsPickable(entity); }
-	return false;
-}
-
-bool EntityIsPushable(Entity entity)
-{
-	if (entity->Type == EntityTypeMob) { return MobIsPushable(entity); }
-	return false;
-}
-
-bool EntityIsShootable(Entity entity)
-{
-	if (entity->Type == EntityTypeMob) { return MobIsShootable(entity); }
-	return false;
-}
-
-void EntityAwardKillScore(Entity entityA, Entity entityB, int score)
-{
-	if (entityA->Type == EntityTypeArrow) { ArrowAwardKillScore(entityA, entityB, score); return; }
-	if (entityA->Type == EntityTypeMob && ((MobData)entityA->TypeData)->Type == MobTypePlayer) { PlayerAwardKillScore(entityA, entityB, score); return; }
 }
 
 bool EntityShouldRender(Entity entity, float3 v)
@@ -408,24 +329,9 @@ int EntityGetTexture(Entity entity)
 	return entity->TextureID;
 }
 
-bool EntityIsCreativeModeAllowed(Entity entity)
-{
-	if (entity->Type == EntityTypeMob && ((MobData)entity->TypeData)->Type == MobTypePlayer) { return PlayerIsCreativeModeAllowed(entity); }
-	return false;
-}
-
-void EntityRenderHover(Entity entity, float dt)
-{
-	
-}
-
 void EntityDestroy(Entity entity)
 {
-	if (entity->Type == EntityTypeItem) { ItemDestroy(entity); }
-	if (entity->Type == EntityTypeTakeAnimation) { TakeAnimationDestroy(entity); }
-	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTDestroy(entity); }
-	if (entity->Type == EntityTypeArrow) { ArrowDestroy(entity); }
-	if (entity->Type == EntityTypeMob) { MobDestroy(entity); }
+	if (entity->Type == EntityTypePlayer) { PlayerDestroy(entity); }
 	if (entity->Type == EntityTypeParticle) { ParticleDestroy(entity); }
 	MemoryFree(entity);
 }

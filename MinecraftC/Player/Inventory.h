@@ -11,7 +11,7 @@ typedef struct Inventory
 
 Inventory InventoryCreate(void);
 BlockType InventoryGetSelected(Inventory inventory);
-void InventoryGrabTexture(Inventory inventory, BlockType tile, bool var);
+void InventoryGrabTexture(Inventory inventory, BlockType tile);
 void InventorySwapPaint(Inventory inventory, int slot);
 void InventoryReplaceSlot(Inventory inventory, int sessionBlock);
 void InventoryReplaceSlotWithBlock(Inventory inventory, Block block);

@@ -30,13 +30,13 @@ static int GetSlot(Inventory inventory, BlockType tile)
 	return -1;
 }
 
-void InventoryGrabTexture(Inventory inventory, BlockType tile, bool creative)
+void InventoryGrabTexture(Inventory inventory, BlockType tile)
 {
 	int slot = GetSlot(inventory, tile);
 	if (slot >= 0) { inventory->Selected = slot; }
 	else
 	{
-		if (creative && tile != BlockTypeNone && ListContains(SessionDataAllowedBlocks, Blocks.Table[tile])) { InventoryReplaceSlotWithBlock(inventory, Blocks.Table[tile]); }
+		if (tile != BlockTypeNone && ListContains(SessionDataAllowedBlocks, Blocks.Table[tile])) { InventoryReplaceSlotWithBlock(inventory, Blocks.Table[tile]); }
 	}
 }
 

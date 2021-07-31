@@ -1,27 +1,21 @@
 #include <string.h>
 #include <OpenGL.h>
 #include "Minecraft.h"
-#include "GameMode/CreativeMode.h"
-#include "GameMode/SurvivalMode.h"
-#include "GUI/GameOverScreen.h"
 #include "GUI/PauseScreen.h"
 #include "GUI/ChatInputScreen.h"
+#include "GUI/BlockSelectScreen.h"
 #include "Utilities/Log.h"
 #include "Utilities/Time.h"
 #include "Render/Texture/LavaTexture.h"
 #include "Render/Texture/WaterTexture.h"
 #include "Render/ShapeRenderer.h"
-#include "Item/Item.h"
-#include "Item/Arrow.h"
 #include "Level/Generator/LevelGenerator.h"
 #include "Particle/WaterDropParticle.h"
-#include "Mob/Sheep.h"
 
 Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fullScreen)
 {
 	Minecraft minecraft = MemoryAllocate(sizeof(struct Minecraft));
 	*minecraft = (struct Minecraft){ 0 };
-	minecraft->GameMode = SurvivalModeCreate(minecraft);
 	minecraft->Timer = TimerCreate(20.0);
 	minecraft->ProgressBar = ProgressBarDisplayCreate(minecraft);
 	minecraft->Renderer = RendererCreate(minecraft);
@@ -52,7 +46,6 @@ void MinecraftSetCurrentScreen(Minecraft minecraft, GUIScreen screen)
 	if (minecraft->CurrentScreen != NULL && minecraft->CurrentScreen->Type == GUIScreenTypeError) { return; }
 	
 	if (minecraft->CurrentScreen != NULL) { GUIScreenOnClose(minecraft->CurrentScreen); }
-	if (screen == NULL && ((MobData)minecraft->Player->TypeData)->Health <= 0) { screen = GameOverScreenCreate(); }
 	minecraft->CurrentScreen = screen;
 	if (screen != NULL)
 	{
@@ -107,7 +100,7 @@ static void CheckGLError(Minecraft minecraft, char * msg)
 
 static void OnMouseClicked(Minecraft minecraft, int button)
 {
-	PlayerData player = ((MobData)minecraft->Player->TypeData)->TypeData;
+	PlayerData player = minecraft->Player->TypeData;
 	if (button != SDL_BUTTON_LEFT || minecraft->BlockHitTime <= 0)
 	{
 		if (button == SDL_BUTTON_LEFT)
@@ -116,22 +109,9 @@ static void OnMouseClicked(Minecraft minecraft, int button)
 			minecraft->Renderer->HeldBlock.Moving = true;
 		}
 		
-		int selected = InventoryGetSelected(player->Inventory);
-		if (button == SDL_BUTTON_RIGHT && selected > 0 && GameModeUseItem(minecraft->GameMode, minecraft->Player, selected))
+		if (!minecraft->Selected.Null)
 		{
-			minecraft->Renderer->HeldBlock.Position = 0.0;
-		}
-		else if (minecraft->Selected.Null)
-		{
-			if (button == SDL_BUTTON_LEFT && minecraft->GameMode->Type != GameModeTypeCreative) { minecraft->BlockHitTime = 10; }
-		}
-		else
-		{
-			if (minecraft->Selected.EntityPosition == 1)
-			{
-				if (button == SDL_BUTTON_LEFT) { EntityHurt(minecraft->Selected.Entity, minecraft->Player, 4); return; }
-			}
-			else if (minecraft->Selected.EntityPosition == 0)
+			if (minecraft->Selected.EntityPosition == 0)
 			{
 				int3 v = minecraft->Selected.XYZ;
 				if (button != SDL_BUTTON_LEFT)
@@ -146,7 +126,21 @@ static void OnMouseClicked(Minecraft minecraft, int button)
 				Block block = Blocks.Table[LevelGetTile(minecraft->Level, v.x, v.y, v.z)];
 				if (button == SDL_BUTTON_LEFT)
 				{
-					if (block != NULL && (block->Type != BlockTypeBedrock || player->UserType >= 100)) { GameModeHitBlock(minecraft->GameMode, v.x, v.y, v.z); return; }
+					if (block != NULL && (block->Type != BlockTypeBedrock || player->UserType >= 100))
+					{
+						Level level = minecraft->Level;
+						Block block = Blocks.Table[LevelGetTile(level, v.x, v.y, v.z)];
+						bool setTile = LevelNetSetTile(level, v.x, v.y, v.z, 0);
+						if (block != NULL && setTile)
+						{
+							if (block->Sound.Type != TileSoundTypeNone)
+							{
+								LevelPlaySoundAt(level, "step.wtf", (float3){ v.x, v.y, v.z}, (TileSoundGetVolume(block->Sound) + 1.0) / 2.0, TileSoundGetPitch(block->Sound) * 0.8);
+							}
+							BlockSpawnBreakParticles(block, level, v.x, v.y, v.z, minecraft->ParticleManager);
+						}
+						return;
+					}
 				}
 				else
 				{
@@ -155,9 +149,8 @@ static void OnMouseClicked(Minecraft minecraft, int button)
 					
 					Block block = Blocks.Table[LevelGetTile(minecraft->Level, v.x, v.y, v.z)];
 					AABB aabb = Blocks.Table[selected] == NULL ? AABBNull : BlockGetCollisionAABB(Blocks.Table[selected], v.x, v.y, v.z);
-					if ((block == NULL || block->Type == BlockTypeWater || block->Type == BlockTypeStillWater || block->Type == BlockTypeLava || block->Type == BlockTypeStillLava) && (AABBIsNull(aabb) || (AABBIntersects(minecraft->Player->AABB, aabb) ? false : LevelIsFree(minecraft->Level, aabb))))
+					if ((block == NULL || block->Type == BlockTypeWater || block->Type == BlockTypeStillWater || block->Type == BlockTypeLava || block->Type == BlockTypeStillLava) && (AABBIsNull(aabb) || !AABBIntersects(minecraft->Player->AABB, aabb)))
 					{
-						if (!GameModeCanPlace(minecraft->GameMode, selected)) { return; }
 						LevelNetSetTile(minecraft->Level, v.x, v.y, v.z, selected);
 						minecraft->Renderer->HeldBlock.Position = 0.0;
 						BlockOnPlaced(Blocks.Table[selected], minecraft->Level, v.x, v.y, v.z);
@@ -177,8 +170,6 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 		if (System.currentTimeMillis() > var2.lastMusic && var2.playMusic(var1, "calm")) { var2.lastMusic = System.currentTimeMillis() + (long)var2.random.nextInt(900000) + 300000L; }
 	}*/
 	
-	GameModeSpawnMob(minecraft->GameMode);
-	
 	HUDScreen hud = minecraft->HUD;
 	hud->Ticks++;
 	for (int i = 0; i < ListCount(hud->Chat); i++) { hud->Chat[i]->Time++; }
@@ -193,9 +184,7 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, texture->TextureID % 16 << 4, texture->TextureID / 16 << 4, 16, 16, GL_RGBA, GL_UNSIGNED_BYTE, minecraft->TextureManager->TextureBuffer);
 	}
 	
-	MobData playerMob = minecraft->Player->TypeData;
-	PlayerData player = playerMob->TypeData;
-	if (minecraft->CurrentScreen == NULL && minecraft->Player != NULL && playerMob->Health <= 0) { MinecraftSetCurrentScreen(minecraft, NULL); }
+	PlayerData player = minecraft->Player->TypeData;
 	if (minecraft->CurrentScreen == NULL || minecraft->CurrentScreen->GrabsMouse)
 	{
 		for (int i = 0; i < ListCount(events); i++)
@@ -222,7 +211,7 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 						if (tile == BlockTypeGrass) { tile = BlockTypeDirt; }
 						if (tile == BlockTypeDoubleSlab) { tile = BlockTypeSlab; }
 						if (tile == BlockTypeBedrock) { tile = BlockTypeStone; }
-						InventoryGrabTexture(player->Inventory, tile, minecraft->GameMode->Type == GameModeTypeCreative);
+						InventoryGrabTexture(player->Inventory, tile);
 					}
 				}
 			}
@@ -240,22 +229,14 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 				else
 				{
 					if (events[i].key.keysym.scancode == SDL_SCANCODE_ESCAPE) { MinecraftPause(minecraft); events[i] = (SDL_Event){ 0 }; }
-					if (minecraft->GameMode->Type == GameModeTypeCreative)
+					if (events[i].key.keysym.scancode == minecraft->Settings->LoadLocationKey.Key) { EntityResetPosition(minecraft->Player); }
+					if (events[i].key.keysym.scancode == minecraft->Settings->SaveLocationKey.Key)
 					{
-						if (events[i].key.keysym.scancode == minecraft->Settings->LoadLocationKey.Key) { EntityResetPosition(minecraft->Player); }
-						if (events[i].key.keysym.scancode == minecraft->Settings->SaveLocationKey.Key)
-						{
-							LevelSetSpawnPosition(minecraft->Level, minecraft->Player->Position.x, minecraft->Player->Position.y, minecraft->Player->Position.z, minecraft->Player->Rotation.y);
-							EntityResetPosition(minecraft->Player);
-						}
+						LevelSetSpawnPosition(minecraft->Level, minecraft->Player->Position.x, minecraft->Player->Position.y, minecraft->Player->Position.z, minecraft->Player->Rotation.y);
+						EntityResetPosition(minecraft->Player);
 					}
 					if (events[i].key.keysym.scancode == SDL_SCANCODE_F5) { minecraft->Raining = !minecraft->Raining; }
-					if (events[i].key.keysym.scancode == SDL_SCANCODE_TAB && minecraft->GameMode->Type == GameModeTypeSurvival && player->Arrows > 0)
-					{
-						LevelAddEntity(minecraft->Level, ArrowCreate(minecraft->Level, minecraft->Player, minecraft->Player->Position, minecraft->Player->Rotation.yx, 1.2));
-						player->Arrows--;
-					}
-					if (events[i].key.keysym.scancode == minecraft->Settings->BuildKey.Key) { GameModeOpenInventory(minecraft->GameMode); }
+					if (events[i].key.keysym.scancode == minecraft->Settings->BuildKey.Key) { MinecraftSetCurrentScreen(minecraft, BlockSelectScreenCreate()); }
 					if (events[i].key.keysym.scancode == minecraft->Settings->ChatKey.Key)
 					{
 						//PlayerReleaseAllKeys(minecraft->Player);
@@ -284,16 +265,6 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 				minecraft->LastClick = minecraft->Ticks;
 			}
 		}
-		
-		bool condition = minecraft->CurrentScreen == NULL && (SDL_GetMouseState(&(int){ 0 }, &(int){ 0 }) & SDL_BUTTON(SDL_BUTTON_LEFT)) > 0 && minecraft->HasMouse;
-		if (!minecraft->GameMode->InstantBreak && minecraft->BlockHitTime <= 0)
-		{
-			if (condition && !minecraft->Selected.Null && minecraft->Selected.EntityPosition == 0)
-			{
-				GameModeHitBlockSide(minecraft->GameMode, minecraft->Selected.XYZ.x, minecraft->Selected.XYZ.y, minecraft->Selected.XYZ.z, minecraft->Selected.Face);
-			}
-			else { GameModeResetHits(minecraft->GameMode); }
-		}
 	}
 	
 	if (minecraft->CurrentScreen != NULL)
@@ -317,8 +288,7 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 				renderer->HeldBlock.Moving = false;
 			}
 		}
-		MobData playerMob = minecraft->Player->TypeData;
-		PlayerData player = playerMob->TypeData;
+		PlayerData player = minecraft->Player->TypeData;
 		int selected = InventoryGetSelected(player->Inventory);
 		Block block = NULL;
 		if (selected >= 0) { block = Blocks.Table[selected]; }
@@ -348,7 +318,7 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events)
 		
 		minecraft->LevelRenderer->Ticks++;
 		LevelTickEntities(minecraft->Level);
-		if (!MinecraftIsOnline(minecraft)) { LevelTick(minecraft->Level); }
+		LevelTick(minecraft->Level);
 		ParticleManagerTick(minecraft->ParticleManager);
 	}
 }
@@ -395,29 +365,15 @@ void MinecraftRun(Minecraft minecraft)
 	TextureManagerRegisterAnimation(minecraft->TextureManager, WaterTextureCreate());
 	minecraft->Font = FontRendererCreate(minecraft->Settings, "Default.png", minecraft->TextureManager);
 	minecraft->LevelRenderer = LevelRendererCreate(minecraft, minecraft->TextureManager);
-	ItemInitializeModels();
-	MobModelCache = ModelManagerCreate();
 	glViewport(0, 0, minecraft->FrameWidth, minecraft->FrameHeight);
 	
-	if (minecraft->Server != NULL && minecraft->Session != NULL)
+	if (!minecraft->LevelLoaded)
 	{
-		Level level = LevelCreate();
-		unsigned char * data = MemoryAllocate(8 * 8 * 8);
-		LevelSetData(level, 8, 8, 8, data);
-		MemoryFree(data);
-		MinecraftSetLevel(minecraft, level);
+		Level level = LevelIOLoad(minecraft->LevelIO, SDL_RWFromFile("level.dat", "rb"));
+		if (level != NULL) { MinecraftSetLevel(minecraft, level); }
 	}
-	else
-	{
-		if (minecraft->LevelName != NULL) { MinecraftLoadOnlineLevel(minecraft, (char *)minecraft->LevelName, minecraft->LevelID); }
-		else if (!minecraft->LevelLoaded)
-		{
-			Level level = LevelIOLoad(minecraft->LevelIO, SDL_RWFromFile("level.dat", "rb"));
-			if (level != NULL) { MinecraftSetLevel(minecraft, level); }
-		}
-		
-		if (minecraft->Level == NULL) { MinecraftGenerateLevel(minecraft, 1); }
-	}
+	
+	if (minecraft->Level == NULL) { MinecraftGenerateLevel(minecraft, 0); }
 	minecraft->LevelLoaded = true;
 	
 	minecraft->ParticleManager = ParticleMangerCreate(minecraft->Level, minecraft->TextureManager);
@@ -447,16 +403,10 @@ void MinecraftRun(Minecraft minecraft)
 			var51.printStackTrace();
 			var4.running = false;
 		}
-		var1.resourceThread = new ResourceDownloadThread(var2, var1);
-		var1.resourceThread.start();
 	} catch (Exception var52) { ; }*/
 	
 	CheckGLError(minecraft, "Post startup");
 	minecraft->HUD = HUDScreenCreate(minecraft, minecraft->Width, minecraft->Height);
-	/*(new SkinDownloadThread(this)).start();
-	if(this.server != null && this.session != null) {
-		this.networkManager = new NetworkManager(this, this.server, this.port, this.session.username, this.session.mppass);
-	}*/
 	
 	int frame = 0;
 	uint64_t start = TimeMilli();
@@ -468,6 +418,20 @@ void MinecraftRun(Minecraft minecraft)
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT) { minecraft->Running = false; }
+			/*if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				SDL_GetWindowSize(minecraft->Window, &minecraft->Width, &minecraft->Height);
+				SDL_GL_GetDrawableSize(minecraft->Window, &minecraft->FrameWidth, &minecraft->FrameHeight);
+				glViewport(0, 0, minecraft->FrameWidth, minecraft->FrameHeight);
+				HUDScreenDestroy(minecraft->HUD);
+				minecraft->HUD = HUDScreenCreate(minecraft, minecraft->Width, minecraft->Height);
+				if (minecraft->CurrentScreen != NULL)
+				{
+					int w = minecraft->Width * 240 / minecraft->Height;
+					int h = minecraft->Height * 240 / minecraft->Height;
+					GUIScreenOpen(minecraft->CurrentScreen, minecraft, w, h);
+				}
+			}*/
 			SDL_Event copy;
 			memcpy(&copy, &event, sizeof(SDL_Event));
 			events = ListPush(events, &copy);
@@ -513,8 +477,6 @@ void MinecraftRun(Minecraft minecraft)
 		glEnable(GL_TEXTURE_2D);
 		if (!minecraft->Online)
 		{
-			GameModeApplyCracks(minecraft->GameMode, timer->Delta);
-			
 			float delta = timer->Delta;
 			Renderer renderer = minecraft->Renderer;
 			if (renderer->DisplayActive && (SDL_GetWindowFlags(minecraft->Window) & SDL_WINDOW_INPUT_FOCUS) == 0)
@@ -559,38 +521,11 @@ void MinecraftRun(Minecraft minecraft)
 				float s2 = sin(-rot.x * rad);
 				float sc = s1 * c2;
 				float cc = c1 * c2;
-				float reach = GameModeGetReachDistance(minecraft->GameMode);
+				float reach = 5.0;
 				float3 v2 = v + (float3){ sc, s2, cc } * reach;
 				minecraft->Selected = LevelClip(minecraft->Level, v, v2);
-				float _reach = reach;
-				if (!minecraft->Selected.Null) { reach = distance3f(minecraft->Selected.Vector, v); }
-				if (minecraft->GameMode->Type == GameModeTypeCreative) { reach = 32.0; }
-				else { reach = _reach; }
+				reach = 32.0;
 				v2 = v + (float3){ sc, s2, cc } * reach;
-				
-				renderer->Entity = NULL;
-				list(Entity) entities = BlockMapGetEntitiesAABB(minecraft->Level->BlockMap, player, AABBExpand(player->AABB, (float3){ sc, s2, cc } * reach));
-				float a = 0.0;
-				for (int i = 0; i < ListCount(entities); i++)
-				{
-					Entity entity = entities[i];
-					if (EntityIsPickable(entity))
-					{
-						_reach = 0.1;
-						MovingObjectPosition pos = AABBClip(AABBGrow(entity->AABB, one3f * _reach), v, v2);
-						if (!pos.Null) { _reach = distance3f(v, pos.Vector); }
-						if ((!pos.Null && _reach < a) || a == 0.0)
-						{
-							renderer->Entity = entity;
-							a = _reach;
-						}
-					}
-				}
-				ListDestroy(entities);
-				if (renderer->Entity != NULL && minecraft->GameMode->Type != GameModeTypeCreative)
-				{
-					minecraft->Selected = (MovingObjectPosition){ .EntityPosition = 1, .Entity = renderer->Entity };
-				}
 			
 				for (int i = 0; i <= 2; i++)
 				{
@@ -634,14 +569,10 @@ void MinecraftRun(Minecraft minecraft)
 					glLoadIdentity();
 					if (minecraft->Settings->Anaglyph) { glTranslatef(-((i << 1) - 1) * 0.07, 0.0, 0.0); }
 					
-					MobData playerMob = player->TypeData;
-					float fov = 70.0;
-					if (playerMob->Health <= 0) { fov /= (1.0 - 500.0 / (playerMob->DeathTime + delta + 500.0)) * 2.0 + 1.0; }
-					gluPerspective(fov, (float)minecraft->Width / (float)minecraft->Height, 0.05, renderer->FogEnd);
+					gluPerspective(70.0, (float)minecraft->Width / (float)minecraft->Height, 0.05, renderer->FogEnd);
 					glMatrixMode(GL_MODELVIEW);
 					glLoadIdentity();
 					if (minecraft->Settings->Anaglyph) { glTranslatef(((i << 1) - 1) * 0.1, 0.0, 0.0); }
-					RendererHurtEffect(renderer, delta);
 					if (minecraft->Settings->ViewBobbing) { RendererApplyBobbing(renderer, delta); }
 					
 					glTranslatef(0.0, 0.0, -0.1);
@@ -700,9 +631,6 @@ void MinecraftRun(Minecraft minecraft)
 					}
 					
 					ParticleManager particles = minecraft->ParticleManager;
-					RendererSetLighting(renderer, true);
-					float3 v = RendererGetPlayerVector(renderer, delta);
-					BlockMapRender(level->BlockMap, v, frustum, minecraft->TextureManager, delta);
 					RendererSetLighting(renderer, false);
 					RendererUpdateFog(renderer);
 					float dt = delta;
@@ -919,12 +847,9 @@ void MinecraftRun(Minecraft minecraft)
 						glDisable(GL_BLEND);
 					}
 					
-					if (renderer->Entity != NULL) { EntityRenderHover(renderer->Entity, delta); }
-					
 					glClear(GL_DEPTH_BUFFER_BIT);
 					glLoadIdentity();
 					if (minecraft->Settings->Anaglyph) { glTranslatef(((i << 1) - 1) * 0.1, 0.0, 0.0); }
-					RendererHurtEffect(renderer, delta);
 					if (minecraft->Settings->ViewBobbing) { RendererApplyBobbing(renderer, delta); }
 					
 					HeldBlock held = renderer->HeldBlock;
@@ -957,17 +882,6 @@ void MinecraftRun(Minecraft minecraft)
 						glTranslatef(-0.5, -0.5, -0.5);
 						glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->TextureManager, "Terrain.png"));
 						BlockRenderPreview(held.Block);
-					}
-					else
-					{
-						MobBindTexture(player, minecraft->TextureManager);
-						glScalef(1.0, -1.0, -1.0);
-						glTranslatef(0.0, 0.2, 0.0);
-						glRotatef(-120.0, 0.0, 0.0, 1.0);
-						glScalef(1.0, 1.0, 1.0);
-						ModelPart model = ((HumanoidModelData)PlayerGetModel(player)->TypeData)->LeftArm;
-						if (!model->HasList) { ModelPartGenerateList(model, 0.0625); }
-						glCallList(model->List);
 					}
 					glDisable(GL_NORMALIZE);
 					glPopMatrix();
@@ -1042,10 +956,9 @@ bool MinecraftIsOnline(Minecraft minecraft)
 
 void MinecraftGenerateLevel(Minecraft minecraft, int size)
 {
-	char * user = minecraft->Session != NULL ? minecraft->Session->UserName : "anonymous";
+	char * user = "anonymous";
 	LevelGenerator generator = LevelGeneratorCreate(minecraft->ProgressBar);
 	Level level = LevelGeneratorGenerate(generator, user, 128 << size, 128 << size, 64);
-	GameModePrepareLevel(minecraft->GameMode, level);
 	MinecraftSetLevel(minecraft, level);
 	LevelGeneratorDestroy(generator);
 }
@@ -1067,40 +980,26 @@ void MinecraftSetLevel(Minecraft minecraft, Level level)
 	minecraft->Level = level;
 	if (level != NULL)
 	{
-		LevelInitializeTransient(level);
-		GameModeApply(minecraft->GameMode, level);
 		level->Font = minecraft->Font;
 		level->Minecraft = minecraft;
-		if (!MinecraftIsOnline(minecraft))
-		{
-			if (minecraft->Player != NULL) { EntityDestroy(minecraft->Player); }
-			minecraft->Player = LevelFindPlayer(level);
-		}
-		else if (minecraft->Player != NULL)
-		{
-			PlayerResetPosition(minecraft->Player);
-			GameModePreparePlayer(minecraft->GameMode, minecraft->Player);
-			if (level != NULL)
-			{
-				level->Player = minecraft->Player;
-				LevelAddEntity(level, minecraft->Player);
-			}
-		}
+		if (minecraft->Player != NULL) { EntityDestroy(minecraft->Player); }
+		minecraft->Player = LevelFindPlayer(level);
 	}
 	
 	if (minecraft->Player == NULL)
 	{
 		minecraft->Player = PlayerCreate(level);
-		PlayerResetPosition(minecraft->Player);
-		//EntitySetPosition(minecraft->Player, minecraft->Player->Position + (float3){ 0.0, 100.0, 0.0 });
-		GameModePreparePlayer(minecraft->GameMode, minecraft->Player);
+		EntityResetPosition(minecraft->Player);
 		if (level != NULL) { level->Player = minecraft->Player; }
 	}
 	
-	MobData playerMob = minecraft->Player->TypeData;
-	PlayerData player = playerMob->TypeData;
+	PlayerData player = minecraft->Player->TypeData;
 	player->Input = InputHandlerCreate(minecraft->Settings);
-	GameModeApplyPlayer(minecraft->GameMode, minecraft->Player);
+	for (int i = 0; i < 9; i++)
+	{
+		player->Inventory->Count[i] = 1;
+		if (player->Inventory->Slots[i] == -1) { player->Inventory->Slots[i] = SessionDataAllowedBlocks[i]->Type; }
+	}
 	
 	if (minecraft->LevelRenderer != NULL)
 	{
@@ -1127,7 +1026,6 @@ void MinecraftSetLevel(Minecraft minecraft, Level level)
 
 void MinecraftDestroy(Minecraft minecraft)
 {
-	GameModeDestroy(minecraft->GameMode);
 	TimerDestroy(minecraft->Timer);
 	ProgressBarDisplayDestroy(minecraft->ProgressBar);
 	RendererDestroy(minecraft->Renderer);

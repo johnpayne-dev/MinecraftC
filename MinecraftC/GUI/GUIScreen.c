@@ -5,7 +5,6 @@
 #include "ChatInputScreen.h"
 #include "ControlsScreen.h"
 #include "ErrorScreen.h"
-#include "GameOverScreen.h"
 #include "GenerateLevelScreen.h"
 #include "LevelNameScreen.h"
 #include "LoadLevelScreen.h"
@@ -31,7 +30,6 @@ void GUIScreenRender(GUIScreen screen, int2 m)
 	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenRender(screen, m); return; }
 	if (screen->Type == GUIScreenTypeControls) { ControlsScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeError) { ErrorScreenRender(screen, m); }
-	if (screen->Type == GUIScreenTypeGameOver) { GameOverScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenRender(screen, m); }
 	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenRender(screen, m); return; }
@@ -90,7 +88,6 @@ void GUIScreenOnMouseClicked(GUIScreen screen, int x, int y, int button)
 void GUIScreenOnButtonClicked(GUIScreen screen, Button button)
 {
 	if (screen->Type == GUIScreenTypeControls) { ControlsScreenOnButtonClicked(screen, button); return; }
-	if (screen->Type == GUIScreenTypeGameOver) { GameOverScreenOnButtonClicked(screen, button); return; }
 	if (screen->Type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenOnButtonClicked(screen, button); return; }
 	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenOnButtonClicked(screen, button); return; }
 	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnButtonClicked(screen, button); return; }
@@ -113,7 +110,6 @@ void GUIScreenOnOpen(GUIScreen screen)
 	if (screen->Type == GUIScreenTypeChatInput) { ChatInputScreenOnOpen(screen); return; }
 	if (screen->Type == GUIScreenTypeControls) { ControlsScreenOnOpen(screen); return; }
 	if (screen->Type == GUIScreenTypeError) { ErrorScreenOnOpen(screen); return; }
-	if (screen->Type == GUIScreenTypeGameOver) { GameOverScreenOnOpen(screen); return; }
 	if (screen->Type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenOnOpen(screen); return; }
 	if (screen->Type == GUIScreenTypeLevelName) { LevelNameScreenOnOpen(screen); return; }
 	if (screen->Type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnOpen(screen); return; }

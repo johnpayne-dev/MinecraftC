@@ -1,5 +1,5 @@
 #include "AABB.h"
-#include "../Model/Vector3D.h"
+#include "Vector3D.h"
 
 static float Epsilon = 0.0;
 

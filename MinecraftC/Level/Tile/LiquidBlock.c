@@ -153,21 +153,6 @@ int LiquidBlockGetTickDelay(LiquidBlock block)
 	return ((LiquidBlockData)block->TypeData)->Type == LiquidTypeLava ? 5 : 0;
 }
 
-void LiquidBlockOnBreak(LiquidBlock block, struct Level * level, int x, int y, int z)
-{
-	
-}
-
-void LiquidBlockDropItems(LiquidBlock block, struct Level * level, int x, int y, int z, float probability)
-{
-	
-}
-
-int LiquidBlockGetDropCount(LiquidBlock block)
-{
-	return 0;
-}
-
 int LiquidBlockGetRenderPass(LiquidBlock block)
 {
 	return ((LiquidBlockData)block->TypeData)->Type == LiquidTypeWater ? 1 : 0;

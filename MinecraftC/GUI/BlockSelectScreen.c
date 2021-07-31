@@ -63,7 +63,7 @@ void BlockSelectScreenOnMouseClicked(BlockSelectScreen screen, int x, int y, int
 {
 	if (button == SDL_BUTTON_LEFT)
 	{
-		InventoryReplaceSlot(((PlayerData)((MobData)screen->Minecraft->Player->TypeData)->TypeData)->Inventory, GetBlockOnScreen(screen, (int2){ x, y }));
+		InventoryReplaceSlot(((PlayerData)screen->Minecraft->Player->TypeData)->Inventory, GetBlockOnScreen(screen, (int2){ x, y }));
 		MinecraftSetCurrentScreen(screen->Minecraft, NULL);
 	}
 }

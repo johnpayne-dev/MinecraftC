@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include "Tile/Block.h"
 #include "NextTickListEntry.h"
-#include "BlockMap.h"
 #include "../MovingObjectPosition.h"
 #include "../Utilities/List.h"
 #include "../Utilities/Random.h"
@@ -24,7 +23,6 @@ typedef struct Level
 	RandomGenerator Random;
 	int RandomValue;
 	list(NextTickListEntry) TickList;
-	BlockMap BlockMap;
 	bool NetworkMode;
 	struct Minecraft * Minecraft;
 	bool CreativeMode;
@@ -62,15 +60,12 @@ BlockType LevelGetTile(Level level, int x, int y, int z);
 bool LevelIsSolidTile(Level level, int x, int y, int z);
 void LevelTickEntities(Level level);
 void LevelTick(Level level);
-int LevelCountInstancesOf(Level level, EntityType type);
 bool LevelIsInBounds(Level level, int x, int y, int z);
 float LevelGetGroundLevel(Level level);
 float LevelGetWaterLevel(Level level);
 bool LevelContainsAnyLiquid(Level level, AABB box);
 bool LevelContainsLiquid(Level level, AABB box, LiquidType liquidID);
 void LevelAddToNextTick(Level level, int x, int y, int z, BlockType tile);
-bool LevelIsFree(Level level, AABB aabb);
-list(Entity) LevelFindEntities(Level level, AABB aabb);
 bool LevelIsSolidSearch(Level level, float3 pos, float search);
 int LevelGetHighestTile(Level level, int x, int z);
 void LevelSetSpawnPosition(Level level, int x, int y, int z, float rotation);
@@ -87,8 +82,6 @@ void LevelPlaySoundAt(Level level, const char * sound, float3 position, float vo
 bool LevelMaybeGrowTree(Level level, int x, int y, int z);
 Entity LevelGetPlayer(Level level);
 void LevelAddEntity(Level level, Entity entity);
-void LevelRemoveEntity(Level level, Entity entity);
 void LevelExplode(Level level, Entity entity, float3 pos, float radius);
 Entity LevelFindPlayer(Level level);
-void LevelRemoveAllNonCreativeModeEntities(Level level);
 void LevelDestroy(Level level);

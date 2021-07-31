@@ -23,8 +23,5 @@ bool LiquidBlockIsSolid(LiquidBlock block);
 LiquidType LiquidBlockGetLiquidType(LiquidBlock block);
 void LiquidBlockOnNeighborChanged(LiquidBlock block, struct Level * level, int x, int y, int z, BlockType tile);
 int LiquidBlockGetTickDelay(LiquidBlock block);
-void LiquidBlockOnBreak(LiquidBlock block, struct Level * level, int x, int y, int z);
-void LiquidBlockDropItems(LiquidBlock block, struct Level * level, int x, int y, int z, float probability);
-int LiquidBlockGetDropCount(LiquidBlock block);
 int LiquidBlockGetRenderPass(LiquidBlock block);
 void LiquidBlockDestroy(LiquidBlock block);

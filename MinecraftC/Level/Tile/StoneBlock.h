@@ -4,4 +4,3 @@
 typedef Block StoneBlock;
 
 StoneBlock StoneBlockCreate(int textureID);
-BlockType StoneBlockGetDrop(StoneBlock block);

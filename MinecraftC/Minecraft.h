@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include "GameMode/GameMode.h"
 #include "Render/LevelRenderer.h"
 #include "Particle/ParticleManager.h"
 #include "GUI/GUIScreen.h"
@@ -15,7 +14,6 @@ typedef void * MinecraftApplet;
 
 typedef struct Minecraft
 {
-	GameMode GameMode;
 	bool FullScreen;
 	int Width, FrameWidth;
 	int Height, FrameHeight;
