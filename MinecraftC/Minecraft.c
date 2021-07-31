@@ -327,7 +327,7 @@ void MinecraftRun(Minecraft minecraft)
 {
 	minecraft->Running = true;
 	
-	SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
+	SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE;
 	if (minecraft->FullScreen) { flags |= SDL_WINDOW_FULLSCREEN_DESKTOP; }
 	minecraft->Window = SDL_CreateWindow("Minecraft 0.30", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, minecraft->Width, minecraft->Height, flags);
 	if (minecraft->Window == NULL) { LogFatal("Failed to create window: %s\n", SDL_GetError()); }
@@ -418,7 +418,7 @@ void MinecraftRun(Minecraft minecraft)
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT) { minecraft->Running = false; }
-			/*if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
+			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
 				SDL_GetWindowSize(minecraft->Window, &minecraft->Width, &minecraft->Height);
 				SDL_GL_GetDrawableSize(minecraft->Window, &minecraft->FrameWidth, &minecraft->FrameHeight);
@@ -431,7 +431,7 @@ void MinecraftRun(Minecraft minecraft)
 					int h = minecraft->Height * 240 / minecraft->Height;
 					GUIScreenOpen(minecraft->CurrentScreen, minecraft, w, h);
 				}
-			}*/
+			}
 			SDL_Event copy;
 			memcpy(&copy, &event, sizeof(SDL_Event));
 			events = ListPush(events, &copy);

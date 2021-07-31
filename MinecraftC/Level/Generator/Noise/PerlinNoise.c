@@ -50,10 +50,6 @@ float PerlinNoiseCompute(PerlinNoise noise, float2 xy)
 	float l3 = Lerp(vd.x, Grad(aab, v - forward3f), Grad(bab, v - right3f - forward3f));
 	float l4 = Lerp(vd.x, Grad(abb, v - forward3f - up3f), Grad(bbb, v - one3f));
 	float l = Lerp(vd.z, Lerp(vd.y, l1, l2), Lerp(vd.y, l3, l4));
-	if (l > 1.0 || l < -1.0)
-	{
-		
-	}
 	return l;
 }
 
