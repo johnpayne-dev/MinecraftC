@@ -4,6 +4,7 @@
 #include "../Minecraft.h"
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/Time.h"
+#include "../Utilities/SinTable.h"
 
 HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height)
 {
@@ -46,9 +47,9 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos)
 			if (player->Inventory->PopTime[i] > 0)
 			{
 				float f1 = (player->Inventory->PopTime[i] - var1) / 5.0;
-				float f2 = -sin(f1 * f1 * pi) * 8.0;
-				float f3 = sin(f1 * f1 * pi) + 1.0;
-				float f4 = sin(f1 * pi) + 1.0;
+				float f2 = -tsin(f1 * f1 * pi) * 8.0;
+				float f3 = tsin(f1 * f1 * pi) + 1.0;
+				float f4 = tsin(f1 * pi) + 1.0;
 				glTranslatef(10.0, f2 + 10.0, 0.0);
 				glScalef(f3, f4, 1.0);
 				glTranslatef(-10.0, -10.0, 0.0);

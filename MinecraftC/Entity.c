@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "Level/Level.h"
 #include "Player/Player.h"
+#include "Utilities/SinTable.h"
 
 Entity EntityCreate(Level level)
 {
@@ -254,8 +255,8 @@ void EntityMoveRelative(Entity entity, float2 xz, float speed)
 		if (len < 1.0) { len = 1.0; }
 		len = speed / len;
 		xz *= len;
-		float s = sin(entity->Rotation.y * rad);
-		float c = cos(entity->Rotation.y * rad);
+		float s = tsin(entity->Rotation.y * rad);
+		float c = tcos(entity->Rotation.y * rad);
 		entity->Delta.x += xz.x * c - xz.y * s;
 		entity->Delta.z += xz.y * c + xz.x * s;
 	}

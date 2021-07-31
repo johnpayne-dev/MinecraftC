@@ -4,6 +4,7 @@
 #include "Noise/CombinedNoise.h"
 #include "../../Utilities/Time.h"
 #include "../../Utilities/Log.h"
+#include "../../Utilities/SinTable.h"
 
 LevelGenerator LevelGeneratorCreate(ProgressBarDisplay progressBar)
 {
@@ -32,12 +33,12 @@ static void PopulateOre(LevelGenerator generator, BlockType ore, int a1, int a2,
 		float2 r2 = { 0.0, 0.0 };
 		for (int j = 0; j < jj; j++)
 		{
-			v1 += (float3){ sin(r1.x) * cos(r1.y), sin(r1.y), cos(r1.x) * cos(r1.y) };
+			v1 += (float3){ tsin(r1.x) * tcos(r1.y), tsin(r1.y), tcos(r1.x) * tcos(r1.y) };
 			r1.x += r2.x * 0.2;
 			r2.x = r2.x * 0.9 + RandomGeneratorUniform(generator->Random) - RandomGeneratorUniform(generator->Random);
 			r1.y = (r1.y + r2.y * 0.5) * 0.5;
 			r2.y = r2.y * 0.9 + RandomGeneratorUniform(generator->Random) - RandomGeneratorUniform(generator->Random);
-			float v2 = sin(j * pi / jj) * a1 / 100.0 + 1.0;
+			float v2 = tsin(j * pi / jj) * a1 / 100.0 + 1.0;
 			for (int x = v1.x - v2; x <= (int)(v1.x + v2); x++)
 			{
 				for (int y = v1.y - v2; y <= (int)(v1.y + v2); y++)
@@ -245,7 +246,7 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 		float v2 = RandomGeneratorUniform(generator->Random) * RandomGeneratorUniform(generator->Random);
 		for (int j = 0; j < jj; j++)
 		{
-			v1 += (float3){ sin(r1.x) * cos(r1.y), sin(r1.y), cos(r1.x) * cos(r1.y) };
+			v1 += (float3){ tsin(r1.x) * tcos(r1.y), tsin(r1.y), tcos(r1.x) * tcos(r1.y) };
 			r1.x = (r1.x + r1.x * 0.2) * 0.9;
 			r2.x = r1.x + RandomGeneratorUniform(generator->Random) - RandomGeneratorUniform(generator->Random);
 			r1.y = (r1.y + r2.y * 0.5) * 0.5;
@@ -255,7 +256,7 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 				float3 v3 = v1 + ((float3){ RandomGeneratorUniform(generator->Random), RandomGeneratorUniform(generator->Random), RandomGeneratorUniform(generator->Random) } * 4.0 - 2.0) * 0.2;
 				float v4 = (h - v3.y) / h;
 				v4 = 1.2 + (v4 * 3.5 + 1.0) * v2;
-				v4 *= sin(j * pi / jj);
+				v4 *= tsin(j * pi / jj);
 				for (int x = v3.x - v4; x <= (int)(v3.x + v4); x++)
 				{
 					for (int y = v3.y - v4; y <= (int)(v3.y + v4); y++)

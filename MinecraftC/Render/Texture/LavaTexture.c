@@ -1,5 +1,6 @@
 #include "LavaTexture.h"
 #include "../../Level/Tile/Block.h"
+#include "../../Utilities/SinTable.h"
 
 LavaTexture LavaTextureCreate()
 {
@@ -17,8 +18,8 @@ void LavaTextureAnimate(LavaTexture texture)
 	{
 		for (int y = 0; y < 16; y++)
 		{
-			int sy = sin(y * pi / 8.0) * 1.2;
-			int sx = sin(x * pi / 8.0) * 1.2;
+			int sy = tsin(y * pi / 8.0) * 1.2;
+			int sx = tsin(x * pi / 8.0) * 1.2;
 			float v = 0.0;
 			for (int i = x - 1; i <= x + 1; i++)
 			{

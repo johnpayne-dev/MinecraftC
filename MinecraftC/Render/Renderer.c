@@ -1,6 +1,7 @@
 #include <OpenGL.h>
 #include "Renderer.h"
 #include "../Minecraft.h"
+#include "../Utilities/SinTable.h"
 
 Renderer RendererCreate(Minecraft minecraft)
 {
@@ -32,9 +33,9 @@ void RendererApplyBobbing(Renderer renderer, float t)
 	walk = entity->WalkDistance + walk * t;
 	float bob = player->OldBobbing + (player->Bobbing - player->OldBobbing) * t;
 	float tilt = player->OldTilt + (player->Tilt - player->OldTilt) * t;
-	glTranslatef(sin(walk * pi) * bob * 0.5, -fabs(cos(walk * pi) * bob), 0.0);
-	glRotatef(sin(walk * pi) * bob * 3.0, 0.0, 0.0, 1.0);
-	glRotatef(fabs(cos(walk * pi + 0.2) * bob) * 5.0, 1.0, 0.0, 0.0);
+	glTranslatef(tsin(walk * pi) * bob * 0.5, -fabs(tcos(walk * pi) * bob), 0.0);
+	glRotatef(tsin(walk * pi) * bob * 3.0, 0.0, 0.0, 1.0);
+	glRotatef(fabs(tcos(walk * pi + 0.2) * bob) * 5.0, 1.0, 0.0, 0.0);
 	glRotatef(tilt, 1.0, 0.0, 0.0);
 }
 

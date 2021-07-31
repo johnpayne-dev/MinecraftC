@@ -5,6 +5,7 @@
 #include "GUI/ChatInputScreen.h"
 #include "GUI/BlockSelectScreen.h"
 #include "Utilities/Log.h"
+#include "Utilities/SinTable.h"
 #include "Utilities/Time.h"
 #include "Render/Texture/LavaTexture.h"
 #include "Render/Texture/WaterTexture.h"
@@ -515,10 +516,10 @@ void MinecraftRun(Minecraft minecraft)
 				Player player = minecraft->Player;
 				float2 rot = player->OldRotation + (player->Rotation - player->OldRotation) * delta;
 				float3 v = RendererGetPlayerVector(renderer, delta);
-				float c1 = cos(-rot.y * rad - pi);
-				float s1 = sin(-rot.y * rad - pi);
-				float c2 = cos(-rot.x * rad);
-				float s2 = sin(-rot.x * rad);
+				float c1 = tcos(-rot.y * rad - pi);
+				float s1 = tsin(-rot.y * rad - pi);
+				float c2 = tcos(-rot.x * rad);
+				float s2 = tsin(-rot.x * rad);
 				float sc = s1 * c2;
 				float cc = c1 * c2;
 				float reach = 5.0;
@@ -634,11 +635,11 @@ void MinecraftRun(Minecraft minecraft)
 					RendererSetLighting(renderer, false);
 					RendererUpdateFog(renderer);
 					float dt = delta;
-					float c = -cos(player->Rotation.y * rad);
-					float s = -sin(player->Rotation.y * rad);
-					float ss = -s * sin(player->Rotation.x * rad);
-					float cs = c * sin(player->Rotation.x * rad);
-					float c2 = cos(player->Rotation.x * rad);
+					float c = -tcos(player->Rotation.y * rad);
+					float s = -tsin(player->Rotation.y * rad);
+					float ss = -s * tsin(player->Rotation.x * rad);
+					float cs = c * tsin(player->Rotation.x * rad);
+					float c2 = tcos(player->Rotation.x * rad);
 					for (int j = 0; j < 2; j++)
 					{
 						if (ListCount(particles->Particles[j]) != 0)
@@ -717,7 +718,7 @@ void MinecraftRun(Minecraft minecraft)
 						glEnable(GL_BLEND);
 						glEnable(GL_ALPHA_TEST);
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-						glColor4f(1.0, 1.0, 1.0, (sin(TimeMilli() / 100.0) * 0.2 + 0.4) * 0.5);
+						glColor4f(1.0, 1.0, 1.0, (tsin(TimeMilli() / 100.0) * 0.2 + 0.4) * 0.5);
 						if (lrenderer->Cracks > 0.0)
 						{
 							glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
@@ -863,7 +864,7 @@ void MinecraftRun(Minecraft minecraft)
 					if (held.Moving)
 					{
 						float a = (held.Offset + delta) / 7.0;
-						glTranslatef(-sin(sqrt(a) * pi) * 0.4, sin(sqrt(a) * pi * 2.0) * 0.2, -sin(a * pi) * 0.2);
+						glTranslatef(-tsin(sqrt(a) * pi) * 0.4, tsin(sqrt(a) * pi * 2.0) * 0.2, -tsin(a * pi) * 0.2);
 					}
 					glTranslatef(0.7 * 0.8, -0.65 * 0.8 - (1.0 - heldPos) * 0.6, -0.9 * 0.8);
 					glRotatef(45.0, 0.0, 1.0, 0.0);
@@ -871,8 +872,8 @@ void MinecraftRun(Minecraft minecraft)
 					if (held.Moving)
 					{
 						float a = (held.Offset + delta) / 7.0;
-						glRotatef(sin(sqrt(a) * pi) * 80.0, 0.0, 1.0, 0.0);
-						glRotatef(-sin(a * a * pi), 1.0, 0.0, 0.0);
+						glRotatef(tsin(sqrt(a) * pi) * 80.0, 0.0, 1.0, 0.0);
+						glRotatef(-tsin(a * a * pi), 1.0, 0.0, 0.0);
 					}
 					float brightness = LevelGetBrightness(level, player->Position.x, player->Position.y, player->Position.z);
 					glColor4f(brightness, brightness, brightness, 1.0);
@@ -1036,6 +1037,7 @@ void MinecraftDestroy(Minecraft minecraft)
 
 int main(int argc, char * argv[])
 {
+	SinTableInitialize();
 	Minecraft minecraft = MinecraftCreate(NULL, 860, 480, false);
 	MinecraftRun(minecraft);
 	return 0;

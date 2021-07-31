@@ -3,6 +3,7 @@
 #include "SaplingBlock.h"
 #include "../Level.h"
 #include "../../Render/ShapeRenderer.h"
+#include "../../Utilities/SinTable.h"
 
 FlowerBlock FlowerBlockCreate(BlockType type, int textureID)
 {
@@ -53,7 +54,7 @@ static void Render(FlowerBlock block, float3 v0)
 	
 	for (int i = 0; i < 2; i++)
 	{
-		float2 sc = (float2){ sin(i * pi / 2.0 + pi / 4.0), cos(i * pi / 2.0 + pi / 4.0) } * 0.5;
+		float2 sc = (float2){ tsin(i * pi / 2.0 + pi / 4.0), tcos(i * pi / 2.0 + pi / 4.0) } * 0.5;
 		float3 v1 = v0 + (float3){ 0.5 - sc.x, 1.0, 0.5 - sc.y };
 		sc += v0.xz + 0.5;
 		ShapeRendererVertexUV((float3){ v1.x, v1.y, v1.z }, (float2){ uv2.x, uv1.y });

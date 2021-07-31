@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "../Render/LevelRenderer.h"
 #include "../Utilities/Log.h"
+#include "../Utilities/SinTable.h"
 
 Level LevelCreate()
 {
@@ -439,8 +440,8 @@ float LevelGetCaveness(Level level, float3 pos, float degrees)
 
 float LevelGetCavenessEntity(Level level, Entity entity)
 {
-	float2 r1 = { cos(-entity->Rotation.y * deg + pi), sin(-entity->Rotation.y * deg + pi) };
-	float2 r2 = { cos(-entity->Rotation.x * deg), sin(-entity->Rotation.x * deg) };
+	float2 r1 = { tcos(-entity->Rotation.y * deg + pi), tsin(-entity->Rotation.y * deg + pi) };
+	float2 r2 = { tcos(-entity->Rotation.x * deg), tsin(-entity->Rotation.x * deg) };
 	float3 p = entity->Position;
 	float f = 0.0, g = 0.0;
 	for (int i = 0; i <= 200; i++)
