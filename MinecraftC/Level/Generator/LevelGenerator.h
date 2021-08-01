@@ -8,7 +8,7 @@ typedef struct LevelGenerator
 	ProgressBarDisplay ProgressBar;
 	int Width, Depth, Height;
 	RandomGenerator Random;
-	unsigned char * Blocks;
+	uint8_t * Blocks;
 	int WaterLevel;
 	int * FloodData;
 } * LevelGenerator;

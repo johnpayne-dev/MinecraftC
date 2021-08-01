@@ -5,7 +5,7 @@ typedef struct ProgressBarDisplay
 	struct Minecraft * Minecraft;
 	char * Text;
 	char * Title;
-	long Start;
+	int64_t Start;
 } * ProgressBarDisplay;
 
 ProgressBarDisplay ProgressBarDisplayCreate(struct Minecraft * minecraft);

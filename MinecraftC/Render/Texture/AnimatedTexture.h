@@ -11,7 +11,7 @@ typedef enum AnimatedTextureType
 
 typedef struct AnimatedTexture
 {
-	unsigned char Data[1024];
+	uint8_t Data[1024];
 	int TextureID;
 	bool Anaglyph;
 	AnimatedTextureType Type;

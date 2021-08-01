@@ -4,16 +4,16 @@
 
 typedef struct RandomGenerator
 {
-	unsigned long Seed;
-	unsigned long State;
+	uint64_t Seed;
+	uint64_t State;
 	double LastNormal;
 } * RandomGenerator;
 
-RandomGenerator RandomGeneratorCreate(unsigned long seed);
+RandomGenerator RandomGeneratorCreate(uint64_t seed);
 
-unsigned long RandomGeneratorInteger(RandomGenerator generator);
+uint64_t RandomGeneratorInteger(RandomGenerator generator);
 
-long RandomGeneratorIntegerRange(RandomGenerator generator, long min, long max);
+int64_t RandomGeneratorIntegerRange(RandomGenerator generator, int64_t min, int64_t max);
 
 double RandomGeneratorUniform(RandomGenerator generator);
 

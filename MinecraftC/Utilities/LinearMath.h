@@ -99,7 +99,7 @@ Matrix4x4 Matrix4x4FromLookAt(float3 position, float3 target, float3 up);
 
 Matrix4x4 Matrix4x4FromDirection(float3 direction, float3 up);
 
-typedef unsigned char __attribute__((ext_vector_type(4))) Color;
+typedef uint8_t __attribute__((ext_vector_type(4))) Color;
 
 #define ColorBlack (Color){ 0x00, 0x00, 0x00, 0xff }
 #define ColorWhite (Color){ 0xff, 0xff, 0xff, 0xff }

@@ -12,10 +12,10 @@
 typedef struct Level
 {
 	int Width, Height, Depth;
-	unsigned char * Blocks;
+	uint8_t * Blocks;
 	const char * Name;
 	const char * Creator;
-	long CreateTime;
+	int64_t CreateTime;
 	int3 Spawn;
 	float SpawnRotation;
 	list(struct LevelRenderer *) Renderers;
@@ -40,7 +40,7 @@ typedef struct Level
 
 Level LevelCreate(void);
 void LevelInitializeTransient(Level level);
-void LevelSetData(Level level, int w, int d, int h, unsigned char * blocks);
+void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks);
 void LevelFindSpawn(Level level);
 void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1);
 void LevelAddRenderer(Level level, struct LevelRenderer * listener);
@@ -72,7 +72,7 @@ void LevelSetSpawnPosition(Level level, int x, int y, int z, float rotation);
 float LevelGetBrightness(Level level, int x, int y, int z);
 float LevelGetCaveness(Level level, float3 xyz, float degrees);
 float LevelGetCavenessEntity(Level level, Entity entity);
-unsigned char * LevelCopyBlocks(Level level);
+uint8_t * LevelCopyBlocks(Level level);
 LiquidType LevelGetLiquidType(Level level, int x, int y, int z);
 bool LevelIsWater(Level level, int x, int y, int z);
 void LevelSetNetworkMode(Level level, bool network);

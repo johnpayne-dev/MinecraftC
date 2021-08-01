@@ -152,7 +152,7 @@ Color ColorFromHex(unsigned int hex)
 Color ColorFromFloat4(float4 rgba)
 {
 	rgba *= 255.0;
-	return (Color){ (unsigned char)rgba.x, (unsigned char)rgba.y, (unsigned char)rgba.z, (unsigned char)rgba.w, };
+	return (Color){ (uint8_t)rgba.x, (uint8_t)rgba.y, (uint8_t)rgba.z, (uint8_t)rgba.w, };
 }
 
 float4 ColorToFloat4(Color color)

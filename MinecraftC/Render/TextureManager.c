@@ -37,7 +37,7 @@ int TextureManagerLoad(TextureManager manager, char * resource)
 	SDL_RWclose(file);
 	
 	int width, height, channels;
-	unsigned char * p = stbi_load_from_memory(fileData, fileSize, &width, &height, &channels, 4);
+	uint8_t * p = stbi_load_from_memory(fileData, fileSize, &width, &height, &channels, 4);
 	if (p == NULL) { LogFatal("Failed to open file %s: %s\n", resource, stbi_failure_reason()); }
 	MemoryFree(fileData);
 	

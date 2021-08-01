@@ -1038,6 +1038,8 @@ void MinecraftDestroy(Minecraft minecraft)
 int main(int argc, char * argv[])
 {
 	SinTableInitialize();
+	RandomSetSeed((unsigned int)time(NULL));
+	
 	Minecraft minecraft = MinecraftCreate(NULL, 860, 480, false);
 	MinecraftRun(minecraft);
 	return 0;

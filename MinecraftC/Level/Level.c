@@ -36,7 +36,7 @@ void LevelInitializeTransient(Level level)
 	LevelFindSpawn(level);
 }
 
-void LevelSetData(Level level, int w, int d, int h, unsigned char * blocks)
+void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks)
 {
 	level->Width = w;
 	level->Depth = d;
@@ -485,9 +485,9 @@ float LevelGetCavenessEntity(Level level, Entity entity)
 	}
 }
 
-unsigned char * LevelCopyBlocks(Level level)
+uint8_t * LevelCopyBlocks(Level level)
 {
-	unsigned char * blocks = MemoryAllocate(level->Width * level->Depth * level->Height);
+	uint8_t * blocks = MemoryAllocate(level->Width * level->Depth * level->Height);
 	memcpy(blocks, level->Blocks, level->Width * level->Depth * level->Height);
 	return blocks;
 }

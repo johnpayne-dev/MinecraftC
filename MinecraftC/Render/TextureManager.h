@@ -7,7 +7,7 @@ typedef struct TextureManager
 {
 	list(unsigned int) Textures;
 	list(char *) TextureNames;
-	unsigned char * TextureBuffer;
+	uint8_t * TextureBuffer;
 	unsigned int IDBuffer;
 	list(AnimatedTexture) Animations;
 	GameSettings Settings;

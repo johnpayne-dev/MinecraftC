@@ -58,7 +58,7 @@ static void PopulateOre(LevelGenerator generator, BlockType ore, int a1, int a2,
 	}
 }
 
-static long Flood(LevelGenerator generator, int x, int y, int z, int var, BlockType tile)
+static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, BlockType tile)
 {
 	list(int *) floodStack = ListCreate(sizeof(int *));
 	
@@ -69,7 +69,7 @@ static long Flood(LevelGenerator generator, int x, int y, int z, int var, BlockT
 	int w = generator->Width - 1;
 	generator->FloodData[0] = (((y << xx) + z) << zz) + x;
 	int i = 1;
-	long j = 0;
+	int64_t j = 0;
 	int ii = generator->Width * generator->Depth;
 	while (i > 0)
 	{

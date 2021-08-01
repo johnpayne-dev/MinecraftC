@@ -46,7 +46,7 @@ void ProgressBarDisplaySetProgress(ProgressBarDisplay display, int progress)
 {
 	if (!display->Minecraft->Running) { LogFatal("\n"); }
 	
-	long time = TimeMilli();
+	int64_t time = TimeMilli();
 	if (time - display->Start < 0 || time - display->Start >= 20)
 	{
 		display->Start = time;

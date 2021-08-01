@@ -2,7 +2,7 @@
 #include "Memory.h"
 #include <stdlib.h>
 
-RandomGenerator RandomGeneratorCreate(unsigned long seed)
+RandomGenerator RandomGeneratorCreate(uint64_t seed)
 {
 	RandomGenerator generator = malloc(sizeof(struct RandomGenerator));
 	generator->Seed = seed;
@@ -11,7 +11,7 @@ RandomGenerator RandomGeneratorCreate(unsigned long seed)
 	return generator;
 }
 
-unsigned long RandomGeneratorInteger(RandomGenerator generator)
+uint64_t RandomGeneratorInteger(RandomGenerator generator)
 {
 	generator->State ^= (generator->State >> 12);
 	generator->State ^= (generator->State << 25);
@@ -19,7 +19,7 @@ unsigned long RandomGeneratorInteger(RandomGenerator generator)
 	return generator->State * 2685821657736338717ULL;
 }
 
-long RandomGeneratorIntegerRange(RandomGenerator generator, long min, long max)
+int64_t RandomGeneratorIntegerRange(RandomGenerator generator, int64_t min, int64_t max)
 {
 	return min + RandomGeneratorInteger(generator) % (max + 1 - min);
 }

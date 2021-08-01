@@ -9,7 +9,7 @@ list(void) ListCreate(unsigned int elementSize)
 	unsigned int * list = malloc(MetaSize + 2 * elementSize);
 	list[0] = elementSize;
 	list[1] = 0;
-	return (unsigned char *)list + MetaSize;
+	return (uint8_t *)list + MetaSize;
 }
 
 struct ListData
@@ -22,20 +22,20 @@ struct ListData
 static struct ListData ListData(list(void) list)
 {
 	struct ListData data = { 0 };
-	data.ElementSize = *(unsigned int *)((unsigned char *)list - MetaSize);
-	data.Count = (unsigned int *)((unsigned char *)list - MetaSize / 2);
+	data.ElementSize = *(unsigned int *)((uint8_t *)list - MetaSize);
+	data.Count = (unsigned int *)((uint8_t *)list - MetaSize / 2);
 	data.Capacity = pow(2.0, floor(log2(*data.Count)) + 1.0);
 	return data;
 }
 
 unsigned int ListCount(list(void) list)
 {
-	return *(unsigned int *)((unsigned char *)list - MetaSize / 2);
+	return *(unsigned int *)((uint8_t *)list - MetaSize / 2);
 }
 
 unsigned int ListElementSize(list(void) list)
 {
-	return *(unsigned int *)((unsigned char *)list - MetaSize);
+	return *(unsigned int *)((uint8_t *)list - MetaSize);
 }
 
 unsigned int ListCapacity(list(void) list)
@@ -55,11 +55,11 @@ list(void) ListInsert(list(void) list, void * element, int index)
 	(*data.Count)++;
 	if (*data.Count == data.Capacity)
 	{
-		list = (unsigned char *)realloc((unsigned char *)list - MetaSize, MetaSize + 2 * data.Capacity * data.ElementSize) + MetaSize;
+		list = (uint8_t *)realloc((uint8_t *)list - MetaSize, MetaSize + 2 * data.Capacity * data.ElementSize) + MetaSize;
 	}
 	data = ListData(list);
-	memmove((unsigned char *)list + (index + 1) * data.ElementSize, (unsigned char *)list + index * data.ElementSize, (*data.Count - 1 - index) * data.ElementSize);
-	memcpy((unsigned char *)list + index * data.ElementSize, element, data.ElementSize);
+	memmove((uint8_t *)list + (index + 1) * data.ElementSize, (uint8_t *)list + index * data.ElementSize, (*data.Count - 1 - index) * data.ElementSize);
+	memcpy((uint8_t *)list + index * data.ElementSize, element, data.ElementSize);
 	return list;
 }
 
@@ -74,12 +74,12 @@ list(void) ListRemove(list(void) list, int index)
 
 	for (int j = (index + 1) * (int)data.ElementSize; j < (*data.Count) * (int)data.ElementSize; j++)
 	{
-		((unsigned char *)list)[j - data.ElementSize] = ((unsigned char *)list)[j];
+		((uint8_t *)list)[j - data.ElementSize] = ((uint8_t *)list)[j];
 	}
 	(*data.Count)--;
 	if (*data.Count == data.Capacity / 2 - 1)
 	{
-		list = (unsigned char *)realloc((unsigned char *)list - MetaSize, MetaSize + (data.Capacity / 2) * data.ElementSize) + MetaSize;
+		list = (uint8_t *)realloc((uint8_t *)list - MetaSize, MetaSize + (data.Capacity / 2) * data.ElementSize) + MetaSize;
 	}
 	return list;
 }
@@ -103,7 +103,7 @@ list(void) ListRemoveAll(list(void) list, void * value)
 {
 	for (int i = 0; i < ListCount(list); i++)
 	{
-		if (memcmp((unsigned char *)list + i * ListElementSize(list), value, ListElementSize(list)) == 0)
+		if (memcmp((uint8_t *)list + i * ListElementSize(list), value, ListElementSize(list)) == 0)
 		{
 			list = ListRemove(list, i);
 			i--;
@@ -116,7 +116,7 @@ _Bool ListContains(list(void) list, void * value)
 {
 	for (int i = 0; i < ListCount(list); i++)
 	{
-		if (memcmp((unsigned char *)list + i * ListElementSize(list), value, ListElementSize(list))) { return true; }
+		if (memcmp((uint8_t *)list + i * ListElementSize(list), value, ListElementSize(list))) { return true; }
 	}
 	return false;
 }
@@ -130,5 +130,5 @@ list(void) ListClear(list(void) list)
 
 void ListDestroy(list(void) list)
 {
-	free((unsigned char *)list - MetaSize);
+	free((uint8_t *)list - MetaSize);
 }
