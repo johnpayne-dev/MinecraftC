@@ -1,10 +1,11 @@
 #include <OpenGL.h>
-#include <stb_image.h>
 #include <string.h>
 #include "FontRenderer.h"
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/String.h"
 #include "../Utilities/Log.h"
+
+#include "../../Resources/Default.h"
 
 FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManager textures)
 {
@@ -12,18 +13,10 @@ FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManag
 	font->Settings = settings;
 	font->TextureName = name;
 	
-	SDL_RWops * file = SDL_RWFromFile("Default.png", "rb");
-	if (file == NULL) { LogFatal("Fialed to open file %s: %s\n", name, SDL_GetError()); }
-	int fileSize = (int)SDL_RWseek(file, 0, RW_SEEK_END);
-	SDL_RWseek(file, 0, RW_SEEK_SET);
-	void * fileData = MemoryAllocate(fileSize);
-	SDL_RWread(file, fileData, fileSize, 1);
-	SDL_RWclose(file);
-	
-	int width, height;
-	int * pixels = (int *)stbi_load_from_memory(fileData, fileSize, &width, &height, &(int){ 0 }, 4);
-	if (pixels == NULL) { LogFatal("Failed to create image %s: %s\n", name, stbi_failure_reason()); }
-	MemoryFree(fileData);
+	int width = 0;
+	int * pixels = NULL;
+	if (strcmp(name, "Default.png") == 0) { pixels = (int *)Resource_Default_RGBA; width = Resource_Default_Width; }
+	if (pixels == NULL) { LogFatal("Failed to load image %s.\n", name); }
 	
 	for (int i = 0; i < 128; i++)
 	{
@@ -45,7 +38,6 @@ FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManag
 		if (i == 32) { x = 4; }
 		font->WidthMap[i] = x;
 	}
-	stbi_image_free(pixels);
 	font->Texture = TextureManagerLoad(textures, name);
 	return font;
 }

@@ -157,17 +157,6 @@ bool PlayerAddResource(Player player, BlockType resource)
 	return InventoryAddResource(this->Inventory, resource);
 }
 
-void PlayerBindTexture(Player player, TextureManager textures)
-{
-	//if (PlayerNewTexture != NULL)
-	//{
-	//	PlayerNewTextureID = TextureManagerLoad(textures, PlayerNewTexture);
-	//	PlayerNewTexture = NULL;
-	//}
-	
-	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(textures, "Char.png"));
-}
-
 void PlayerDestroy(Player player)
 {
 	PlayerData this = player->TypeData;

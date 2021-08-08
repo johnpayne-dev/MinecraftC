@@ -35,7 +35,6 @@ typedef struct PlayerData
 
 Player PlayerCreate(Level level);
 void PlayerTick(Player player);
-void PlayerBindTexture(Player player, TextureManager textures);
 void PlayerTravel(Player player, float x, float y);
 void PlayerResetPosition(Player player);
 void PlayerStepAI(Player player);
