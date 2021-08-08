@@ -1,8 +1,8 @@
-#include <OpenGL.h>
 #include "ProgressBarDisplay.h"
 #include "Minecraft.h"
 #include "Utilities/Time.h"
 #include "Utilities/Log.h"
+#include "Utilities/OpenGL.h"
 #include "Render/ShapeRenderer.h"
 
 ProgressBarDisplay ProgressBarDisplayCreate(Minecraft minecraft)

@@ -1,8 +1,8 @@
-#include <OpenGL.h>
 #include "LevelRenderer.h"
 #include "ShapeRenderer.h"
 #include "../Minecraft.h"
 #include "../Utilities/Log.h"
+#include "../Utilities/OpenGL.h"
 
 LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures)
 {

@@ -1,7 +1,7 @@
-#include <OpenGL.h>
 #include "Renderer.h"
 #include "../Minecraft.h"
 #include "../Utilities/SinTable.h"
+#include "../Utilities/OpenGL.h"
 
 Renderer RendererCreate(Minecraft minecraft)
 {

@@ -1,10 +1,10 @@
-#include <OpenGL.h>
 #include "HUDScreen.h"
 #include "Screen.h"
 #include "../Minecraft.h"
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/Time.h"
 #include "../Utilities/SinTable.h"
+#include "../Utilities/OpenGL.h"
 
 HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height)
 {

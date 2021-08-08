@@ -1,9 +1,9 @@
-#include <OpenGL.h>
 #include <string.h>
 #include "FontRenderer.h"
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/String.h"
 #include "../Utilities/Log.h"
+#include "../Utilities/OpenGL.h"
 
 #include "../../Resources/Default.h"
 

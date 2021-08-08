@@ -1,4 +1,3 @@
-#include <OpenGL.h>
 #include "GUIScreen.h"
 #include "Screen.h"
 #include "BlockSelectScreen.h"
@@ -12,6 +11,7 @@
 #include "PauseScreen.h"
 #include "SaveLevelScreen.h"
 #include "../Minecraft.h"
+#include "../Utilities/OpenGL.h"
 
 GUIScreen GUIScreenCreate()
 {

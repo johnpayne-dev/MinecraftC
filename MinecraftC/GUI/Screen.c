@@ -1,6 +1,6 @@
-#include <OpenGL.h>
 #include "Screen.h"
 #include "../Render/ShapeRenderer.h"
+#include "../Utilities/OpenGL.h"
 
 void ScreenDrawBox(int2 v0, int2 v1, Color color)
 {

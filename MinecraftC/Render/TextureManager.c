@@ -1,7 +1,7 @@
 #include <string.h>
-#include <OpenGL.h>
 #include "TextureManager.h"
 #include "../Utilities/Log.h"
+#include "../Utilities/OpenGL.h"
 
 #include "../../Resources/GUI/GUI.h"
 #include "../../Resources/GUI/Icons.h"

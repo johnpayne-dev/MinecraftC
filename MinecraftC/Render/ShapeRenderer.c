@@ -1,7 +1,7 @@
-#include <OpenGL.h>
 #include "ShapeRenderer.h"
 #include "../Utilities/Memory.h"
 #include "../Utilities/Log.h"
+#include "../Utilities/OpenGL.h"
 
 struct ShapeRenderer ShapeRenderer = { 0 };
 static int MaxFloats = 524288;

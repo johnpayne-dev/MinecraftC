@@ -1,5 +1,4 @@
 #include <string.h>
-#include <OpenGL.h>
 #include "Minecraft.h"
 #include "GUI/PauseScreen.h"
 #include "GUI/ChatInputScreen.h"
@@ -7,6 +6,7 @@
 #include "Utilities/Log.h"
 #include "Utilities/SinTable.h"
 #include "Utilities/Time.h"
+#include "Utilities/OpenGL.h"
 #include "Render/Texture/LavaTexture.h"
 #include "Render/Texture/WaterTexture.h"
 #include "Render/ShapeRenderer.h"

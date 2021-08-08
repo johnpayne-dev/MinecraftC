@@ -1,6 +1,6 @@
-#include <OpenGL.h>
 #include "Player.h"
 #include "PlayerAI.h"
+#include "../Utilities/OpenGL.h"
 
 Player PlayerCreate(Level level)
 {

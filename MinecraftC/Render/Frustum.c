@@ -1,5 +1,5 @@
-#include <OpenGL.h>
 #include "Frustum.h"
+#include "../Utilities/OpenGL.h"
 
 static void Normalize(Frustum * frustum, int plane)
 {

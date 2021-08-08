@@ -1,7 +1,7 @@
-#include <OpenGL.h>
 #include "Chunk.h"
 #include "ShapeRenderer.h"
 #include "../Utilities/Log.h"
+#include "../Utilities/OpenGL.h"
 
 int ChunkUpdates = 0;
 

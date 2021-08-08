@@ -1,10 +1,10 @@
-#include <OpenGL.h>
 #include "BlockSelectScreen.h"
 #include "Screen.h"
 #include "../SessionData.h"
 #include "../Minecraft.h"
 #include "../Level/Tile/Block.h"
 #include "../Render/ShapeRenderer.h"
+#include "../Utilities/OpenGL.h"
 
 BlockSelectScreen BlockSelectScreenCreate()
 {
