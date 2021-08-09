@@ -95,7 +95,7 @@ bool LiquidBlockCanRenderSide(LiquidBlock block, Level level, int x, int y, int 
 		BlockType tile = LevelGetTile(level, x, y, z);
 		if (tile != liquid->MovingID && tile != liquid->StillID)
 		{
-			if (side == 1 && (LevelGetTile(level, x - 1, y, z) == 0 || LevelGetTile(level, x + 1, y, z) == 0 || LevelGetTile(level, x, y, z - 1) == 0 || LevelGetTile(level, x, y, z + 1) == 0))
+			if (side == 1 && (LevelGetTile(level, x - 1, y, z) == 0 || LevelGetTile(level, x + 1, y, z) == 0 || LevelGetTile(level, x, y, z - 1) == 0 || LevelGetTile(level, x, y, z + 1) == 0 || LevelGetTile(level, x - 1, y, z - 1) || LevelGetTile(level, x + 1, y, y + 1)))
 			{
 				return true;
 			}
