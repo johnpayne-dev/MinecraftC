@@ -1,4 +1,5 @@
 cd BuildScripts
+rm -r ../Output/MinecraftC.app
 mkdir -p ../Output/MinecraftC.app/Contents/MacOS
 mkdir ../Output/MinecraftC.app/Contents/Resources
 cp ../Resources/Icons/MacOS.icns ../Output/MinecraftC.app/Contents/Resources

@@ -52,20 +52,23 @@ int TextureManagerLoad(TextureManager manager, char * resource)
 	if (strcmp(resource, "GUI/Icons.png") == 0) { p = Resource_GUI_Icons_RGBA; width = Resource_GUI_Icons_Width; height = Resource_GUI_Icons_Height; }
 	if (p == NULL) { LogFatal("Failed to load image %s.\n", resource); }
 	
+	uint8_t * pixels = malloc(4 * width * height);
 	if (manager->Settings->Anaglyph)
 	{
 		for (int i = 0; i < 4 * width * height; i += 4)
 		{
 			Color color = { (p[i + 0] * 30 + p[i + 1] * 59 + p[i + 2] * 11) / 100, (p[i + 0] * 30 + p[i + 1] * 70) / 100, (p[i + 0] * 30 + p[i + 2] * 70) / 100, p[i + 3] };
-			memcpy(p + i, &color, sizeof(Color));
+			memcpy(pixels + i, &color, sizeof(Color));
 		}
 	}
+	else { memcpy(pixels, p, 4 * width * height); }
 	
 	glGenTextures(1, &manager->IDBuffer);
 	glBindTexture(GL_TEXTURE_2D, manager->IDBuffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, p);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	free(pixels);
 	
 	manager->TextureNames = ListPush(manager->TextureNames, &resource);
 	manager->Textures = ListPush(manager->Textures, &manager->IDBuffer);
