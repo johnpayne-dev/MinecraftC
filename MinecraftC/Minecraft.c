@@ -374,7 +374,7 @@ void MinecraftRun(Minecraft minecraft)
 		if (level != NULL) { MinecraftSetLevel(minecraft, level); }
 	}
 	
-	if (minecraft->Level == NULL) { MinecraftGenerateLevel(minecraft, 0); }
+	if (minecraft->Level == NULL) { MinecraftGenerateLevel(minecraft, 1); }
 	minecraft->LevelLoaded = true;
 	
 	minecraft->ParticleManager = ParticleMangerCreate(minecraft->Level, minecraft->TextureManager);

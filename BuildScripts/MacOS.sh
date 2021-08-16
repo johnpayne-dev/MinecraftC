@@ -19,6 +19,7 @@ clang \
 	-I ../Include \
 	-L ../Libraries/MacOS/ARM \
 	-D GL_SILENCE_DEPRECATION \
+	-O3 \
 	-framework AppKit \
 	-framework AudioToolbox \
 	-framework Carbon \
