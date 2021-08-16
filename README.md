@@ -6,8 +6,10 @@
 - Implemented fully in C using SDL2 and OpenGL 1.1
 
 ## Screenshots
-<img width="855" alt="Screen Shot 2021-03-10 at 2 09 46 PM" src="https://user-images.githubusercontent.com/79012575/110685071-e5d0f700-81ab-11eb-90c7-8ac8aa8d4283.png">
-<img width="858" alt="Screen Shot 2021-03-10 at 2 16 12 PM" src="https://user-images.githubusercontent.com/79012575/110685245-11ec7800-81ac-11eb-9081-c0ebc11f23d9.png">
+<img width="856" alt="Screen Shot 2021-08-16 at 6 22 31 PM" src="https://user-images.githubusercontent.com/79012575/129637145-c0145174-ab00-4121-8055-05d2dc206af1.png">
+<img width="861" alt="Screen Shot 2021-08-16 at 6 24 26 PM" src="https://user-images.githubusercontent.com/79012575/129637151-b7a36271-3842-4af2-82c9-5466f46c016c.png">
+<img width="858" alt="Screen Shot 2021-08-16 at 6 28 46 PM" src="https://user-images.githubusercontent.com/79012575/129637157-e6727c40-7fd6-40be-9562-bfaa5b7b3f68.png">
+
 
 ## Downloads
 - [Windows (32 bit)]()
