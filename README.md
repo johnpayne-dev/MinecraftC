@@ -12,10 +12,10 @@
 
 
 ## Downloads
-- [Windows (64 bit)]()
-- [MacOS (ARM)]()
-- [MacOS (x86)]()
-- [Linux]()
+- [Windows (64 bit)](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-Windows-64.zip)
+- [MacOS (ARM)](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-MacOS-ARM.zip)
+- [MacOS (x86)](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-MacOS-x86.zip)
+- [Linux](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-Linux.zip)
 
 ## Planned features
 - Sound effects and music (v1.1)
@@ -27,7 +27,7 @@
 ## Compiling
 ### Requirements:
 - LLVM/Clang (the project uses clang-specific extensions).
-- SDL2 library and headers, which are provided [here]().
+- SDL2 library and headers, which are provided in the corresponding External.zip [here](https://github.com/johnpayne-dev/MinecraftC/releases/tag/v1.0).
 - If you're using Linux, grab the library with this command instead: `sudo apt-get install libsdl2-dev`
 ### Instructions:
 1. Clone or download the repository and rename top directory to `"MinecraftC/"` if it's not already
