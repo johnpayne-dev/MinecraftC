@@ -1037,6 +1037,10 @@ void MinecraftDestroy(Minecraft minecraft)
 
 int main(int argc, char * argv[])
 {
+#ifdef _WIN32
+#include <shellscalingapi.h>
+	SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+#endif
 	SinTableInitialize();
 	RandomSetSeed((unsigned int)time(NULL));
 	

@@ -2,7 +2,7 @@ cd BuildScripts
 rm -r ../Output/MinecraftC.app
 mkdir -p ../Output/MinecraftC.app/Contents/MacOS
 mkdir ../Output/MinecraftC.app/Contents/Resources
-cp ../Resources/Icons/MacOS.icns ../Output/MinecraftC.app/Contents/Resources
+cp ../Resources/Icons/Icon.icns ../Output/MinecraftC.app/Contents/Resources
 clang \
 	../MinecraftC/*.c \
 	../MinecraftC/GUI/*.c \
@@ -57,6 +57,6 @@ echo >../Output/MinecraftC.app/Contents/Info.plist \
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleIconFile</key>
-    <string>MacOS</string>
+    <string>Icon</string>
 </dict>
 </plist>'

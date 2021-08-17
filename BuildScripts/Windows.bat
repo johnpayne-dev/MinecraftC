@@ -28,8 +28,11 @@ clang-cl ^
 		Imm32.lib ^
 		Version.lib ^
 		Advapi32.lib ^
+		Shcore.lib ^
 		SDL2main.lib ^
 		SDL2-static.lib ^
 		Opengl32.lib ^
 		Glu32.lib ^
+		../Resources/MinecraftC.res ^
+		/NODEFAULTLIB:MSVCRT ^
 		/OUT:../Output/MinecraftC.exe
