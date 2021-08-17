@@ -17,7 +17,7 @@ clang \
 	../MinecraftC/Render/Texture/*.c \
 	../MinecraftC/Utilities/*.c \
 	-I ../Include \
-	-L ../Libraries/MacOS/ARM \
+	-L ../Libraries \
 	-D GL_SILENCE_DEPRECATION \
 	-O3 \
 	-framework AppKit \

@@ -16,7 +16,7 @@ clang-cl ^
 	/I ../Include ^
 	/D _CRT_SECURE_NO_WARNINGS ^
 	/link ^
-		/LIBPATH:../Libraries/Windows ^
+		/LIBPATH:../Libraries ^
 		/SUBSYSTEM:WINDOWS ^
 		Shell32.lib ^
 		Setupapi.lib ^
