@@ -13,11 +13,5 @@ clang \
 	../MinecraftC/Render/*.c \
 	../MinecraftC/Render/Texture/*.c \
 	../MinecraftC/Utilities/*.c \
-	-I ../Include \
-	-L ../Libraries/MacOS/ARM \
-	-O3 \
-	-lm \
-	-lSDL2 \
-	-lGL \
-	-lGLU \
+	-lm -lSDL2 -lGL -lGLU \
 	-o ../Output/MinecraftC
