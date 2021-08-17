@@ -12,7 +12,6 @@
 
 
 ## Downloads
-- [Windows (32 bit)]()
 - [Windows (64 bit)]()
 - [MacOS (ARM)]()
 - [MacOS (x86)]()
@@ -29,9 +28,10 @@
 ### Requirements:
 - LLVM/Clang (the project uses clang-specific extensions).
 - SDL2 library and headers, which are provided [here]().
+- If you're using Linux, grab the library with this command instead: `sudo apt-get install libsdl2-dev`
 ### Instructions:
-1. Clone or download the repository and rename top directory to `"MinecraftC/"` (optional, but instructions assume that's the name)
-2. Drag the `"Libraries"` and `"Include"` folders from the download above into `"MinecraftC/"`
+1. Clone or download the repository and rename top directory to `"MinecraftC/"` if it's not already
+2. Drag the `"Libraries"` and `"Include"` folders from the download above into `"MinecraftC/"` (if you're not on Linux)
 3. Open the terminal in `"MinecraftC/"`
 4. Run the following command, according to your OS:
    - Windows: `./BuildScripts/Windows.bat`

@@ -1,5 +1,5 @@
-echo "This script is incomplete"
 cd BuildScripts
+mkdir -p ../Output
 clang \
 	../MinecraftC/*.c \
 	../MinecraftC/GUI/*.c \
@@ -16,5 +16,8 @@ clang \
 	-I ../Include \
 	-L ../Libraries/MacOS/ARM \
 	-O3 \
+	-lm \
 	-lSDL2 \
+	-lGL \
+	-lGLU \
 	-o ../Output/MinecraftC
