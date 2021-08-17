@@ -27,17 +27,19 @@
 ## Compiling
 ### Requirements:
 - LLVM/Clang (the project uses clang-specific extensions).
-- SDL2 library and headers, which are provided in the corresponding External.zip [here](https://github.com/johnpayne-dev/MinecraftC/releases/tag/v1.0).
+- SDL2 library and headers, which are provided in the corresponding [`External.zip` here](https://github.com/johnpayne-dev/MinecraftC/releases/tag/v1.0).
 - If you're using Linux, grab the library with this command instead: `sudo apt-get install libsdl2-dev`
 ### Instructions:
 1. Clone or download the repository and rename top directory to `"MinecraftC/"` if it's not already
-2. Drag the `"Libraries"` and `"Include"` folders from the download above into `"MinecraftC/"` (if you're not on Linux)
+2. (Windows, MacOS) Drag the `"Libraries"` and `"Include"` folders from `External.zip` into `"MinecraftC/"` 
 3. Open the terminal in `"MinecraftC/"`
 4. Run the following command, according to your OS:
    - Windows: `./BuildScripts/Windows.bat`
    - MacOS: `sh BuildScripts/MacOS.sh`
    - Linux: `sh BuildScripts/Linux.sh`
 5. The binary should have been exported to `"MinecraftC/Output"`
+6. (MacOS) Optionally, you may sign the app by running `sh ./BuildScripts/MacOS-Sign.sh <DeveloperID>`
+   - You can find your developer id by running `security find-identity`
 
 ## Modifying Resources
 If you're creating a mod and want to change or add any `.png` resouces, then follow these steps to embed the files into `.h` files:
