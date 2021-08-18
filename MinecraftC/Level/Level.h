@@ -25,7 +25,6 @@ typedef struct Level
 	list(NextTickListEntry) TickList;
 	bool NetworkMode;
 	struct Minecraft * Minecraft;
-	bool CreativeMode;
 	int WaterLevel;
 	Color SkyColor;
 	Color FogColor;

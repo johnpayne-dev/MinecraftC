@@ -299,7 +299,6 @@ void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, Par
 	if (block->Type == BlockTypeTNT)
 	{
 		TNTBlockSpawnBreakParticles(block, level, x, y, z, particles);
-		if (!level->CreativeMode) { return; }
 	}
 	for (int i = 0; i < 4; i++)
 	{
