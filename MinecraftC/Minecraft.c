@@ -793,11 +793,13 @@ void MinecraftRun(Minecraft minecraft)
 						if (i == 0) { glColorMask(false, true, true, false); }
 						else { glColorMask(true, false, false, false); }
 					}
+					glDisable(GL_CULL_FACE);
 					if (count > 0)
 					{
 						glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->TextureManager, "Terrain.png"));
 						glCallLists(count, GL_INT, lrenderer->ChunkDataCache);
 					}
+					glEnable(GL_CULL_FACE);
 					
 					glDepthMask(true);
 					glDisable(GL_BLEND);

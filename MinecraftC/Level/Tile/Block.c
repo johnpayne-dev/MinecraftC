@@ -181,8 +181,8 @@ int BlockGetTextureID(Block block, int face)
 
 void BlockRenderInside(Block block, int x, int y, int z, int side)
 {
+	if (IsLiquidBlock(block->Type)) { return LiquidBlockRenderInside(block, x, y, z, side); }
 	BlockRenderSideWithTexture(block, x, y, z, side, BlockGetTextureID(block, side));
-	if (IsLiquidBlock(block->Type)) { LiquidBlockRenderInside(block, x, y, z, side); }
 }
 
 void BlockRenderSideWithTexture(Block block, int x, int y, int z, int side, int tex)
