@@ -95,9 +95,18 @@ bool LiquidBlockCanRenderSide(LiquidBlock block, Level level, int x, int y, int 
 		BlockType tile = LevelGetTile(level, x, y, z);
 		if (tile != liquid->MovingID && tile != liquid->StillID)
 		{
-			if (side == 1 && (LevelGetTile(level, x - 1, y, z) == 0 || LevelGetTile(level, x + 1, y, z) == 0 || LevelGetTile(level, x, y, z - 1) == 0 || LevelGetTile(level, x, y, z + 1) == 0 || LevelGetTile(level, x - 1, y, z - 1) || LevelGetTile(level, x + 1, y, y + 1)))
+			if (side == 1)
 			{
-				return true;
+				bool shouldRender = LevelGetTile(level, x, y, z) == 0;
+				shouldRender |= LevelGetTile(level, x - 1, y, z) == 0;
+				shouldRender |= LevelGetTile(level, x + 1, y, z) == 0;
+				shouldRender |= LevelGetTile(level, x, y, z - 1) == 0;
+				shouldRender |= LevelGetTile(level, x, y, z + 1) == 0;
+				shouldRender |= LevelGetTile(level, x - 1, y, z - 1) == 0;
+				shouldRender |= LevelGetTile(level, x + 1, y, z - 1) == 0;
+				shouldRender |= LevelGetTile(level, x - 1, y, z + 1) == 0;
+				shouldRender |= LevelGetTile(level, x + 1, y, z + 1) == 0;
+				return  shouldRender;
 			}
 			else { return !LevelIsSolidTile(level, x, y, z); }
 		}
