@@ -528,14 +528,8 @@ void MinecraftRun(Minecraft minecraft)
 				reach = 32.0;
 				v2 = v + (float3){ sc, s2, cc } * reach;
 			
-				for (int i = 0; i <= 2; i++)
+				for (int i = 0; i < 2; i++)
 				{
-					if (i == 2)
-					{
-						glColorMask(true, true, true, true);
-						break;
-					}
-					
 					if (minecraft->Settings->Anaglyph)
 					{
 						if (i == 0) { glColorMask(false, true, true, false); }
@@ -796,7 +790,7 @@ void MinecraftRun(Minecraft minecraft)
 					glColorMask(true, true, true, true);
 					if (minecraft->Settings->Anaglyph)
 					{
-						if (count == 0) { glColorMask(false, true, true, false); }
+						if (i == 0) { glColorMask(false, true, true, false); }
 						else { glColorMask(true, false, false, false); }
 					}
 					if (count > 0)
@@ -889,6 +883,8 @@ void MinecraftRun(Minecraft minecraft)
 					RendererSetLighting(renderer, false);
 					
 					if (!minecraft->Settings->Anaglyph) { break; }
+					
+					if (i == 1) { glColorMask(true, true, true, true); }
 				}
 				
 				HUDScreenRender(minecraft->HUD, delta, minecraft->CurrentScreen != NULL, (int2){ mx, my });
