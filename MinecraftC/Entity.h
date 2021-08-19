@@ -5,10 +5,7 @@
 typedef enum EntityType
 {
 	EntityTypeNone,
-	EntityTypeArrow,
-	EntityTypeItem,
 	EntityTypePrimedTNT,
-	EntityTypeTakeAnimation,
 	EntityTypeParticle,
 	EntityTypePlayer,
 } EntityType;
@@ -71,6 +68,8 @@ float EntityDistanceTo(Entity entityA, Entity entityB);
 float EntityDistanceToPoint(Entity entity, float3 point);
 float EntitySquaredDistanceTo(Entity entityA, Entity entityB);
 bool EntityIntersects(Entity entity, float3 v0, float3 v1);
+bool EntityIsPickable(Entity entity);
+void EntityRender(Entity entity, TextureManager textures, float t);
 bool EntityShouldRender(Entity entity, float3 v);
 bool EntityShouldRenderAtSquaredDistance(Entity entity, float v);
 int EntityGetTexture(Entity entity);

@@ -2,6 +2,7 @@
 #include "Level/Level.h"
 #include "Player/Player.h"
 #include "Utilities/SinTable.h"
+#include "Particle/PrimedTNT.h"
 
 Entity EntityCreate(Level level)
 {
@@ -94,6 +95,7 @@ void EntityInterpolateTurn(Entity entity, float2 angle)
 void EntityTick(Entity entity)
 {
 	if (entity->Type == EntityTypeParticle) { ParticleTick(entity); return; }
+	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
 	
 	entity->OldWalkDistance = entity->WalkDistance;
 	entity->OldPosition = entity->Position;
@@ -323,6 +325,17 @@ bool EntityShouldRender(Entity entity, float3 v)
 bool EntityShouldRenderAtSquaredDistance(Entity entity, float v)
 {
 	return v < pow(AABBGetSize(entity->AABB) * 64.0, 2.0);
+}
+
+bool EntityIsPickable(Entity entity)
+{
+	if (entity->Type == EntityTypePrimedTNT) { return PrimedTNTIsPickable(entity); }
+	return false;
+}
+
+void EntityRender(Entity entity, TextureManager textures, float t)
+{
+	if (entity->Type == EntityTypePrimedTNT) { PrimedTNTRender(entity, textures, t); return; }
 }
 
 int EntityGetTexture(Entity entity)

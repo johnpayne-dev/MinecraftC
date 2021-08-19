@@ -296,10 +296,7 @@ void BlockUpdate(Block block, Level level, int x, int y, int z, RandomGenerator 
 
 void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, ParticleManager particles)
 {
-	if (block->Type == BlockTypeTNT)
-	{
-		TNTBlockSpawnBreakParticles(block, level, x, y, z, particles);
-	}
+	if (block->Type == BlockTypeTNT) { TNTBlockSpawnBreakParticles(block, level, x, y, z, particles); }
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)

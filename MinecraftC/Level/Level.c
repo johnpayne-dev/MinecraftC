@@ -3,6 +3,7 @@
 #include "../Render/LevelRenderer.h"
 #include "../Utilities/Log.h"
 #include "../Utilities/SinTable.h"
+#include "../Particle/PrimedTNT.h"
 
 Level LevelCreate()
 {
@@ -12,6 +13,7 @@ Level LevelCreate()
 		.Renderers = ListCreate(sizeof(LevelRenderer)),
 		.Random = RandomGeneratorCreate(time(NULL)),
 		.TickList = ListCreate(sizeof(NextTickListEntry)),
+		.Entities = ListCreate(sizeof(Entity)),
 		.NetworkMode = false,
 		.Unprocessed = 0,
 		.TickCount = 0,
@@ -245,7 +247,11 @@ bool LevelIsSolidTile(Level level, int x, int y, int z)
 
 void LevelTickEntities(Level level)
 {
-	EntityTick(level->Player);
+	for (int i = 0; i < ListCount(level->Entities); i++)
+	{
+		EntityTick(level->Entities[i]);
+		if (level->Entities[i]->Removed) { ListRemove(level->Entities, i--); }
+	}
 }
 
 void LevelTick(Level level)
@@ -636,6 +642,15 @@ Entity LevelGetPlayer(Level level)
 void LevelAddEntity(Level level, Entity entity)
 {
 	EntitySetLevel(entity, level);
+	level->Entities = ListPush(level->Entities, &entity);
+}
+
+void LevelRenderEntities(Level level, TextureManager textures, float dt)
+{
+	for (int i = 0; i < ListCount(level->Entities); i++)
+	{
+		EntityRender(level->Entities[i], textures, dt);
+	}
 }
 
 void LevelExplode(Level level, Entity entity, float3 pos, float radius)
@@ -669,6 +684,7 @@ Entity LevelFindPlayer(Level level)
 void LevelDestroy(Level level)
 {
 	ListDestroy(level->Renderers);
+	ListDestroy(level->Entities);
 	RandomGeneratorDestroy(level->Random);
 	ListDestroy(level->TickList);
 	if (level->LightBlockers != NULL) { MemoryFree(level->LightBlockers); }

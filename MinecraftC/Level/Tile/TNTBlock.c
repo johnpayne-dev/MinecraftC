@@ -1,5 +1,6 @@
 #include "TNTBlock.h"
 #include "../Level.h"
+#include "../../Particle/PrimedTNT.h"
 
 TNTBlock TNTBlockCreate()
 {
@@ -18,8 +19,12 @@ int TNTBlockGetDropCount(TNTBlock block)
 
 void TNTBlockExplode(TNTBlock block, Level level, int x, int y, int z)
 {
+	PrimedTNT tnt = PrimedTNTCreate(level, (float3){ x, y, z } + 0.5f);
+	((PrimedTNTData)tnt->TypeData)->Life = RandomIntegerRange(5, 14);
+	LevelAddEntity(level, tnt);
 }
 
 void TNTBlockSpawnBreakParticles(TNTBlock block, Level level, int x, int y, int z, ParticleManager particles)
 {
+	LevelAddEntity(level, PrimedTNTCreate(level, (float3){ x, y, z } + 0.5f));
 }

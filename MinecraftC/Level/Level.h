@@ -32,6 +32,7 @@ typedef struct Level
 	int Unprocessed;
 	int TickCount;
 	Entity Player;
+	list(Entity) Entities;
 	ParticleManager ParticleEngine;
 	FontRenderer Font;
 	bool GrowTrees;
@@ -81,6 +82,7 @@ void LevelPlaySoundAt(Level level, const char * sound, float3 position, float vo
 bool LevelMaybeGrowTree(Level level, int x, int y, int z);
 Entity LevelGetPlayer(Level level);
 void LevelAddEntity(Level level, Entity entity);
+void LevelRenderEntities(Level level, TextureManager textures, float dt);
 void LevelExplode(Level level, Entity entity, float3 pos, float radius);
 Entity LevelFindPlayer(Level level);
 void LevelDestroy(Level level);

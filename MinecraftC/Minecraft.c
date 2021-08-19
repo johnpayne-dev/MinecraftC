@@ -12,6 +12,7 @@
 #include "Render/ShapeRenderer.h"
 #include "Level/Generator/LevelGenerator.h"
 #include "Particle/WaterDropParticle.h"
+#include "Particle/PrimedTNT.h"
 
 Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fullScreen)
 {
@@ -112,6 +113,10 @@ static void OnMouseClicked(Minecraft minecraft, int button)
 		
 		if (!minecraft->Selected.Null)
 		{
+			if (minecraft->Selected.EntityPosition == 1 && button == SDL_BUTTON_LEFT && minecraft->Selected.Entity->Type == EntityTypePrimedTNT)
+			{
+				PrimedTNTHurt(minecraft->Selected.Entity);
+			}
 			if (minecraft->Selected.EntityPosition == 0)
 			{
 				int3 v = minecraft->Selected.XYZ;
@@ -525,8 +530,28 @@ void MinecraftRun(Minecraft minecraft)
 				float reach = 5.0;
 				float3 v2 = v + (float3){ sc, s2, cc } * reach;
 				minecraft->Selected = LevelClip(minecraft->Level, v, v2);
-				reach = 32.0;
-				v2 = v + (float3){ sc, s2, cc } * reach;
+				renderer->Entity = NULL;
+				float a = 0.0;
+				for (int i = 0; i < ListCount(minecraft->Level->Entities); i++)
+				{
+					Entity entity = minecraft->Level->Entities[i];
+					if (EntityIsPickable(entity) && distance3f(entity->Position, minecraft->Level->Player->Position) < reach)
+					{
+						float _reach = 0.1;
+						MovingObjectPosition pos = AABBClip(AABBGrow(entity->AABB, one3f * _reach), v, v2);
+						if (!pos.Null) { _reach = distance3f(v, pos.Vector); }
+						if ((!pos.Null && _reach < a) || a == 0.0)
+						{
+							renderer->Entity = entity;
+							a = _reach;
+						}
+					}
+				}
+				
+				if (renderer->Entity != NULL)
+				{
+					minecraft->Selected = (MovingObjectPosition){ .EntityPosition = 1, .Entity = renderer->Entity };
+				}
 			
 				for (int i = 0; i < 2; i++)
 				{
@@ -625,6 +650,8 @@ void MinecraftRun(Minecraft minecraft)
 						}
 					}
 					
+					RendererSetLighting(renderer, true);
+					LevelRenderEntities(minecraft->Level, minecraft->TextureManager, delta);
 					ParticleManager particles = minecraft->ParticleManager;
 					RendererSetLighting(renderer, false);
 					RendererUpdateFog(renderer);
