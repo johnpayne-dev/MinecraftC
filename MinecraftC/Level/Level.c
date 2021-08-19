@@ -250,7 +250,7 @@ void LevelTickEntities(Level level)
 	for (int i = 0; i < ListCount(level->Entities); i++)
 	{
 		EntityTick(level->Entities[i]);
-		if (level->Entities[i]->Removed) { ListRemove(level->Entities, i--); }
+		if (level->Entities[i]->Removed) { level->Entities = ListRemove(level->Entities, i--); }
 	}
 }
 

@@ -90,8 +90,29 @@ float LiquidBlockGetBrightness(LiquidBlock block, Level level, int x, int y, int
 bool LiquidBlockCanRenderSide(LiquidBlock block, Level level, int x, int y, int z, int side)
 {
 	LiquidBlockData liquid = block->TypeData;
-	BlockType tile = LevelGetTile(level, x, y, z);
-	return x >= 0 && y >= 0 && z >= 0 && x < level->Width && y < level->Height ? (tile != liquid->MovingID && tile != liquid->StillID ? (side == 1 && (LevelGetTile(level, x - 1, y, z) == 0 || LevelGetTile(level, x + 1, y, z) == 0 || LevelGetTile(level, x, y, z - 1) == 0 || LevelGetTile(level, x, y, z + 1) == 0) ? true : !LevelIsSolidTile(level, x, y, z)) : false) : false;
+	if (x >= 0 && y >= 0 && z >= 0 && x < level->Width && z < level->Height)
+	{
+		BlockType tile = LevelGetTile(level, x, y, z);
+		if (tile != liquid->MovingID && tile != liquid->StillID)
+		{
+			if (side == 1)
+			{
+				bool shouldRender = LevelGetTile(level, x, y, z) == 0;
+				shouldRender |= LevelGetTile(level, x - 1, y, z) == 0;
+				shouldRender |= LevelGetTile(level, x + 1, y, z) == 0;
+				shouldRender |= LevelGetTile(level, x, y, z - 1) == 0;
+				shouldRender |= LevelGetTile(level, x, y, z + 1) == 0;
+				shouldRender |= LevelGetTile(level, x - 1, y, z - 1) == 0;
+				shouldRender |= LevelGetTile(level, x + 1, y, z - 1) == 0;
+				shouldRender |= LevelGetTile(level, x - 1, y, z + 1) == 0;
+				shouldRender |= LevelGetTile(level, x + 1, y, z + 1) == 0;
+				return  shouldRender;
+			}
+			else { return !LevelIsSolidTile(level, x, y, z); }
+		}
+		else { return false; }
+	}
+	else { return false; }
 }
 
 void LiquidBlockRenderInside(LiquidBlock block, int x, int y, int z, int side)
