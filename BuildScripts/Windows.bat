@@ -1,6 +1,6 @@
 mkdir Output
 cd BuildScripts
-clang-cl ^
+clang ^
 	../MinecraftC/*.c ^
 	../MinecraftC/GUI/*.c ^
 	../MinecraftC/Level/*.c ^
@@ -13,26 +13,26 @@ clang-cl ^
 	../MinecraftC/Render/*.c ^
 	../MinecraftC/Render/Texture/*.c ^
 	../MinecraftC/Utilities/*.c ^
-	/I ../Include ^
-	/D _CRT_SECURE_NO_WARNINGS ^
-	/link ^
-		/LIBPATH:../Libraries ^
-		/SUBSYSTEM:WINDOWS ^
-		Shell32.lib ^
-		Setupapi.lib ^
-		Ole32.lib ^
-		User32.lib ^
-		Gdi32.lib ^
-		Winmm.lib ^
-		OleAut32.lib ^
-		Imm32.lib ^
-		Version.lib ^
-		Advapi32.lib ^
-		Shcore.lib ^
-		SDL2main.lib ^
-		SDL2-static.lib ^
-		Opengl32.lib ^
-		Glu32.lib ^
-		../Resources/MinecraftC.res ^
-		/NODEFAULTLIB:MSVCRT ^
-		/OUT:../Output/MinecraftC.exe
+	../Resources/MinecraftC.res ^
+	-I ../Include ^
+	-L ../Libraries ^
+	-D _CRT_SECURE_NO_WARNINGS ^
+	-std=c11 ^
+	-lShell32.lib ^
+	-lSetupapi.lib ^
+	-lOle32.lib ^
+	-lUser32.lib ^
+	-lGdi32.lib ^
+	-lWinmm.lib ^
+	-lOleAut32.lib ^
+	-lImm32.lib ^
+	-lVersion.lib ^
+	-lAdvapi32.lib ^
+	-lShcore.lib ^
+	-lSDL2main.lib ^
+	-lSDL2-static.lib ^
+	-lOpengl32.lib ^
+	-lGlu32.lib ^
+	-Xlinker /subsystem:windows ^
+	-Xlinker /NODEFAULTLIB:MSVCRT ^
+	-o ../Output/MinecraftC.exe
