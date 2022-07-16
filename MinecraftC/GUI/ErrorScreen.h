@@ -3,10 +3,9 @@
 
 typedef GUIScreen ErrorScreen;
 
-typedef struct ErrorScreenData
-{
-	char * Title;
-	char * Text;
+typedef struct ErrorScreenData {
+	char * title;
+	char * text;
 } * ErrorScreenData;
 
 ErrorScreen ErrorScreenCreate(char * title, char * text);

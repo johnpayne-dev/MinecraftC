@@ -2,17 +2,16 @@
 #include <stdbool.h>
 #include "../Utilities/LinearMath.h"
 
-extern struct ShapeRenderer
-{
-	float * Buffer;
-	int Vertices;
-	float2 UV;
-	float3 RGB;
-	bool HasColor;
-	bool HasTexture;
-	int VertexLength;
-	int Length;
-	bool NoColor;
+extern struct ShapeRenderer {
+	float * buffer;
+	int vertices;
+	float2 uv;
+	float3 rgb;
+	bool hasColor;
+	bool hasTexture;
+	int vertexLength;
+	int length;
+	bool noColor;
 } ShapeRenderer;
 
 void ShapeRendererInitialize(void);

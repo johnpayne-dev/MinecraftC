@@ -1,12 +1,11 @@
 #pragma once
 #include "../Level/Tile/Block.h"
 
-typedef struct Inventory
-{
-	BlockType Slots[9];
-	int Count[9];
-	int PopTime[9];
-	int Selected;
+typedef struct Inventory {
+	BlockType slots[9];
+	int count[9];
+	int popTime[9];
+	int selected;
 } * Inventory;
 
 Inventory InventoryCreate(void);

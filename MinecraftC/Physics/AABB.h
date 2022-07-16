@@ -3,10 +3,9 @@
 #include "../Utilities/LinearMath.h"
 #include "../MovingObjectPosition.h"
 
-typedef struct AABB
-{
-	float3 V0;
-	float3 V1;
+typedef struct AABB {
+	float3 v0;
+	float3 v1;
 } AABB;
 
 #define AABBNull ((AABB){ 0 })

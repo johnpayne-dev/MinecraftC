@@ -2,46 +2,44 @@
 #include "Physics/AABB.h"
 #include "Render/TextureManager.h"
 
-typedef enum EntityType
-{
+typedef enum EntityType {
 	EntityTypeNone,
 	EntityTypePrimedTNT,
 	EntityTypeParticle,
 	EntityTypePlayer,
 } EntityType;
 
-typedef struct Entity
-{
-	struct Level * Level;
-	float3 OldPosition;
-	float3 Position;
-	float3 Delta;
-	float2 OldRotation;
-	float2 Rotation;
-	AABB AABB;
-	bool OnGround;
-	bool HorizontalCollision;
-	bool Collision;
-	bool Slide;
-	bool Removed;
-	float HeightOffset;
-	float AABBWidth;
-	float AABBHeight;
-	float OldWalkDistance;
-	float WalkDistance;
-	bool MakeStepSound;
-	float FallDistance;
-	int NextStep;
-	struct BlockMap * BlockMap;
-	float3 XYZOld;
-	int TextureID;
-	float YSlideOffset;
-	float FootSize;
-	bool NoPhysics;
-	float PushThrough;
-	bool Hovered;
-	EntityType Type;
-	void * TypeData;
+typedef struct Entity {
+	struct Level * level;
+	float3 oldPosition;
+	float3 position;
+	float3 delta;
+	float2 oldRotation;
+	float2 rotation;
+	AABB aabb;
+	bool onGround;
+	bool horizontalCollision;
+	bool collision;
+	bool slide;
+	bool removed;
+	float heightOffset;
+	float aabbWidth;
+	float aabbHeight;
+	float oldWalkDistance;
+	float walkDistance;
+	bool makeStepSound;
+	float fallDistance;
+	int nextStep;
+	struct BlockMap * blockMap;
+	float3 xyzOld;
+	int textureID;
+	float ySlideOffset;
+	float footSize;
+	bool noPhysics;
+	float pushThrough;
+	bool hovered;
+	EntityType type;
+	void * typeData;
 } * Entity;
 
 Entity EntityCreate(struct Level * level);

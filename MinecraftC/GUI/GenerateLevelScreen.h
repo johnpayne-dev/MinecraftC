@@ -3,9 +3,8 @@
 
 typedef GUIScreen GenerateLevelScreen;
 
-typedef struct GenerateLevelScreenData
-{
-	GUIScreen Parent;
+typedef struct GenerateLevelScreenData {
+	GUIScreen parent;
 } * GenerateLevelScreenData;
 
 GenerateLevelScreen GenerateLevelScreenCreate(GUIScreen parent);

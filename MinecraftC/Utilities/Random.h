@@ -4,9 +4,9 @@
 
 typedef struct RandomGenerator
 {
-	uint64_t Seed;
-	uint64_t State;
-	double LastNormal;
+	uint64_t seed;
+	uint64_t state;
+	double lastNormal;
 } * RandomGenerator;
 
 RandomGenerator RandomGeneratorCreate(uint64_t seed);

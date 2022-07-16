@@ -3,13 +3,12 @@
 
 typedef GUIScreen LevelNameScreen;
 
-typedef struct LevelNameScreenData
-{
-	GUIScreen Parent;
-	char * Title;
-	int ID;
-	String Name;
-	int Counter;
+typedef struct LevelNameScreenData {
+	GUIScreen parent;
+	char * title;
+	int id;
+	String name;
+	int counter;
 } * LevelNameScreenData;
 
 LevelNameScreen LevelNameScreenCreate(GUIScreen parent, char * name, int id);

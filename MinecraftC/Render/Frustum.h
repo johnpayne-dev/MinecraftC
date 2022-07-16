@@ -1,12 +1,11 @@
 #pragma once
 #include "../Physics/AABB.h"
 
-typedef struct Frustum
-{
-	float Planes[6][16];
-	float Projection[16];
-	float ModelView[16];
-	float Clip[16];
+typedef struct Frustum {
+	float planes[6][16];
+	float projection[16];
+	float modelView[16];
+	float clip[16];
 } Frustum;
 
 Frustum FrustumUpdate(void);

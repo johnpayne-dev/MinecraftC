@@ -1,10 +1,9 @@
 #pragma once
 #include "Particle.h"
 
-typedef struct ParticleManager
-{
-	list(Particle) Particles[2];
-	TextureManager Textures;
+typedef struct ParticleManager {
+	list(Particle) particles[2];
+	TextureManager textures;
 } * ParticleManager;
 
 ParticleManager ParticleMangerCreate(struct Level * level, TextureManager textures);

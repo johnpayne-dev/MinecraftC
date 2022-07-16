@@ -1,25 +1,23 @@
 #pragma once
 #include "../Entity.h"
 
-typedef enum ParticleType
-{
+typedef enum ParticleType {
 	ParticleTypeNone,
 	ParticleTypeSmoke,
 	ParticleTypeTerrain,
 	ParticleTypeWaterDrop,
 } ParticleType;
 
-typedef struct ParticleData
-{
-	float3 Delta;
-	int Texture;
-	float2 UV;
-	int Age;
-	int LifeTime;
-	float Size;
-	float Gravity;
-	float3 Color;
-	ParticleType Type;
+typedef struct ParticleData {
+	float3 delta;
+	int texture;
+	float2 uv;
+	int age;
+	int lifeTime;
+	float size;
+	float gravity;
+	float3 color;
+	ParticleType type;
 } * ParticleData;
 
 typedef Entity Particle;

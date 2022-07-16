@@ -1,12 +1,11 @@
 #pragma once
 #include <stdint.h>
 
-typedef struct ProgressBarDisplay
-{
-	struct Minecraft * Minecraft;
-	char * Text;
-	char * Title;
-	int64_t Start;
+typedef struct ProgressBarDisplay {
+	struct Minecraft * minecraft;
+	char * text;
+	char * title;
+	int64_t start;
 } * ProgressBarDisplay;
 
 ProgressBarDisplay ProgressBarDisplayCreate(struct Minecraft * minecraft);

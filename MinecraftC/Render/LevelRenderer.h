@@ -2,22 +2,21 @@
 #include "Chunk.h"
 #include "../Level/Level.h"
 
-typedef struct LevelRenderer
-{
-	Level Level;
-	TextureManager Textures;
-	int ListID;
-	list(Chunk) Chunks;
-	Chunk * LoadQueue;
-	Chunk * ChunkCache;
-	int ChunkCacheCount;
-	int3 ChunkCount;
-	int BaseListID;
-	struct Minecraft * Minecraft;
-	int * ChunkDataCache;
-	int Ticks;
-	float3 LastLoad;
-	float Cracks;
+typedef struct LevelRenderer {
+	Level level;
+	TextureManager textures;
+	int listID;
+	list(Chunk) chunks;
+	Chunk * loadQueue;
+	Chunk * chunkCache;
+	int chunkCacheCount;
+	int3 chunkCount;
+	int baseListID;
+	struct Minecraft * minecraft;
+	int * chunkDataCache;
+	int ticks;
+	float3 lastLoad;
+	float cracks;
 } * LevelRenderer;
 
 LevelRenderer LevelRendererCreate(struct Minecraft * minecraft, TextureManager textures);

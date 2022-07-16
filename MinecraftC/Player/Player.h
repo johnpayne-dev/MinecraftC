@@ -6,31 +6,30 @@
 
 typedef Entity Player;
 
-typedef struct PlayerData
-{
-	float Rotation;
-	float TimeOffset;
-	float Speed;
-	float RotationA;
-	float BodyRotation;
-	float OldBodyRotation;
-	float Run;
-	float OldRun;
-	float AnimationStep;
-	float OldAnimationStep;
-	int TickCount;
-	bool AllowAlpha;
-	float RotationOffset;
-	float BobbingStrength;
-	float RenderOffset;
-	float Tilt;
-	float OldTilt;
-	PlayerAI AI;
-	InputHandler Input;
-	Inventory Inventory;
-	int UserType;
-	float Bobbing;
-	float OldBobbing;
+typedef struct PlayerData {
+	float rotation;
+	float timeOffset;
+	float speed;
+	float rotationA;
+	float bodyRotation;
+	float oldBodyRotation;
+	float run;
+	float oldRun;
+	float animationStep;
+	float oldAnimationStep;
+	int tickCount;
+	bool allowAlpha;
+	float rotationOffset;
+	float bobbingStrength;
+	float renderOffset;
+	float tilt;
+	float oldTilt;
+	PlayerAI ai;
+	InputHandler input;
+	Inventory inventory;
+	int userType;
+	float bobbing;
+	float oldBobbing;
 } * PlayerData;
 
 Player PlayerCreate(Level level);

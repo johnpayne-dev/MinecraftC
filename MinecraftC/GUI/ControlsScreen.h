@@ -4,12 +4,11 @@
 
 typedef GUIScreen ControlsScreen;
 
-typedef struct ControlsScreenData
-{
-	GUIScreen Parent;
-	char * Title;
-	GameSettings Settings;
-	int Selected;
+typedef struct ControlsScreenData {
+	GUIScreen parent;
+	char * title;
+	GameSettings settings;
+	int selected;
 } * ControlsScreenData;
 
 ControlsScreen ControlsScreenCreate(GUIScreen parent, GameSettings settings);

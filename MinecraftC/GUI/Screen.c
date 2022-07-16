@@ -2,8 +2,7 @@
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/OpenGL.h"
 
-void ScreenDrawBox(int2 v0, int2 v1, Color color)
-{
+void ScreenDrawBox(int2 v0, int2 v1, Color color) {
 	float4 col = ColorToFloat4(color);
 	glEnable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
@@ -19,8 +18,7 @@ void ScreenDrawBox(int2 v0, int2 v1, Color color)
 	glDisable(GL_BLEND);
 }
 
-void ScreenDrawFadingBox(int2 v0, int2 v1, Color col0, Color col1)
-{
+void ScreenDrawFadingBox(int2 v0, int2 v1, Color col0, Color col1) {
 	float4 c0 = ColorToFloat4(col0);
 	float4 c1 = ColorToFloat4(col1);
 	glEnable(GL_BLEND);
@@ -38,18 +36,15 @@ void ScreenDrawFadingBox(int2 v0, int2 v1, Color col0, Color col1)
 	glDisable(GL_BLEND);
 }
 
-void ScreenDrawCenteredString(FontRenderer font, char * str, int2 pos, Color color)
-{
+void ScreenDrawCenteredString(FontRenderer font, char * str, int2 pos, Color color) {
 	FontRendererRender(font, str, pos.x - FontRendererGetWidth(font, str) / 2, pos.y, color);
 }
 
-void ScreenDrawString(FontRenderer font, char * str, int2 pos, Color color)
-{
+void ScreenDrawString(FontRenderer font, char * str, int2 pos, Color color) {
 	FontRendererRender(font, str, pos.x, pos.y, color);
 }
 
-void ScreenDrawImage(int2 v0, int2 v1, int2 uv, float imgZ)
-{
+void ScreenDrawImage(int2 v0, int2 v1, int2 uv, float imgZ) {
 	float2 s = one2f * 0.00390625;
 	ShapeRendererBegin();
 	ShapeRendererVertexUV((float3){ v0.x, v0.y + uv.y, imgZ }, (float2){ v1.x, v1.y + uv.y } * s);

@@ -4,9 +4,8 @@
 
 typedef Noise PerlinNoise;
 
-typedef struct PerlinNoiseData
-{
-	int Hash[512];
+typedef struct PerlinNoiseData {
+	int hash[512];
 } * PerlinNoiseData;
 
 PerlinNoise PerlinNoiseCreate(RandomGenerator random);

@@ -4,10 +4,9 @@
 
 typedef GUIScreen ChatInputScreen;
 
-typedef struct ChatInputScreenData
-{
-	String Message;
-	int Counter;
+typedef struct ChatInputScreenData {
+	String message;
+	int counter;
 } * ChatInputScreenData;
 
 ChatInputScreen ChatInputScreenCreate(void);

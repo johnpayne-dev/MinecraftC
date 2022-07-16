@@ -2,12 +2,11 @@
 #include "Utilities/String.h"
 #include "Level/Tile/Block.h"
 
-typedef struct SessionData
-{
-	String UserName;
-	char * SessionID;
-	char * MPPass;
-	bool HasPaid;
+typedef struct SessionData {
+	String userName;
+	char * sessionID;
+	char * mpPass;
+	bool hasPaid;
 } * SessionData;
 
 extern list(Block) SessionDataAllowedBlocks;

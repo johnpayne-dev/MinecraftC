@@ -3,10 +3,8 @@
 
 static float SinTable[0xFFFF];
 
-void SinTableInitialize()
-{
-	for (int i = 0; i < sizeof(SinTable) / sizeof(float); i++)
-	{
+void SinTableInitialize() {
+	for (int i = 0; i < sizeof(SinTable) / sizeof(float); i++) {
 		SinTable[i] = sin(i * 2.0 * pi / (float)0xFFFF);
 	}
 }

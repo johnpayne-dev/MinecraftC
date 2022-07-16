@@ -1,18 +1,17 @@
 #pragma once
 #include "HeldBlock.h"
 
-typedef struct Renderer
-{
-	struct Minecraft * Minecraft;
-	float FogColorMultiplier;
-	bool DisplayActive;
-	float FogEnd;
-	HeldBlock HeldBlock;
-	int LevelTicks;
-	Entity Entity;
-	RandomGenerator Random;
-	float Buffer[16];
-	float4 FogColor;
+typedef struct Renderer {
+	struct Minecraft * minecraft;
+	float fogColorMultiplier;
+	bool displayActive;
+	float fogEnd;
+	HeldBlock heldBlock;
+	int levelTicks;
+	Entity entity;
+	RandomGenerator random;
+	float buffer[16];
+	float4 fogColor;
 } * Renderer;
 
 Renderer RendererCreate(struct Minecraft * minecraft);

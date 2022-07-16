@@ -3,9 +3,8 @@
 
 typedef AnimatedTexture LavaTexture;
 
-typedef struct LavaTextureData
-{
-	float4 Colors[256];
+typedef struct LavaTextureData {
+	float4 colors[256];
 } * LavaTextureData;
 
 LavaTexture LavaTextureCreate(void);

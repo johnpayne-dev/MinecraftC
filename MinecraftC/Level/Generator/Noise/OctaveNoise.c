@@ -1,38 +1,33 @@
 #include "OctaveNoise.h"
 #include "../../../Utilities/Memory.h"
 
-OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount)
-{
+OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount) {
 	Noise noise = NoiseCreate();
-	noise->Type = NoiseTypeOctave;
-	noise->TypeData = MemoryAllocate(sizeof(struct OctaveNoiseData));
-	OctaveNoiseData this = noise->TypeData;
-	*this = (struct OctaveNoiseData)
-	{
-		.OctaveCount = octaveCount,
-		.Octaves = MemoryAllocate(octaveCount * sizeof(PerlinNoise)),
+	noise->type = NoiseTypeOctave;
+	noise->typeData = MemoryAllocate(sizeof(struct OctaveNoiseData));
+	OctaveNoiseData this = noise->typeData;
+	*this = (struct OctaveNoiseData) {
+		.octaveCount = octaveCount,
+		.octaves = MemoryAllocate(octaveCount * sizeof(PerlinNoise)),
 	};
-	for (int i = 0; i < octaveCount; i++) { this->Octaves[i] = PerlinNoiseCreate(random); }
+	for (int i = 0; i < octaveCount; i++) { this->octaves[i] = PerlinNoiseCreate(random); }
 	return noise;
 }
 
-float OctaveNoiseCompute(OctaveNoise noise, float2 v)
-{
-	OctaveNoiseData this = noise->TypeData;
+float OctaveNoiseCompute(OctaveNoise noise, float2 v) {
+	OctaveNoiseData this = noise->typeData;
 	float a = 0.0;
 	float b = 1.0;
-	for (int i = 0; i < this->OctaveCount; i++)
-	{
-		a += NoiseCompute(this->Octaves[i], v / b) * b;
+	for (int i = 0; i < this->octaveCount; i++) {
+		a += NoiseCompute(this->octaves[i], v / b) * b;
 		b *= 2;
 	}
 	return a;
 }
 
-void OctaveNoiseDestroy(OctaveNoise noise)
-{
-	OctaveNoiseData this = noise->TypeData;
-	for (int i = 0; i < this->OctaveCount; i++) { NoiseDestroy(this->Octaves[i]); }
-	MemoryFree(this->Octaves);
+void OctaveNoiseDestroy(OctaveNoise noise) {
+	OctaveNoiseData this = noise->typeData;
+	for (int i = 0; i < this->octaveCount; i++) { NoiseDestroy(this->octaves[i]); }
+	MemoryFree(this->octaves);
 	MemoryFree(this);
 }

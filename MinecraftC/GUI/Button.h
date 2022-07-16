@@ -2,14 +2,13 @@
 #include "../Utilities/LinearMath.h"
 #include "../Utilities/String.h"
 
-typedef struct Button
-{
-	int2 Position;
-	int2 Size;
-	String Text;
-	int ID;
-	bool Active;
-	bool Visible;
+typedef struct Button {
+	int2 position;
+	int2 size;
+	String text;
+	int id;
+	bool active;
+	bool visible;
 } * Button;
 
 Button ButtonCreate(int buttonID, int x, int y, char * text);

@@ -4,17 +4,16 @@
 
 typedef GUIScreen LoadLevelScreen;
 
-typedef struct LoadLevelScreenData
-{
-	GUIScreen Parent;
-	bool Finished;
-	bool Loaded;
-	char * Levels[5];
-	char * Status;
-	char * Title;
-	bool Frozen;
-	bool Saving;
-	char * SelectedFile;
+typedef struct LoadLevelScreenData {
+	GUIScreen parent;
+	bool finished;
+	bool loaded;
+	char * levels[5];
+	char * status;
+	char * title;
+	bool frozen;
+	bool saving;
+	char * selectedFile;
 } * LoadLevelScreenData;
 
 LoadLevelScreen LoadLevelScreenCreate(GUIScreen parent);

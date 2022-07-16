@@ -3,14 +3,13 @@
 #include "../Utilities/List.h"
 #include "../Utilities/Random.h"
 
-typedef struct HUDScreen
-{
-	list(ChatLine) Chat;
-	RandomGenerator Random;
-	struct Minecraft * Minecraft;
-	int Width, Height;
-	const char * HoveredPlayer;
-	int Ticks;
+typedef struct HUDScreen {
+	list(ChatLine) chat;
+	RandomGenerator random;
+	struct Minecraft * minecraft;
+	int width, height;
+	const char * hoveredPlayer;
+	int ticks;
 } * HUDScreen;
 
 HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height);

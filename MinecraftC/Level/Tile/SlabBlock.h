@@ -3,8 +3,7 @@
 
 typedef Block SlabBlock;
 
-typedef struct SlabBlockData
-{
+typedef struct SlabBlockData {
 	bool DoubleSlab;
 } * SlabBlockData;
 

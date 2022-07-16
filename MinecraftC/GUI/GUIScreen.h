@@ -4,8 +4,7 @@
 #include "Button.h"
 #include "FontRenderer.h"
 
-typedef enum GUIScreenType
-{
+typedef enum GUIScreenType {
 	GUIScreenTypeNone,
 	GUIScreenTypeBlockSelect,
 	GUIScreenTypeChatInput,
@@ -20,15 +19,14 @@ typedef enum GUIScreenType
 	GUIScreenTypeSaveLevel,
 } GUIScreenType;
 
-typedef struct GUIScreen
-{
-	struct Minecraft * Minecraft;
-	int Width, Height;
-	list(Button) Buttons;
-	bool GrabsMouse;
-	FontRenderer Font;
-	GUIScreenType Type;
-	void * TypeData;
+typedef struct GUIScreen {
+	struct Minecraft * minecraft;
+	int width, height;
+	list(Button) buttons;
+	bool grabsMouse;
+	FontRenderer font;
+	GUIScreenType type;
+	void * typeData;
 } * GUIScreen;
 
 GUIScreen GUIScreenCreate(void);

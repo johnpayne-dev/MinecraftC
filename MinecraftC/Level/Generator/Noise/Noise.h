@@ -1,18 +1,16 @@
 #pragma once
 #include "../../../Utilities/LinearMath.h"
 
-typedef enum NoiseType
-{
+typedef enum NoiseType {
 	NoiseTypeNone,
 	NoiseTypePerlin,
 	NoiseTypeOctave,
 	NoiseTypeCombined,
 } NoiseType;
 
-typedef struct Noise
-{
-	NoiseType Type;
-	void * TypeData;
+typedef struct Noise {
+	NoiseType type;
+	void * typeData;
 } * Noise;
 
 Noise NoiseCreate(void);

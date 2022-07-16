@@ -3,11 +3,10 @@
 
 typedef Block LiquidBlock;
 
-typedef struct LiquidBlockData
-{
-	LiquidType Type;
-	BlockType StillID;
-	BlockType MovingID;
+typedef struct LiquidBlockData {
+	LiquidType type;
+	BlockType stillID;
+	BlockType movingID;
 } * LiquidBlockData;
 
 LiquidBlock LiquidBlockCreate(BlockType blockType, LiquidType liquidType);

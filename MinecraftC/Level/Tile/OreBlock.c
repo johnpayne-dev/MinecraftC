@@ -1,16 +1,13 @@
 #include "OreBlock.h"
 
-OreBlock OreBlockCreate(BlockType type, int textureID)
-{
+OreBlock OreBlockCreate(BlockType type, int textureID) {
 	return BlockCreate(type, textureID);
 }
 
-BlockType OreBlockGetDrop(OreBlock block)
-{
-	return block->Type == BlockTypeCoalOre ? BlockTypeSlab : (block->Type == BlockTypeGoldOre ? BlockTypeGold : (block->Type == BlockTypeIronOre ? BlockTypeIron : block->Type));
+BlockType OreBlockGetDrop(OreBlock block) {
+	return block->type == BlockTypeCoalOre ? BlockTypeSlab : (block->type == BlockTypeGoldOre ? BlockTypeGold : (block->type == BlockTypeIronOre ? BlockTypeIron : block->type));
 }
 
-int OreBlockGetDropCount(OreBlock block)
-{
+int OreBlockGetDropCount(OreBlock block) {
 	return RandomIntegerRange(1, 3);
 }

@@ -2,22 +2,19 @@
 #include "Utilities/Memory.h"
 #include "Utilities/Time.h"
 
-Timer TimerCreate(float ticksPerSecond)
-{
+Timer TimerCreate(float ticksPerSecond) {
 	Timer timer = MemoryAllocate(sizeof(struct Timer));
-	*timer = (struct Timer)
-	{
-		.Speed = 1.0,
-		.ElapsedDelta = 0.0,
-		.Adjustment = 1.0,
-		.TicksPerSecond = ticksPerSecond,
-		.LastSystemClock = TimeMilli(),
-		.LastHRClock = TimeNano() / 1e6,
+	*timer = (struct Timer) {
+		.speed = 1.0,
+		.elapsedDelta = 0.0,
+		.adjustment = 1.0,
+		.ticksPerSecond = ticksPerSecond,
+		.lastSystemClock = TimeMilli(),
+		.lastHRClock = TimeNano() / 1e6,
 	};
 	return timer;
 }
 
-void TimerDestroy(Timer timer)
-{
+void TimerDestroy(Timer timer) {
 	MemoryFree(timer);
 }

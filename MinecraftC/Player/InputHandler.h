@@ -5,10 +5,10 @@
 
 typedef struct InputHandler
 {
-	bool KeyStates[10];
-	GameSettings Settings;
-	float2 XY;
-	bool Jumping;
+	bool keyStates[10];
+	GameSettings settings;
+	float2 xy;
+	bool jumping;
 } * InputHandler;
 
 InputHandler InputHandlerCreate(GameSettings settings);

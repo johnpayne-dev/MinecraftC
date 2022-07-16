@@ -3,10 +3,9 @@
 
 typedef AnimatedTexture WaterTexture;
 
-typedef struct WaterTextureData
-{
-	float4 Colors[256];
-	int Updates;
+typedef struct WaterTextureData {
+	float4 colors[256];
+	int updates;
 } * WaterTextureData;
 
 WaterTexture WaterTextureCreate(void);

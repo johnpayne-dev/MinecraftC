@@ -3,8 +3,8 @@
 
 typedef struct ChatLine
 {
-	String Message;
-	int Time;
+	String message;
+	int time;
 } * ChatLine;
 
 ChatLine ChatLineCreate(char * message);

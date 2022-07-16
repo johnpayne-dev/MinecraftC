@@ -3,15 +3,14 @@
 #include "../Player/Player.h"
 #include "../Render/Frustum.h"
 
-typedef struct Chunk
-{
-	Level Level;
-	int BaseListID;
-	int3 Position;
-	int Width, Depth, Height;
-	bool Visible;
-	bool Dirty[2];
-	bool Loaded;
+typedef struct Chunk {
+	Level level;
+	int baseListID;
+	int3 position;
+	int width, depth, height;
+	bool visible;
+	bool dirty[2];
+	bool loaded;
 } * Chunk;
 
 extern int ChunkUpdates;

@@ -5,55 +5,46 @@
 #include "../../Render/ShapeRenderer.h"
 #include "../../Utilities/SinTable.h"
 
-FlowerBlock FlowerBlockCreate(BlockType type, int textureID)
-{
+FlowerBlock FlowerBlockCreate(BlockType type, int textureID) {
 	Block block = BlockCreate(type, textureID);
-	block->TextureID = textureID;
+	block->textureID = textureID;
 	BlockSetPhysics(block, true);
 	float w = 0.2;
 	BlockSetBounds(block, (float3){ 0.5 - w, 0.0, 0.5 - w }, (float3){ 0.5 + w, 3.0 * w, 0.5 + w });
 	return block;
 }
 
-void FlowerBlockUpdate(FlowerBlock block, Level level, int x, int y, int z, RandomGenerator random)
-{
-	if (block->Type == BlockTypeRedMushroom || block->Type == BlockTypeBrownMushroom) { MushroomBlockUpdate(block, level, x, y, z, random); return; }
-	if (block->Type == BlockTypeSapling) { SaplingBlockUpdate(block, level, x, y, z, random); return; }
+void FlowerBlockUpdate(FlowerBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+	if (block->type == BlockTypeRedMushroom || block->type == BlockTypeBrownMushroom) { MushroomBlockUpdate(block, level, x, y, z, random); return; }
+	if (block->type == BlockTypeSapling) { SaplingBlockUpdate(block, level, x, y, z, random); return; }
 	
-	if (!level->GrowTrees)
-	{
+	if (!level->growTrees) {
 		BlockType tile = LevelGetTile(level, x, y - 1, z);
-		if (!LevelIsLit(level, x, y, z) || (tile != BlockTypeDirt && tile != BlockTypeGrass))
-		{
+		if (!LevelIsLit(level, x, y, z) || (tile != BlockTypeDirt && tile != BlockTypeGrass)) {
 			LevelSetTile(level, x, y, z, BlockTypeNone);
 		}
 	}
 }
 
-AABB FlowerBlockGetCollisionAABB(FlowerBlock block, int x, int y, int z)
-{
+AABB FlowerBlockGetCollisionAABB(FlowerBlock block, int x, int y, int z) {
 	return AABBNull;
 }
 
-bool FlowerBlockIsOpaque(FlowerBlock block)
-{
+bool FlowerBlockIsOpaque(FlowerBlock block) {
 	return false;
 }
 
-bool FlowerBlockIsSolid(FlowerBlock block)
-{
+bool FlowerBlockIsSolid(FlowerBlock block) {
 	return false;
 }
 
-static void Render(FlowerBlock block, float3 v0)
-{
+static void Render(FlowerBlock block, float3 v0) {
 	int tex = BlockGetTextureID(block, 15);
 	int2 uv0 = (int2){ tex % 16, tex / 16 } << 4;
 	float2 uv1 = float2i(uv0) / 256.0;
 	float2 uv2 = (float2i(uv0) + 15.99) / 256.0;
 	
-	for (int i = 0; i < 2; i++)
-	{
+	for (int i = 0; i < 2; i++) {
 		float2 sc = (float2){ tsin(i * pi / 2.0 + pi / 4.0), tcos(i * pi / 2.0 + pi / 4.0) } * 0.5;
 		float3 v1 = v0 + (float3){ 0.5 - sc.x, 1.0, 0.5 - sc.y };
 		sc += v0.xz + 0.5;
@@ -68,29 +59,25 @@ static void Render(FlowerBlock block, float3 v0)
 	}
 }
 
-void FlowerBlockRenderPreview(FlowerBlock block)
-{
+void FlowerBlockRenderPreview(FlowerBlock block) {
 	ShapeRendererNormal(up3f);
 	ShapeRendererBegin();
 	Render(block, (float3){ 0.0, 0.4, -0.3 });
 	ShapeRendererEnd();
 }
 
-bool FlowerBlockIsCube(FlowerBlock block)
-{
+bool FlowerBlockIsCube(FlowerBlock block) {
 	return false;
 }
 
-bool FlowerBlockRender(FlowerBlock block, Level level, int x, int y, int z)
-{
+bool FlowerBlockRender(FlowerBlock block, Level level, int x, int y, int z) {
 	float brightness = LevelGetBrightness(level, x, y, z);
 	ShapeRendererColor(one3f * brightness);
 	Render(block, (float3){ x, y, z });
 	return true;
 }
 
-void FlowerBlockRenderFullBrightness(FlowerBlock block)
-{
+void FlowerBlockRenderFullBrightness(FlowerBlock block) {
 	ShapeRendererColor(one3f);
 	Render(block, right3f * -2.0);
 }

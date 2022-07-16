@@ -9,33 +9,32 @@
 #include "../Physics/AABB.h"
 #include "../GUI/FontRenderer.h"
 
-typedef struct Level
-{
-	int Width, Height, Depth;
-	uint8_t * Blocks;
-	const char * Name;
-	const char * Creator;
-	int64_t CreateTime;
-	int3 Spawn;
-	float SpawnRotation;
-	list(struct LevelRenderer *) Renderers;
-	int * LightBlockers;
-	RandomGenerator Random;
-	int RandomValue;
-	list(NextTickListEntry) TickList;
-	bool NetworkMode;
-	struct Minecraft * Minecraft;
-	int WaterLevel;
-	Color SkyColor;
-	Color FogColor;
-	Color CloudColor;
-	int Unprocessed;
-	int TickCount;
-	Entity Player;
-	list(Entity) Entities;
-	ParticleManager ParticleEngine;
-	FontRenderer Font;
-	bool GrowTrees;
+typedef struct Level {
+	int width, height, depth;
+	uint8_t * blocks;
+	const char * name;
+	const char * creator;
+	int64_t createTime;
+	int3 spawn;
+	float spawnRotation;
+	list(struct LevelRenderer *) renderers;
+	int * lightBlockers;
+	RandomGenerator random;
+	int randomValue;
+	list(NextTickListEntry) tickList;
+	bool networkMode;
+	struct Minecraft * minecraft;
+	int waterLevel;
+	Color skyColor;
+	Color fogColor;
+	Color cloudColor;
+	int unprocessed;
+	int tickCount;
+	Entity player;
+	list(Entity) entities;
+	ParticleManager particleEngine;
+	FontRenderer font;
+	bool growTrees;
 } * Level;
 
 Level LevelCreate(void);

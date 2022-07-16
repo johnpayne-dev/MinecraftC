@@ -3,9 +3,8 @@
 #include "../ProgressBarDisplay.h"
 #include "Level.h"
 
-typedef struct LevelIO
-{
-	ProgressBarDisplay ProgressBar;
+typedef struct LevelIO {
+	ProgressBarDisplay progressBar;
 } * LevelIO;
 
 LevelIO LevelIOCreate(ProgressBarDisplay progress);

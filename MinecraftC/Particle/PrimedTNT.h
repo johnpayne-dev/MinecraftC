@@ -4,11 +4,10 @@
 
 typedef Entity PrimedTNT;
 
-typedef struct PrimedTNTData
-{
-	float3 Delta;
-	int Life;
-	bool Defused;
+typedef struct PrimedTNTData {
+	float3 delta;
+	int life;
+	bool defused;
 } * PrimedTNTData;
 
 PrimedTNT PrimedTNTCreate(Level level, float3 pos);

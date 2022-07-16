@@ -2,20 +2,19 @@
 #include "../Utilities/Random.h"
 #include "../Level/Level.h"
 
-typedef struct PlayerAI
-{
-	int DefaultLookAngle;
-	RandomGenerator Random;
-	float2 XY;
-	float Rotation;
-	Level Level;
-	Entity Mob;
-	bool Jumping;
-	int AttackDelay;
-	float RunSpeed;
-	int NoActionTime;
-	Entity AttackTarget;
-	struct Entity * Parent;
+typedef struct PlayerAI {
+	int defaultLookAngle;
+	RandomGenerator random;
+	float2 xy;
+	float rotation;
+	Level level;
+	Entity mob;
+	bool jumping;
+	int attackDelay;
+	float runSpeed;
+	int noActionTime;
+	Entity attackTarget;
+	struct Entity * parent;
 } * PlayerAI;
 
 PlayerAI PlayerAICreate(struct Entity * parent);

@@ -4,12 +4,11 @@
 #include "../Utilities/LinearMath.h"
 #include "../Utilities/String.h"
 
-typedef struct FontRenderer
-{
-	int WidthMap[256];
-	char * TextureName;
-	int Texture;
-	GameSettings Settings;
+typedef struct FontRenderer {
+	int widthMap[256];
+	char * textureName;
+	int texture;
+	GameSettings settings;
 } * FontRenderer;
 
 FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManager textures);

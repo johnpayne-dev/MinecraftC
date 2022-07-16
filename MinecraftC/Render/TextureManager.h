@@ -3,14 +3,13 @@
 #include "../GameSettings.h"
 #include "Texture/AnimatedTexture.h"
 
-typedef struct TextureManager
-{
-	list(unsigned int) Textures;
-	list(char *) TextureNames;
-	uint8_t * TextureBuffer;
-	unsigned int IDBuffer;
-	list(AnimatedTexture) Animations;
-	GameSettings Settings;
+typedef struct TextureManager {
+	list(unsigned int) textures;
+	list(char *) textureNames;
+	uint8_t * textureBuffer;
+	unsigned int idBuffer;
+	list(AnimatedTexture) animations;
+	GameSettings settings;
 } * TextureManager;
 
 TextureManager TextureManagerCreate(GameSettings settings);

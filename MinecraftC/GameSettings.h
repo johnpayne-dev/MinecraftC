@@ -6,30 +6,29 @@
 #include "Utilities/List.h"
 #include "Utilities/String.h"
 
-typedef struct GameSettings
-{
-	bool Music;
-	bool Sound;
-	bool InvertMouse;
-	bool ShowFrameRate;
-	int ViewDistance;
-	bool ViewBobbing;
-	bool Anaglyph;
-	bool LimitFramerate;
-	KeyBinding ForwardKey;
-	KeyBinding LeftKey;
-	KeyBinding BackKey;
-	KeyBinding RightKey;
-	KeyBinding JumpKey;
-	KeyBinding BuildKey;
-	KeyBinding ChatKey;
-	KeyBinding ToggleFogKey;
-	KeyBinding SaveLocationKey;
-	KeyBinding LoadLocationKey;
-	list(KeyBinding *) Bindings;
-	struct Minecraft * Minecraft;
-	String File;
-	int SettingsCount;
+typedef struct GameSettings {
+	bool music;
+	bool sound;
+	bool invertMouse;
+	bool showFrameRate;
+	int viewDistance;
+	bool viewBobbing;
+	bool anaglyph;
+	bool limitFramerate;
+	KeyBinding forwardKey;
+	KeyBinding leftKey;
+	KeyBinding backKey;
+	KeyBinding rightKey;
+	KeyBinding jumpKey;
+	KeyBinding buildKey;
+	KeyBinding chatKey;
+	KeyBinding toggleFogKey;
+	KeyBinding saveLocationKey;
+	KeyBinding loadLocationKey;
+	list(KeyBinding *) bindings;
+	struct Minecraft * minecraft;
+	String file;
+	int settingsCount;
 } * GameSettings;
 
 GameSettings GameSettingsCreate(struct Minecraft * minecraft);

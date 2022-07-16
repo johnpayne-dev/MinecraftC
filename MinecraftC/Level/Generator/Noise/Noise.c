@@ -4,25 +4,22 @@
 #include "PerlinNoise.h"
 #include "../../../Utilities/Memory.h"
 
-Noise NoiseCreate()
-{
+Noise NoiseCreate() {
 	Noise noise = MemoryAllocate(sizeof(struct Noise));
 	*noise = (struct Noise){ 0 };
 	return noise;
 }
 
-float NoiseCompute(Noise noise, float2 v)
-{
-	if (noise->Type == NoiseTypeOctave) { return OctaveNoiseCompute(noise, v); }
-	if (noise->Type == NoiseTypePerlin) { return PerlinNoiseCompute(noise, v); }
-	if (noise->Type == NoiseTypeCombined) { return CombinedNoiseCompute(noise, v); }
+float NoiseCompute(Noise noise, float2 v) {
+	if (noise->type == NoiseTypeOctave) { return OctaveNoiseCompute(noise, v); }
+	if (noise->type == NoiseTypePerlin) { return PerlinNoiseCompute(noise, v); }
+	if (noise->type == NoiseTypeCombined) { return CombinedNoiseCompute(noise, v); }
 	return 0.0;
 }
 
-void NoiseDestroy(Noise noise)
-{
-	if (noise->Type == NoiseTypeOctave) { OctaveNoiseDestroy(noise); }
-	if (noise->Type == NoiseTypePerlin) { PerlinNoiseDestroy(noise); }
-	if (noise->Type == NoiseTypeCombined) { CombinedNoiseDestroy(noise); }
+void NoiseDestroy(Noise noise) {
+	if (noise->type == NoiseTypeOctave) { OctaveNoiseDestroy(noise); }
+	if (noise->type == NoiseTypePerlin) { PerlinNoiseDestroy(noise); }
+	if (noise->type == NoiseTypeCombined) { CombinedNoiseDestroy(noise); }
 	MemoryFree(noise);
 }

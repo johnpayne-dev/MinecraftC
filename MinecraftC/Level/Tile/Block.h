@@ -5,8 +5,7 @@
 #include "../../Physics/AABB.h"
 #include "../../Particle/ParticleManager.h"
 
-typedef enum BlockType
-{
+typedef enum BlockType {
 	BlockTypeNone,
 	BlockTypeStone,
 	BlockTypeGrass,
@@ -60,24 +59,22 @@ typedef enum BlockType
 	BlockTypeCount,
 } BlockType;
 
-typedef enum LiquidType
-{
+typedef enum LiquidType {
 	LiquidTypeNone,
 	LiquidTypeWater,
 	LiquidTypeLava,
 } LiquidType;
 
-typedef struct Block
-{
-	int TextureID;
-	TileSound Sound;
-	int Hardness;
-	bool Explodable;
-	float3 XYZ0;
-	float3 XYZ1;
-	float ParticleGravity;
-	BlockType Type;
-	void * TypeData;
+typedef struct Block {
+	int textureID;
+	TileSound sound;
+	int hardness;
+	bool explodable;
+	float3 xyz0;
+	float3 xyz1;
+	float particleGravity;
+	BlockType type;
+	void * typeData;
 } * Block;
 
 Block BlockCreate(BlockType type, int textureID);
@@ -115,14 +112,13 @@ bool BlockRender(Block block, struct Level * level, int x, int y, int z);
 int BlockGetRenderPass(Block block);
 void BlockDestroy(Block block);
 
-extern struct Blocks
-{
-	Block Table[256];
-	bool Physics[256];
-	bool Opaque[256];
-	bool Cube[256];
-	bool Liquid[256];
-	int TickDelay[256];
+extern struct Blocks {
+	Block table[256];
+	bool physics[256];
+	bool opaque[256];
+	bool cube[256];
+	bool liquid[256];
+	int tickDelay[256];
 } Blocks;
 
 void BlocksInitialize(void);

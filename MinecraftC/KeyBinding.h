@@ -1,7 +1,6 @@
 #pragma once
 
-typedef struct KeyBinding
-{
-	char * Name;
-	int Key;
+typedef struct KeyBinding {
+	char * name;
+	int key;
 } KeyBinding;

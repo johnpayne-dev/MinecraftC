@@ -3,10 +3,9 @@
 
 typedef Noise CombinedNoise;
 
-typedef struct CombinedNoiseData
-{
-	Noise Noise1;
-	Noise Noise2;
+typedef struct CombinedNoiseData {
+	Noise noise1;
+	Noise noise2;
 } * CombinedNoiseData;
 
 CombinedNoise CombinedNoiseCreate(Noise n1, Noise n2);

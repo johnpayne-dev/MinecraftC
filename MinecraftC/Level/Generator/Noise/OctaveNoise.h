@@ -4,10 +4,9 @@
 
 typedef Noise OctaveNoise;
 
-typedef struct OctaveNoiseData
-{
-	int OctaveCount;
-	PerlinNoise * Octaves;
+typedef struct OctaveNoiseData {
+	int octaveCount;
+	PerlinNoise * octaves;
 } * OctaveNoiseData;
 
 OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount);

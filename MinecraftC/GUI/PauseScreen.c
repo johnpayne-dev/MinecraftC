@@ -6,46 +6,40 @@
 #include "Screen.h"
 #include "../Minecraft.h"
 
-PauseScreen PauseScreenCreate()
-{
+PauseScreen PauseScreenCreate() {
 	GUIScreen screen = GUIScreenCreate();
-	screen->Type = GUIScreenTypePause;
+	screen->type = GUIScreenTypePause;
 	return screen;
 }
 
-void PauseScreenOnOpen(PauseScreen screen)
-{
-	for (int i = 0; i < ListCount(screen->Buttons); i++) { ButtonDestroy(screen->Buttons[i]); }
-	screen->Buttons = ListClear(screen->Buttons);
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(0, screen->Width / 2 - 100, screen->Height / 4, "Options...") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(1, screen->Width / 2 - 100, screen->Height / 4 + 24, "Generate new level...") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(2, screen->Width / 2 - 100, screen->Height / 4 + 48, "Save level..") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(3, screen->Width / 2 - 100, screen->Height / 4 + 72, "Load level..") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(4, screen->Width / 2 - 100, screen->Height / 4 + 120, "Back to game") });
+void PauseScreenOnOpen(PauseScreen screen) {
+	for (int i = 0; i < ListCount(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
+	screen->buttons = ListClear(screen->buttons);
+	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(0, screen->width / 2 - 100, screen->height / 4, "Options...") });
+	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(1, screen->width / 2 - 100, screen->height / 4 + 24, "Generate new level...") });
+	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(2, screen->width / 2 - 100, screen->height / 4 + 48, "Save level..") });
+	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(3, screen->width / 2 - 100, screen->height / 4 + 72, "Load level..") });
+	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(4, screen->width / 2 - 100, screen->height / 4 + 120, "Back to game") });
 	
-	screen->Buttons[1]->Active = true;
-	screen->Buttons[2]->Active = false;
-	screen->Buttons[3]->Active = false;
+	screen->buttons[1]->active = true;
+	screen->buttons[2]->active = false;
+	screen->buttons[3]->active = false;
 }
 
-void PauseScreenOnButtonClicked(PauseScreen screen, Button button)
-{
-	if (button->ID == 0) { MinecraftSetCurrentScreen(screen->Minecraft, OptionsScreenCreate(screen, screen->Minecraft->Settings)); }
-	if (button->ID == 1) { MinecraftSetCurrentScreen(screen->Minecraft, GenerateLevelScreenCreate(screen)); }
-	if (screen->Minecraft->Session != NULL)
-	{
-		if (button->ID == 2) { MinecraftSetCurrentScreen(screen->Minecraft, SaveLevelScreenCreate(screen)); }
-		if (button->ID == 3) { MinecraftSetCurrentScreen(screen->Minecraft, LoadLevelScreenCreate(screen)); }
+void PauseScreenOnButtonClicked(PauseScreen screen, Button button) {
+	if (button->id == 0) { MinecraftSetCurrentScreen(screen->minecraft, OptionsScreenCreate(screen, screen->minecraft->settings)); }
+	if (button->id == 1) { MinecraftSetCurrentScreen(screen->minecraft, GenerateLevelScreenCreate(screen)); }
+	if (screen->minecraft->session != NULL) {
+		if (button->id == 2) { MinecraftSetCurrentScreen(screen->minecraft, SaveLevelScreenCreate(screen)); }
+		if (button->id == 3) { MinecraftSetCurrentScreen(screen->minecraft, LoadLevelScreenCreate(screen)); }
 	}
-	if (button->ID == 4)
-	{
-		MinecraftGrabMouse(screen->Minecraft);
-		MinecraftSetCurrentScreen(screen->Minecraft, NULL);
+	if (button->id == 4) {
+		MinecraftGrabMouse(screen->minecraft);
+		MinecraftSetCurrentScreen(screen->minecraft, NULL);
 	}
 }
 
-void PauseScreenRender(PauseScreen screen, int2 mousePos)
-{
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->Width, screen->Height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->Font, "Game menu", (int2){ screen->Width / 2, 20 }, ColorWhite);
+void PauseScreenRender(PauseScreen screen, int2 mousePos) {
+	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
+	ScreenDrawCenteredString(screen->font, "Game menu", (int2){ screen->width / 2, 20 }, ColorWhite);
 }

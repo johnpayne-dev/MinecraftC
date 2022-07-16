@@ -4,11 +4,10 @@
 
 typedef GUIScreen OptionsScreen;
 
-typedef struct OptionsScreenData
-{
-	GUIScreen Parent;
-	char * Title;
-	GameSettings Settings;
+typedef struct OptionsScreenData {
+	GUIScreen parent;
+	char * title;
+	GameSettings settings;
 } * OptionsScreenData;
 
 OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings);
