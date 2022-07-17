@@ -9,23 +9,23 @@ typedef enum ParticleType {
 } ParticleType;
 
 typedef struct ParticleData {
-	float3 delta;
+	float xd, yd, zd;
 	int texture;
-	float2 uv;
+	float u, v;
 	int age;
 	int lifeTime;
 	float size;
 	float gravity;
-	float3 color;
+	float r, g, b;
 	ParticleType type;
 } * ParticleData;
 
 typedef Entity Particle;
 
-Particle ParticleCreate(struct Level * level, float3 pos, float3 vel);
+Particle ParticleCreate(struct Level * level, float x, float y, float z, float xd, float yd, float zd);
 Particle ParticleSetPower(Particle particle, float power);
 Particle ParticleScale(Particle particle, float scale);
 void ParticleTick(Particle particle);
-void ParticleRender(Particle particle, float t, float3 v1, float v6, float v7);
+void ParticleRender(Particle particle, float t, float x, float y, float z, float v6, float v7);
 int ParticleGetParticleTexture(Particle particle);
 void ParticleDestroy(Particle particle);

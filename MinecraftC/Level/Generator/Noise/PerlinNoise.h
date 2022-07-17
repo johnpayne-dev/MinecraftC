@@ -9,5 +9,5 @@ typedef struct PerlinNoiseData {
 } * PerlinNoiseData;
 
 PerlinNoise PerlinNoiseCreate(RandomGenerator random);
-float PerlinNoiseCompute(PerlinNoise noise, float2 v);
+float PerlinNoiseCompute(PerlinNoise noise, float x, float y);
 void PerlinNoiseDestroy(PerlinNoise noise);

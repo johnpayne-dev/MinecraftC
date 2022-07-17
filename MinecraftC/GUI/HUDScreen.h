@@ -2,6 +2,7 @@
 #include "../ChatLine.h"
 #include "../Utilities/List.h"
 #include "../Utilities/Random.h"
+#include <stdbool.h>
 
 typedef struct HUDScreen {
 	list(ChatLine) chat;
@@ -13,6 +14,6 @@ typedef struct HUDScreen {
 } * HUDScreen;
 
 HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height);
-void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos);
+void HUDScreenRender(HUDScreen hud, float var1, bool var2, int mx, int my);
 void HUDScreenAddChat(HUDScreen hud, char * message);
 void HUDScreenDestroy(HUDScreen hud);

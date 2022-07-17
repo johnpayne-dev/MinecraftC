@@ -17,9 +17,9 @@ Renderer RendererCreate(Minecraft minecraft) {
 	return renderer;
 }
 
-float3 RendererGetPlayerVector(Renderer renderer, float t) {
+Vector3D RendererGetPlayerVector(Renderer renderer, float t) {
 	Player entity = renderer->minecraft->player;
-	return entity->oldPosition + (entity->position - entity->position) * t;
+	return (Vector3D){ entity->xo + (entity->x - entity->xo) * t, entity->yo + (entity->y - entity->yo) * t, entity->zo + (entity->z - entity->zo) * t };
 }
 
 void RendererApplyBobbing(Renderer renderer, float t) {
@@ -29,9 +29,9 @@ void RendererApplyBobbing(Renderer renderer, float t) {
 	walk = entity->walkDistance + walk * t;
 	float bob = player->oldBobbing + (player->bobbing - player->oldBobbing) * t;
 	float tilt = player->oldTilt + (player->tilt - player->oldTilt) * t;
-	glTranslatef(tsin(walk * pi) * bob * 0.5, -fabs(tcos(walk * pi) * bob), 0.0);
-	glRotatef(tsin(walk * pi) * bob * 3.0, 0.0, 0.0, 1.0);
-	glRotatef(fabs(tcos(walk * pi + 0.2) * bob) * 5.0, 1.0, 0.0, 0.0);
+	glTranslatef(tsin(walk * M_PI) * bob * 0.5, -fabs(tcos(walk * M_PI) * bob), 0.0);
+	glRotatef(tsin(walk * M_PI) * bob * 3.0, 0.0, 0.0, 1.0);
+	glRotatef(fabs(tcos(walk * M_PI + 0.2) * bob) * 5.0, 1.0, 0.0, 0.0);
 	glRotatef(tilt, 1.0, 0.0, 0.0);
 }
 
@@ -43,7 +43,7 @@ void RendererSetLighting(Renderer renderer, bool lighting) {
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glEnable(GL_COLOR_MATERIAL);
-		float3 pos = normalize3f((float3){ 0.0, -1.0, 0.5 });
+		Vector3D pos = Vector3DNormalize((Vector3D){ 0.0, -1.0, 0.5 });
 		glLightfv(GL_LIGHT0, GL_POSITION, (float[]){ pos.x, pos.y, pos.z, 0.0 });
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, (float[]){ 0.3, 0.3, 0.3, 1.0 });
 		glLightfv(GL_LIGHT0, GL_AMBIENT, (float[]){ 0.0, 0.0, 0.0, 1.0 });
@@ -66,33 +66,33 @@ void RendererEnableGUIMode(Renderer renderer) {
 void RendererUpdateFog(Renderer renderer) {
 	Level level = renderer->minecraft->level;
 	Player player = renderer->minecraft->player;
-	glFogfv(GL_FOG_COLOR, (float *)&renderer->fogColor);
+	glFogfv(GL_FOG_COLOR, (float []){ renderer->fogR, renderer->fogG, renderer->fogB, 1.0 });
 	glNormal3f(0.0, -1.0, 0.0);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
-	Block block = Blocks.table[LevelGetTile(level, player->position.x, player->position.y + 0.12, player->position.z)];
+	Block block = Blocks.table[LevelGetTile(level, player->x, player->y + 0.12, player->z)];
 	if (block != NULL && BlockGetLiquidType(block) != LiquidTypeNone) {
 		LiquidType liquid = BlockGetLiquidType(block);
 		glFogi(GL_FOG_MODE, GL_EXP);
 		if (liquid == LiquidTypeWater) {
 			glFogf(GL_FOG_DENSITY, 0.1);
-			float4 a = { 0.4, 0.4, 0.9, 1.0 };
+			Vector3D a = { 0.4, 0.4, 0.9 };
 			if (renderer->minecraft->settings->anaglyph) {
-				a.xyz = (float3){ a.x * 30.0 + a.y * 59.0 + a.z * 11.0, a.x * 30.0 + a.y * 70.0, a.x * 30.0 + a.z * 70.0 } / 100.0;
+				a = (Vector3D){ (a.x * 30.0 + a.y * 59.0 + a.z * 11.0) / 100.0, (a.x * 30.0 + a.y * 70.0) / 100.0, (a.x * 30.0 + a.z * 70.0) / 100.0 };
 			}
-			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float *)&a);
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float []){ a.x, a.y, a.z, 1.0 });
 		} else if (liquid == LiquidTypeLava) {
 			glFogf(GL_FOG_DENSITY, 2.0);
-			float4 a = { 0.4, 0.3, 0.3, 1.0 };
+			Vector3D a = { 0.4, 0.3, 0.3 };
 			if (renderer->minecraft->settings->anaglyph) {
-				a.xyz = (float3){ a.x * 30.0 + a.y * 59.0 + a.z * 11.0, a.x * 30.0 + a.y * 70.0, a.x * 30.0 + a.z * 70.0 } / 100.0;
+				a = (Vector3D){ (a.x * 30.0 + a.y * 59.0 + a.z * 11.0) / 100.0, (a.x * 30.0 + a.y * 70.0) / 100.0, (a.x * 30.0 + a.z * 70.0) / 100.0 };
 			}
-			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float *)&a);
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float []){ a.x, a.y, a.z, 1.0 });
 		}
 	} else {
 		glFogi(GL_FOG_MODE, GL_LINEAR);
 		glFogf(GL_FOG_START, 0.0);
 		glFogf(GL_FOG_END, renderer->fogEnd);
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float *)&one4f);
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float []){ 1.0, 1.0, 1.0, 1.0 });
 	}
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT);

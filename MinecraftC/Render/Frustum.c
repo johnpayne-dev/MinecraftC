@@ -2,8 +2,10 @@
 #include "../Utilities/OpenGL.h"
 
 static void Normalize(Frustum * frustum, int plane) {
-	float len = length3f((float3){ frustum->planes[plane][0], frustum->planes[plane][1], frustum->planes[plane][2] });
-	for (int i = 0; i < 4; i++) { frustum->planes[plane][i] /= len; }
+	float len = Vector3DLength((Vector3D){ frustum->planes[plane][0], frustum->planes[plane][1], frustum->planes[plane][2] });
+	for (int i = 0; i < 4; i++) {
+		frustum->planes[plane][i] /= len;
+	}
 }
 
 Frustum FrustumUpdate() {
@@ -59,17 +61,17 @@ Frustum FrustumUpdate() {
 	return frustum;
 }
 
-bool FrustumContainsBox(Frustum frustum, float3 v0, float3 v1) {
+bool FrustumContainsBox(Frustum frustum, float ax, float ay, float az, float bx, float by, float bz) {
 	for (int i = 0; i < 6; i++) {
 		bool b = true;
-		b = b && frustum.planes[i][0] * v0.x + frustum.planes[i][1] * v0.y + frustum.planes[i][2] * v0.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v1.x + frustum.planes[i][1] * v0.y + frustum.planes[i][2] * v0.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v0.x + frustum.planes[i][1] * v1.y + frustum.planes[i][2] * v0.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v1.x + frustum.planes[i][1] * v1.y + frustum.planes[i][2] * v0.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v0.x + frustum.planes[i][1] * v0.y + frustum.planes[i][2] * v1.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v1.x + frustum.planes[i][1] * v0.y + frustum.planes[i][2] * v1.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v0.x + frustum.planes[i][1] * v1.y + frustum.planes[i][2] * v1.z + frustum.planes[i][3] <= 0.0;
-		b = b && frustum.planes[i][0] * v1.x + frustum.planes[i][1] * v1.y + frustum.planes[i][2] * v1.z + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * ax + frustum.planes[i][1] * ay + frustum.planes[i][2] * az + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * bx + frustum.planes[i][1] * ay + frustum.planes[i][2] * az + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * ax + frustum.planes[i][1] * by + frustum.planes[i][2] * az + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * bx + frustum.planes[i][1] * by + frustum.planes[i][2] * az + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * ax + frustum.planes[i][1] * ay + frustum.planes[i][2] * bz + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * bx + frustum.planes[i][1] * ay + frustum.planes[i][2] * bz + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * ax + frustum.planes[i][1] * by + frustum.planes[i][2] * bz + frustum.planes[i][3] <= 0.0;
+		b = b && frustum.planes[i][0] * bx + frustum.planes[i][1] * by + frustum.planes[i][2] * bz + frustum.planes[i][3] <= 0.0;
 		if (b) { return false; }
 	}
 	return true;

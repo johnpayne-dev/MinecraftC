@@ -3,7 +3,7 @@
 
 MushroomBlock MushroomBlockCreate(BlockType type, int textureID) {
 	FlowerBlock block = FlowerBlockCreate(type, textureID);
-	BlockSetBounds(block, (float3){ 0.3, 0.0, 0.3 }, (float3){ 0.7, 0.4, 0.7 });
+	BlockSetBounds(block, 0.3, 0.0, 0.3, 0.7, 0.4, 0.7);
 	return block;
 }
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "TileSound.h"
-#include "../../Utilities/LinearMath.h"
 #include "../../Utilities/Random.h"
 #include "../../Physics/AABB.h"
 #include "../../Particle/ParticleManager.h"
@@ -70,8 +69,8 @@ typedef struct Block {
 	TileSound sound;
 	int hardness;
 	bool explodable;
-	float3 xyz0;
-	float3 xyz1;
+	float x0, y0, z0;
+	float x1, y1, z1;
 	float particleGravity;
 	BlockType type;
 	void * typeData;
@@ -81,7 +80,7 @@ Block BlockCreate(BlockType type, int textureID);
 bool BlockIsCube(Block block);
 Block BlockSetData(Block block, TileSound sound, float var, float particleGravity, float hardness);
 void BlockSetPhysics(Block block, bool physics);
-void BlockSetBounds(Block block, float3 v0, float3 v1);
+void BlockSetBounds(Block block, float x0, float y0, float z0, float x1, float y1, float z1);
 void BlockSetTickDelay(Block block, int tickDelay);
 void BlockRenderFullBrightness(Block block);
 float BlockGetBrightness(Block block, struct Level * level, int x, int y, int z);
@@ -106,7 +105,7 @@ void BlockOnRemoved(Block block, struct Level * level, int x, int y, int z);
 int BlockGetHardness(Block block);
 void BlockRenderPreview(Block block);
 bool BlockCanExplode(Block block);
-MovingObjectPosition BlockClip(Block block, int x, int y, int z, float3 var1, float3 var2);
+MovingObjectPosition BlockClip(Block block, int x, int y, int z, Vector3D var1, Vector3D var2);
 void BlockExplode(Block block, struct Level * level, int x, int y, int z);
 bool BlockRender(Block block, struct Level * level, int x, int y, int z);
 int BlockGetRenderPass(Block block);

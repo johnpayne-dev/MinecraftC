@@ -3,5 +3,5 @@
 
 typedef Particle SmokeParticle;
 
-SmokeParticle SmokeParticleCreate(struct Level * level, float3 pos);
+SmokeParticle SmokeParticleCreate(struct Level * level, float x, float y, float z);
 void SmokeParticleTick(SmokeParticle particle);

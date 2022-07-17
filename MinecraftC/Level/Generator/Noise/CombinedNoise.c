@@ -13,9 +13,9 @@ CombinedNoise CombinedNoiseCreate(Noise n1, Noise n2) {
 	return noise;
 }
 
-float CombinedNoiseCompute(CombinedNoise noise, float2 v) {
+float CombinedNoiseCompute(CombinedNoise noise, float x, float y) {
 	CombinedNoiseData this = noise->typeData;
-	return NoiseCompute(this->noise1, (float2){ v.x + NoiseCompute(this->noise2, v), v.y });
+	return NoiseCompute(this->noise1, x + NoiseCompute(this->noise2, x, y), y);
 }
 
 void CombinedNoiseDestroy(CombinedNoise noise) {

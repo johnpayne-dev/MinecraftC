@@ -19,23 +19,25 @@ void WaterTextureAnimate(WaterTexture texture) {
 			for (int i = x - 1; i <= x + 1; i++) {
 				int a = i & 15;
 				int b = y & 15;
-				v += this->colors[a + (b << 4)].r;
+				v += this->red[a + (b << 4)];
 			}
-			this->colors[x + (y << 4)].b = v / 3.3 + this->colors[x + (y << 4)].g * 0.8;
+			this->blue[x + (y << 4)] = v / 3.3 + this->green[x + (y << 4)] * 0.8;
 		}
 	}
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
-			this->colors[x + (y << 4)].g += this->colors[x + (y << 4)].a * 0.05;
-			if (this->colors[x + (y << 4)].g < 0.0) { this->colors[x + (y << 4)].g = 0.0; }
-			this->colors[x + (y << 4)].a -= 0.1;
-			if (RandomUniform() < 0.05) { this->colors[x + (y << 4)].a = 0.5; }
+			this->green[x + (y << 4)] += this->alpha[x + (y << 4)] * 0.05;
+			if (this->green[x + (y << 4)] < 0.0) { this->green[x + (y << 4)] = 0.0; }
+			this->alpha[x + (y << 4)] -= 0.1;
+			if (RandomUniform() < 0.05) { this->alpha[x + (y << 4)] = 0.5; }
 		}
 	}
 	
 	for (int i = 0; i < 256; i++) {
-		this->colors[i].rb = this->colors[i].br;
-		float v = this->colors[i].r;
+		float blue = this->blue[i];
+		this->blue[i] = this->red[i];
+		this->red[i] = blue;
+		float v = this->red[i];
 		if (v > 1.0) { v = 1.0; }
 		if (v < 0.0) { v = 0.0; }
 		int a = 32.0 + v * v * 32.0;

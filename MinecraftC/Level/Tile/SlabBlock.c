@@ -6,7 +6,7 @@ SlabBlock SlabBlockCreate(BlockType type, bool doubleSlab) {
 	SlabBlockData slab = MemoryAllocate(sizeof(struct SlabBlockData));
 	block->typeData = slab;
 	*slab = (struct SlabBlockData){ .DoubleSlab = doubleSlab, };
-	if (!doubleSlab) { BlockSetBounds(block, zero3f, one3f - up3f * 0.5); }
+	if (!doubleSlab) { BlockSetBounds(block, 0, 0, 0, 1, 0.5, 1); }
 	return block;
 }
 

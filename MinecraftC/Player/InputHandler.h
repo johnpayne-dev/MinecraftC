@@ -1,13 +1,11 @@
 #pragma once
 #include <stdbool.h>
-#include "../Utilities/LinearMath.h"
 #include "../GameSettings.h"
 
-typedef struct InputHandler
-{
+typedef struct InputHandler {
 	bool keyStates[10];
 	GameSettings settings;
-	float2 xy;
+	float x, y;
 	bool jumping;
 } * InputHandler;
 

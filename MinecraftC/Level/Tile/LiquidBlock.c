@@ -5,7 +5,7 @@
 LiquidBlock LiquidBlockCreate(BlockType blockType, LiquidType liquidType) {
 	Block block = BlockCreate(blockType, liquidType == LiquidTypeWater ? 14 : 30);
 	Blocks.liquid[blockType] = true;
-	BlockSetBounds(block, (float3){ 0.0, -0.1, 0.0 } + 0.01, (float3){ 1.0, 0.9, 1.0 } + 0.01);
+	BlockSetBounds(block, 0.01, -0.1 + 0.01, 0.01, 1.01, 0.9 + 0.01, 1.0 + 0.01);
 	BlockSetPhysics(block, true);
 	LiquidBlockData liquid = MemoryAllocate(sizeof(struct LiquidBlockData));
 	*liquid = (struct LiquidBlockData) {

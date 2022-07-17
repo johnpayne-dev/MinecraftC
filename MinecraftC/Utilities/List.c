@@ -1,5 +1,6 @@
 #include <string.h>
-#include "LinearMath.h"
+#include <math.h>
+#include <stdbool.h>
 #include "List.h"
 
 static const unsigned int MetaSize = 2 * sizeof(unsigned int);

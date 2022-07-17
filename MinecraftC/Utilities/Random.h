@@ -1,5 +1,4 @@
 #pragma once
-#include "LinearMath.h"
 #include "Time.h"
 
 typedef struct RandomGenerator

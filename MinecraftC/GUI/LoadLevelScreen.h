@@ -25,5 +25,5 @@ void LoadLevelScreenOpenLevel(LoadLevelScreen screen, int level);
 void LoadLevelScreenOpenLevelFromFile(LoadLevelScreen screen, char * file);
 void LoadLevelScreenOnClose(LoadLevelScreen screen);
 void LoadLevelScreenTick(LoadLevelScreen screen);
-void LoadLevelScreenRender(LoadLevelScreen screen, int2 mousePos);
+void LoadLevelScreenRender(LoadLevelScreen screen, int mx, int my);
 void LoadLevelScreenDestroy(LoadLevelScreen screen);

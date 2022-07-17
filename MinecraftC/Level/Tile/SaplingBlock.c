@@ -3,7 +3,7 @@
 
 SaplingBlock SaplingBlockCreate() {
 	FlowerBlock block = FlowerBlockCreate(BlockTypeSapling, 15);
-	BlockSetBounds(block, (float3){ 0.1, 0.0, 0.1 }, (float3){ 0.9, 0.8, 0.9 });
+	BlockSetBounds(block, 0.1, 0.0, 0.1, 0.9, 0.8, 0.9);
 	return block;
 }
 

@@ -6,7 +6,7 @@
 typedef struct Chunk {
 	Level level;
 	int baseListID;
-	int3 position;
+	int x, y, z;
 	int width, depth, height;
 	bool visible;
 	bool dirty[2];
@@ -15,7 +15,7 @@ typedef struct Chunk {
 
 extern int ChunkUpdates;
 
-Chunk ChunkCreate(Level level, int3 pos, int chunkSize, int baseListID);
+Chunk ChunkCreate(Level level, int x, int y, int z, int chunkSize, int baseListID);
 void ChunkUpdate(Chunk chunk);
 float ChunkDistanceSquared(Chunk chunk, Player player);
 void ChunkSetAllDirty(Chunk chunk);

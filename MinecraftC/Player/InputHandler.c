@@ -21,11 +21,12 @@ void InputHandlerResetKeys(InputHandler input) {
 }
 
 void InputHandlerUpdateMovement(InputHandler input) {
-	input->xy = zero2f;
-	if (input->keyStates[0]) { input->xy.y--; }
-	if (input->keyStates[1]) { input->xy.y++; }
-	if (input->keyStates[2]) { input->xy.x--; }
-	if (input->keyStates[3]) { input->xy.x++; }
+	input->x = 0.0;
+	input->y = 0.0;
+	if (input->keyStates[0]) { input->y--; }
+	if (input->keyStates[1]) { input->y++; }
+	if (input->keyStates[2]) { input->x--; }
+	if (input->keyStates[3]) { input->x++; }
 	input->jumping = input->keyStates[4];
 }
 

@@ -9,4 +9,4 @@ typedef struct Frustum {
 } Frustum;
 
 Frustum FrustumUpdate(void);
-bool FrustumContainsBox(Frustum frustum, float3 v0, float3 v1);
+bool FrustumContainsBox(Frustum frustum, float ax, float ay, float az, float bx, float by, float bz);

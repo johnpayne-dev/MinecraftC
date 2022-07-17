@@ -5,12 +5,14 @@
 
 int ChunkUpdates = 0;
 
-Chunk ChunkCreate(Level level, int3 pos, int chunkSize, int baseListID) {
+Chunk ChunkCreate(Level level, int x, int y, int z, int chunkSize, int baseListID) {
 	Chunk chunk = MemoryAllocate(sizeof(struct Chunk));
 	*chunk = (struct Chunk) {
 		.visible = false,
 		.level = level,
-		.position = pos,
+		.x = x,
+		.y = y,
+		.z = z,
 		.width = 16,
 		.height = 16,
 		.depth = 16,
@@ -22,18 +24,22 @@ Chunk ChunkCreate(Level level, int3 pos, int chunkSize, int baseListID) {
 
 void ChunkUpdate(Chunk chunk) {
 	ChunkUpdates++;
-	int3 v0 = chunk->position;
-	int3 v1 = chunk->position + (int3){ chunk->width, chunk->height, chunk->depth };
+	int x0 = chunk->x, y0 = chunk->y, z0 = chunk->z;
+	int x1 = chunk->x + chunk->width;
+	int y1 = chunk->y + chunk->height;
+	int z1 = chunk->z + chunk->depth;
 	
-	for (int i = 0; i < 2; i++) { chunk->dirty[i] = true; }
+	for (int i = 0; i < 2; i++) {
+		chunk->dirty[i] = true;
+	}
 	for (int i = 0; i < 2; i++) {
 		bool b0 = false;
 		bool b1 = false;
 		glNewList(chunk->baseListID + i, GL_COMPILE);
 		ShapeRendererBegin();
-		for (int x = v0.x; x < v1.x; x++) {
-			for (int y = v0.y; y < v1.y; y++) {
-				for (int z = v0.z; z < v1.z; z++) {
+		for (int x = x0; x < x1; x++) {
+			for (int y = y0; y < y1; y++) {
+				for (int z = z0; z < z1; z++) {
 					BlockType tile = LevelGetTile(chunk->level, x, y, z);
 					if (tile != BlockTypeNone) {
 						Block block = Blocks.table[tile];
@@ -51,11 +57,13 @@ void ChunkUpdate(Chunk chunk) {
 }
 
 float ChunkDistanceSquared(Chunk chunk, Player player) {
-	return sqdistance3f(player->position, float3i(chunk->position));
+	return (player->x - chunk->x) * (player->x - chunk->x) + (player->y - chunk->y) * (player->y - chunk->y) + (player->z - chunk->z) * (player->z - chunk->z);
 }
 
 void ChunkSetAllDirty(Chunk chunk) {
-	for (int i = 0; i < 2; i++) { chunk->dirty[i] = true; }
+	for (int i = 0; i < 2; i++) {
+		chunk->dirty[i] = true;
+	}
 }
 
 void ChunkDispose(Chunk chunk) {
@@ -72,8 +80,7 @@ int ChunkAppendLists(Chunk chunk, int dataCache[], int count, int pass) {
 }
 
 void ChunkClip(Chunk chunk, Frustum frustum) {
-	float3 p = float3i(chunk->position);
-	chunk->visible = FrustumContainsBox(frustum, p, p + (float3){ chunk->width, chunk->height, chunk->depth });
+	chunk->visible = FrustumContainsBox(frustum, chunk->x, chunk->y, chunk->z, chunk->x + chunk->width, chunk->y + chunk->height, chunk->z + chunk->depth);
 }
 
 void ChunkDestroy(Chunk chunk) {
@@ -81,16 +88,24 @@ void ChunkDestroy(Chunk chunk) {
 }
 
 int ChunkDistanceComparator(const void * a, const void * b) {
-	float distA = sqdistance3f(float3i((*(Chunk *)a)->position), (*(Chunk *)a)->level->player->position);
-	float distB = sqdistance3f(float3i((*(Chunk *)b)->position), (*(Chunk *)a)->level->player->position);
+	float ax = (*(Chunk *)a)->x, ay = (*(Chunk *)a)->y, az = (*(Chunk *)a)->z;
+	float apx = (*(Chunk *)a)->level->player->x, apy = (*(Chunk *)a)->level->player->y, apz = (*(Chunk *)a)->level->player->z;
+	float bx = (*(Chunk *)b)->x, by = (*(Chunk *)b)->y, bz = (*(Chunk *)b)->z;
+	float bpx = (*(Chunk *)b)->level->player->x, bpy = (*(Chunk *)b)->level->player->y, bpz = (*(Chunk *)b)->level->player->z;
+	float distA = (ax - apx) * (ax - apx) + (ay - apy) * (ay - apy) + (az - apz) * (az - apz);
+	float distB = (bx - bpx) * (bx - bpx) + (by - bpy) * (by - bpy) + (bz - bpz) * (bz - bpz);
 	return distA == distB ? 0 : (distA > distB ? 1 : -1);
 }
 
 int ChunkVisibleDistanceComparator(const void * a, const void * b) {
 	if ((*(Chunk *)a)->visible || !(*(Chunk *)b)->visible) {
 		if ((*(Chunk *)b)->visible) {
-			float distA = sqdistance3f(float3i((*(Chunk *)a)->position), (*(Chunk *)a)->level->player->position);
-			float distB = sqdistance3f(float3i((*(Chunk *)b)->position), (*(Chunk *)a)->level->player->position);
+			float ax = (*(Chunk *)a)->x, ay = (*(Chunk *)a)->y, az = (*(Chunk *)a)->z;
+			float apx = (*(Chunk *)a)->level->player->x, apy = (*(Chunk *)a)->level->player->y, apz = (*(Chunk *)a)->level->player->z;
+			float bx = (*(Chunk *)b)->x, by = (*(Chunk *)b)->y, bz = (*(Chunk *)b)->z;
+			float bpx = (*(Chunk *)b)->level->player->x, bpy = (*(Chunk *)b)->level->player->y, bpz = (*(Chunk *)b)->level->player->z;
+			float distA = (ax - apx) * (ax - apx) + (ay - apy) * (ay - apy) + (az - apz) * (az - apz);
+			float distB = (bx - bpx) * (bx - bpx) + (by - bpy) * (by - bpy) + (bz - bpz) * (bz - bpz);
 			return distA == distB ? 0 : (distA > distB ? 1 : -1);
 		} else { return -1; }
 	} else { return 1; }

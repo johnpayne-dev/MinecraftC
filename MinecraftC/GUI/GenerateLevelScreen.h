@@ -10,5 +10,5 @@ typedef struct GenerateLevelScreenData {
 GenerateLevelScreen GenerateLevelScreenCreate(GUIScreen parent);
 void GenerateLevelScreenOnOpen(GenerateLevelScreen screen);
 void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen screen, Button button);
-void GenerateLevelScreenRender(GenerateLevelScreen screen, int2 mousePos);
+void GenerateLevelScreenRender(GenerateLevelScreen screen, int mx, int my);
 void GenerateLevelScreenDestroy(GenerateLevelScreen screen);

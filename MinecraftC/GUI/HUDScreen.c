@@ -20,16 +20,16 @@ HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height) {
 	return hud;
 }
 
-void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos) {
+void HUDScreenRender(HUDScreen hud, float var1, bool var2, int mx, int my) {
 	PlayerData player = hud->minecraft->player->typeData;
 	RendererEnableGUIMode(hud->minecraft->renderer);
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->minecraft->textureManager, "GUI/GUI.png"));
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_BLEND);
-	ScreenDrawImage((int2){ hud->width / 2 - 91, hud->height - 22 }, (int2){ 0, 0 }, (int2){ 182, 22 }, -90.0);
-	ScreenDrawImage((int2){ hud->width / 2 - 92 + player->inventory->selected * 20, hud->height - 23 }, (int2){ 0, 22 }, (int2){ 24, 22 }, -90.0);
+	ScreenDrawImage(hud->width / 2 - 91, hud->height - 22, 0, 0, 182, 22, -90.0);
+	ScreenDrawImage(hud->width / 2 - 92 + player->inventory->selected * 20, hud->height - 23, 0, 22, 24, 22, -90.0);
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->minecraft->textureManager, "GUI/Icons.png"));
-	ScreenDrawImage((int2){ hud->width / 2 - 7, hud->height / 2 - 7 }, (int2){ 0, 0 }, (int2){ 16, 16 }, -90.0);
+	ScreenDrawImage(hud->width / 2 - 7, hud->height / 2 - 7, 0, 0, 16, 16, -90.0);
 	
 	glDisable(GL_BLEND);
 	for (int i = 0; i < 9; i++) {
@@ -41,9 +41,9 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos) {
 			glTranslatef(x, y, -50.0);
 			if (player->inventory->popTime[i] > 0) {
 				float f1 = (player->inventory->popTime[i] - var1) / 5.0;
-				float f2 = -tsin(f1 * f1 * pi) * 8.0;
-				float f3 = tsin(f1 * f1 * pi) + 1.0;
-				float f4 = tsin(f1 * pi) + 1.0;
+				float f2 = -tsin(f1 * f1 * M_PI) * 8.0;
+				float f3 = tsin(f1 * f1 * M_PI) + 1.0;
+				float f4 = tsin(f1 * M_PI) + 1.0;
 				glTranslatef(10.0, f2 + 10.0, 0.0);
 				glScalef(f3, f4, 1.0);
 				glTranslatef(-10.0, -10.0, 0.0);
@@ -61,14 +61,14 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos) {
 			glPopMatrix();
 			if (player->inventory->count[i] > 1) {
 				String string = StringCreateFromInt(player->inventory->count[i]);
-				FontRendererRender(hud->minecraft->font, string, x + 19 - FontRendererGetWidth(hud->minecraft->font, string), y + 6, ColorWhite);
+				FontRendererRender(hud->minecraft->font, string, x + 19 - FontRendererGetWidth(hud->minecraft->font, string), y + 6, 0xffffffff);
 				StringDestroy(string);
 			}
 		}
 	}
 		
-	FontRendererRender(hud->minecraft->font, "0.30", 2, 2, ColorWhite);
-	if (hud->minecraft->settings->showFrameRate) { FontRendererRender(hud->minecraft->font, hud->minecraft->debug, 2, 12, ColorWhite); }
+	FontRendererRender(hud->minecraft->font, "0.30", 2, 2, 0xffffffff);
+	if (hud->minecraft->settings->showFrameRate) { FontRendererRender(hud->minecraft->font, hud->minecraft->debug, 2, 12, 0xffffffff); }
 		
 	int maxLines = 10;
 	bool chatScreen = false;
@@ -77,7 +77,7 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int2 mousePos) {
 		chatScreen = true;
 	}
 	for (int i = 0; i < ListCount(hud->chat) && i < maxLines; i++) {
-		if (hud->chat[i]->time < 200 || chatScreen) { FontRendererRender(hud->minecraft->font, hud->chat[i]->message, 2, hud->height - 28 - i * 9, ColorWhite); }
+		if (hud->chat[i]->time < 200 || chatScreen) { FontRendererRender(hud->minecraft->font, hud->chat[i]->message, 2, hud->height - 28 - i * 9, 0xffffffff); }
 	}
 	
 	hud->hoveredPlayer = NULL;

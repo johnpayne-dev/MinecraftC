@@ -99,22 +99,22 @@ void LoadLevelScreenTick(LoadLevelScreen screen) {
 	}
 }
 
-void LoadLevelScreenRender(LoadLevelScreen screen, int2 mousePos) {
+void LoadLevelScreenRender(LoadLevelScreen screen, int mx, int my) {
 	LoadLevelScreenData this = screen->typeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->font, this->title, (int2){ screen->width / 2, 20 }, ColorWhite);
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, this->title, screen->width / 2, 20, 0xffffffff);
 	if (this->frozen) {
-		ScreenDrawCenteredString(screen->font, "Selecting file..", (int2){ screen->width / 2, screen->height / 2 - 4 }, ColorWhite);
+		ScreenDrawCenteredString(screen->font, "Selecting file..", screen->width / 2, screen->height / 2 - 4, 0xffffffff);
 	} else {
 		if (!this->loaded) {
-			ScreenDrawCenteredString(screen->font, this->status, (int2){ screen->width / 2, screen->height / 2 - 4 }, ColorWhite);
+			ScreenDrawCenteredString(screen->font, this->status, screen->width / 2, screen->height / 2 - 4, 0xffffffff);
 		}
 		screen->type = GUIScreenTypeNone;
-		GUIScreenRender(screen, mousePos);
+		GUIScreenRender(screen, mx, my);
 		screen->type = GUIScreenTypeLoadLevel;
 	}
 	if (screen->type == GUIScreenTypeSaveLevel) {
-		SaveLevelScreenRender(screen, mousePos);
+		SaveLevelScreenRender(screen, mx, my);
 	}
 }
 

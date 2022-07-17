@@ -5,12 +5,12 @@
 typedef Entity PrimedTNT;
 
 typedef struct PrimedTNTData {
-	float3 delta;
+	float xd, yd, zd;
 	int life;
 	bool defused;
 } * PrimedTNTData;
 
-PrimedTNT PrimedTNTCreate(Level level, float3 pos);
+PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z);
 void PrimedTNTHurt(PrimedTNT tnt);
 bool PrimedTNTIsPickable(PrimedTNT tnt);
 void PrimedTNTTick(PrimedTNT tnt);

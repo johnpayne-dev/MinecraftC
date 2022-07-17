@@ -13,7 +13,7 @@ typedef struct ControlsScreenData {
 
 ControlsScreen ControlsScreenCreate(GUIScreen parent, GameSettings settings);
 void ControlsScreenOnOpen(ControlsScreen screen);
-void ControlsScreenRender(ControlsScreen screen, int2 mousePos);
+void ControlsScreenRender(ControlsScreen screen, int mx, int my);
 void ControlsScreenOnKeyPressed(ControlsScreen screen, char eventChar, int eventKey);
 void ControlsScreenOnButtonClicked(ControlsScreen screen, Button button);
 void ControlsScreenDestroy(ControlsScreen screen);

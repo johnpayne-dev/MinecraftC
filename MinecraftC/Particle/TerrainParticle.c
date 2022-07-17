@@ -2,12 +2,14 @@
 #include "../Level/Level.h"
 #include "../Render/ShapeRenderer.h"
 
-TerrainParticle TerrainParticleCreate(Level level, float3 pos, float3 vel, Block block) {
-	Particle particle = ParticleCreate(level, pos, vel);
+TerrainParticle TerrainParticleCreate(Level level, float x, float y, float z, float xd, float yd, float zd, Block block) {
+	Particle particle = ParticleCreate(level, x, y, z, xd, yd, zd);
 	ParticleData this = particle->typeData;
 	this->texture = block->textureID;
 	this->gravity = block->particleGravity;
-	this->color = one3f * 0.6;
+	this->r = 0.6;
+	this->g = 0.6;
+	this->b = 0.6;
 	this->type = ParticleTypeTerrain;
 	return particle;
 }
@@ -16,16 +18,20 @@ int TerrainParticleGetTexture(TerrainParticle particle) {
 	return 1;
 }
 
-void TerrainParticleRender(TerrainParticle particle, float t, float3 v1, float v6, float v7) {
+void TerrainParticleRender(TerrainParticle particle, float dt, float x, float y, float z, float v6, float v7) {
 	ParticleData this = particle->typeData;
-	float2 uv0 = (float2){ ((this->texture % 16) + this->uv.x / 4.0F) / 16.0F, ((this->texture / 16) + this->uv.y / 4.0F) / 16.0F };
-	float2 uv1 = uv0 + 0.015609375;
+	float u0 = ((this->texture % 16) + this->u / 4.0) / 16.0;
+	float v0 = ((this->texture / 16) + this->v / 4.0) / 16.0;
+	float u1 = u0 + 0.015609375;
+	float v1 = v0 + 0.015609375;
 	float s = 0.1 * this->size;
-	float3 v = particle->oldPosition + (particle->position - particle->oldPosition) * t;
-	float b = EntityGetBrightness(particle, t);
-	ShapeRendererColor(this->color * b);
-	ShapeRendererVertexUV(v + v1 * (float3){ -s, -s, -s } - (float3){ v6, 0.0, v7 } * s, (float2){ uv0.x, uv1.y });
-	ShapeRendererVertexUV(v + v1 * (float3){ -s, s, -s } + (float3){ v6, 0.0, v7 } * s, (float2){ uv0.x, uv0.y });
-	ShapeRendererVertexUV(v + v1 * (float3){ s, s, s } + (float3){ v6, 0.0, v7 } * s, (float2){ uv1.x, uv0.y });
-	ShapeRendererVertexUV(v + v1 * (float3){ s, -s, s } - (float3){ v6, 0.0, v7 } * s, (float2){ uv1.x, uv1.y });
+	float vx = particle->xo + (particle->x - particle->xo) * dt;
+	float vy = particle->yo + (particle->y - particle->yo) * dt;
+	float vz = particle->zo + (particle->z - particle->zo) * dt;
+	float brightness = EntityGetBrightness(particle, dt);
+	ShapeRendererColorf(this->r * brightness, this->g * brightness, this->b * brightness);
+	ShapeRendererVertexUV(vx - x * s - v6 * s, vy - y * s, vz - z * s - v7 * s, u0, v1);
+	ShapeRendererVertexUV(vx - x * s + v6 * s, vy + y * s, vz - z * s + v7 * s, u0, v0);
+	ShapeRendererVertexUV(vx + x * s + v6 * s, vy + y * s, vz + z * s + v7 * s, u1, v0);
+	ShapeRendererVertexUV(vx + x * s - v6 * s, vy - y * s, vz + z * s - v7 * s, u1, v1);
 }

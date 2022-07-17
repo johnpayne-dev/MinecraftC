@@ -14,12 +14,12 @@ OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount) {
 	return noise;
 }
 
-float OctaveNoiseCompute(OctaveNoise noise, float2 v) {
+float OctaveNoiseCompute(OctaveNoise noise, float x, float y) {
 	OctaveNoiseData this = noise->typeData;
 	float a = 0.0;
 	float b = 1.0;
 	for (int i = 0; i < this->octaveCount; i++) {
-		a += NoiseCompute(this->octaves[i], v / b) * b;
+		a += NoiseCompute(this->octaves[i], x / b, y / b) * b;
 		b *= 2;
 	}
 	return a;

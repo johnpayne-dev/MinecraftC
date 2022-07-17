@@ -27,11 +27,11 @@ void ChatInputScreenTick(ChatInputScreen screen)
 	this->counter++;
 }
 
-void ChatInputScreenRender(ChatInputScreen screen, int2 mousePos) {
+void ChatInputScreenRender(ChatInputScreen screen, int mx, int my) {
 	ChatInputScreenData this = screen->typeData;
-	ScreenDrawBox((int2){ 2, screen->height - 14 }, (int2){ screen->width, screen->height } - 2, ColorFromHex(0x00000080));
+	ScreenDrawBox(2, screen->height - 14, screen->width - 2, screen->height - 2, 0x00000080);
 	String msg = StringConcat(StringConcatFront("> ", StringCreate(this->message)), this->counter / 6 % 2 == 0 ? "_" : "");
-	ScreenDrawString(screen->font, msg, (int2){ 4, screen->height - 12 }, ColorFromHex(0xE0E0E0FF));
+	ScreenDrawString(screen->font, msg, 4, screen->height - 12, 0xE0E0E0FF);
 	StringDestroy(msg);
 }
 

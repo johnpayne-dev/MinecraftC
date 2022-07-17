@@ -5,7 +5,7 @@
 typedef struct PlayerAI {
 	int defaultLookAngle;
 	RandomGenerator random;
-	float2 xy;
+	float x, y;
 	float rotation;
 	Level level;
 	Entity mob;

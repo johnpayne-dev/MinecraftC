@@ -1,5 +1,6 @@
 #include "PerlinNoise.h"
 #include "../../../Utilities/Memory.h"
+#include <math.h>
 
 PerlinNoise PerlinNoiseCreate(RandomGenerator random) {
 	Noise noise = NoiseCreate();
@@ -17,7 +18,7 @@ PerlinNoise PerlinNoiseCreate(RandomGenerator random) {
 	return noise;
 }
 
-static float3 F(float3 x) {
+static float F(float x) {
 	return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
 }
 
@@ -25,33 +26,35 @@ static float Lerp(float t, float a, float b) {
 	return a + t * (b - a);
 }
 
-static float Grad(int i, float3 v) {
+static float Grad(int i, float x, float y, float z) {
 	i &= 15;
-	float a = i < 8 ? v.x : v.y;
-	float b = i < 4 ? v.y : (i != 12 && i != 14 ? v.z : v.x);
+	float a = i < 8 ? x : y;
+	float b = i < 4 ? y : (i != 12 && i != 14 ? z : x);
 	return ((i & 1) == 0 ? a : -a) + ((i & 2) == 0 ? b : -b);
 }
 
-float PerlinNoiseCompute(PerlinNoise noise, float2 xy) {
+float PerlinNoiseCompute(PerlinNoise noise, float x, float y) {
 	PerlinNoiseData this = noise->typeData;
-	float3 v = { xy.x, xy.y, 0.0 };
-	int3 vi = int3f(v) & 255;
-	v -= (float3){ floorf(v.x), floorf(v.y), floorf(v.z) };
-	float3 vd = F(v);
+	float vx = x, vy = y, vz = 0.0;
+	int ix = ((int)vx) & 255, iy = ((int)vy) & 255, iz = ((int)vz) & 255;
+	vx -= floor(vx);
+	vy -= floor(vy);
+	vz -= floor(vz);
+	float xd = F(vx), yd = F(vy), zd = F(vz);
 	int aaa, aba, aab, abb, baa, bba, bab, bbb;
-	aaa = this->hash[this->hash[this->hash[vi.x] + vi.y] + vi.z];
-	aba = this->hash[this->hash[this->hash[vi.x] + vi.y + 1] + vi.z];
-	aab = this->hash[this->hash[this->hash[vi.x] + vi.y] + vi.z + 1];
-	abb = this->hash[this->hash[this->hash[vi.x] + vi.y + 1] + vi.z + 1];
-	baa = this->hash[this->hash[this->hash[vi.x + 1] + vi.y] + vi.z];
-	bba = this->hash[this->hash[this->hash[vi.x + 1] + vi.y + 1] + vi.z];
-	bab = this->hash[this->hash[this->hash[vi.x + 1] + vi.y] + vi.z + 1];
-	bbb = this->hash[this->hash[this->hash[vi.x + 1] + vi.y + 1] + vi.z + 1];
-	float l1 = Lerp(vd.x, Grad(aaa, v), Grad(baa, v - right3f));
-	float l2 = Lerp(vd.x, Grad(aba, v - up3f), Grad(bba, v - right3f - up3f));
-	float l3 = Lerp(vd.x, Grad(aab, v - forward3f), Grad(bab, v - right3f - forward3f));
-	float l4 = Lerp(vd.x, Grad(abb, v - forward3f - up3f), Grad(bbb, v - one3f));
-	float l = Lerp(vd.z, Lerp(vd.y, l1, l2), Lerp(vd.y, l3, l4));
+	aaa = this->hash[this->hash[this->hash[ix] + iy] + iz];
+	aba = this->hash[this->hash[this->hash[ix] + iy + 1] + iz];
+	aab = this->hash[this->hash[this->hash[ix] + iy] + iz + 1];
+	abb = this->hash[this->hash[this->hash[ix] + iy + 1] + iz + 1];
+	baa = this->hash[this->hash[this->hash[ix + 1] + iy] + iz];
+	bba = this->hash[this->hash[this->hash[ix + 1] + iy + 1] + iz];
+	bab = this->hash[this->hash[this->hash[ix + 1] + iy] + iz + 1];
+	bbb = this->hash[this->hash[this->hash[ix + 1] + iy + 1] + iz + 1];
+	float l1 = Lerp(xd, Grad(aaa, vx, vy, vz), Grad(baa, vx - 1.0, vy, vz));
+	float l2 = Lerp(xd, Grad(aba, vx, vy - 1.0, vz), Grad(bba, vx - 1.0, vy - 1.0, vz));
+	float l3 = Lerp(xd, Grad(aab, vx, vy, vz - 1.0), Grad(bab, vx - 1.0, vy, vz - 1.0));
+	float l4 = Lerp(xd, Grad(abb, vx, vy - 1.0, vz - 1.0), Grad(bbb, vx - 1.0, vy - 1.0, vz - 1.0));
+	float l = Lerp(zd, Lerp(yd, l1, l2), Lerp(yd, l3, l4));
 	return l;
 }
 

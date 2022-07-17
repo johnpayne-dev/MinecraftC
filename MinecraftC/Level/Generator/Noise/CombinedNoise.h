@@ -9,5 +9,5 @@ typedef struct CombinedNoiseData {
 } * CombinedNoiseData;
 
 CombinedNoise CombinedNoiseCreate(Noise n1, Noise n2);
-float CombinedNoiseCompute(CombinedNoise noise, float2 v);
+float CombinedNoiseCompute(CombinedNoise noise, float x, float y);
 void CombinedNoiseDestroy(CombinedNoise noise);

@@ -1,13 +1,16 @@
 #include "WaterDropParticle.h"
 #include "../Level/Level.h"
 
-WaterDropParticle WaterDropParticleCreate(Level level, float3 pos) {
-	Particle particle = ParticleCreate(level, pos, zero3f);
+WaterDropParticle WaterDropParticleCreate(Level level, float x, float y, float z) {
+	Particle particle = ParticleCreate(level, x, y, z, 0.0, 0.0, 0.0);
 	ParticleData this = particle->typeData;
 	this->type = ParticleTypeWaterDrop;
-	this->delta.xz *= 0.3;
-	this->delta.y = RandomUniform() * 0.2 + 0.1;
-	this->color = one3f;
+	this->xd *= 0.3;
+	this->zd *= 0.3;
+	this->yd = RandomUniform() * 0.2 + 0.1;
+	this->r = 1.0;
+	this->g = 1.0;
+	this->b = 1.0;
 	this->texture = 16;
 	EntitySetSize(particle, 0.01, 0.01);
 	this->lifeTime = 8.0 / (RandomUniform() * 0.8 + 0.2);
@@ -16,14 +19,18 @@ WaterDropParticle WaterDropParticleCreate(Level level, float3 pos) {
 
 void WaterDropParticleTick(WaterDropParticle particle) {
 	ParticleData this = particle->typeData;
-	particle->oldPosition = particle->position;
-	this->delta.y -= 0.06;
-	EntityMove(particle, this->delta);
-	this->delta *= 0.98;
+	particle->xo = particle->x;
+	particle->yo = particle->y;
+	particle->zo = particle->z;
+	this->yd -= 0.06;
+	EntityMove(particle, this->xd, this->yd, this->zd);
+	this->xd *= 0.98;
+	this->yd *= 0.98;
+	this->zd *= 0.98;
 	if (this->lifeTime-- <= 0) { EntityRemove(particle); }
-	if (particle->onGround)
-	{
+	if (particle->onGround) {
 		if (RandomUniform() < 0.5) { EntityRemove(particle); }
-		this->delta.xz *= 0.7;
+		this->xd *= 0.7;
+		this->zd *= 0.7;
 	}
 }

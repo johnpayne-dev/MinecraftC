@@ -35,16 +35,16 @@ void LevelNameScreenTick(LevelNameScreen screen) {
 	this->counter++;
 }
 
-void LevelNameScreenRender(LevelNameScreen screen, int2 mousePos) {
+void LevelNameScreenRender(LevelNameScreen screen, int mx, int my) {
 	LevelNameScreenData this = screen->typeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->font, this->title, (int2){ screen->width / 2, 40 }, ColorWhite);
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, this->title, screen->width / 2, 40, 0xffffffff);
 	int x = screen->width / 2 - 100;
 	int y = screen->height / 2 - 10;
-	ScreenDrawBox((int2){ x - 1, y - 1 }, (int2){ x + 201, y + 21 }, ColorFromHex(0xA0A0A0FF));
-	ScreenDrawBox((int2){ x, y }, (int2){ x + 200, y + 20 }, ColorBlack);
+	ScreenDrawBox(x - 1, y - 1, x + 201, y + 21, 0xA0A0A0FF);
+	ScreenDrawBox(x, y, x + 200, y + 20, 0x000000ff);
 	String string = StringConcat(StringCreate(this->name), this->counter / 6 % 2 == 0 ? "_" : "");
-	ScreenDrawString(screen->font, string, (int2){ x + 4, y + 6 }, ColorFromHex(0xE0E0E0FF));
+	ScreenDrawString(screen->font, string, x + 4, y + 6, 0xE0E0E0FF);
 	StringDestroy(string);
 }
 

@@ -8,8 +8,10 @@ Button ButtonCreateSize(int buttonID, int x, int y, int w, int h, char * text) {
 	Button button = MemoryAllocate(sizeof(struct Button));
 	*button = (struct Button) {
 		.id = buttonID,
-		.position = (int2){ x, y },
-		.size = (int2){ w, 20 },
+		.x = x,
+		.y = y,
+		.width = w,
+		.height = 20,
 		.text = StringCreate(text),
 		.visible = true,
 		.active = true,

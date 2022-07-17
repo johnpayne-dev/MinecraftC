@@ -38,49 +38,55 @@ FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManag
 	return font;
 }
 
-static void Render(FontRenderer font, char * str, int x, int y, Color color, bool darken) {
+static void Render(FontRenderer font, char * str, int x, int y, uint32_t color, bool darken) {
 	if (str != NULL) {
-		if (darken) { color.rgb >>= 2; }
+		if (darken) { color = (color & 0xfcfcfc) >> 2; }
 		glBindTexture(GL_TEXTURE_2D, font->texture);
 		ShapeRendererBegin();
-		ShapeRendererColor(ColorToFloat4(color).rgb);
+		ShapeRendererColor(color);
 		for (int i = 0, w = 0; i < strlen(str); i++) {
 			if (str[i] == 38 && strlen(str) > i + 1) {
 				String hex = StringCreate("0123456789abcdef");
 				int index = StringIndexOf(hex, str[i + 1]);
 				StringDestroy(hex);
 				if (index < 0) { index = 15; }
-				int3 col = { 0 };
-				col.r = (index & 8) << 3;
-				col.b = (index & 1) * 191 + col.r;
-				col.g = ((index & 2) >> 1) * 191 + col.r;
-				col.r = ((index & 4) >> 2) * 191 + col.r;
-				if (font->settings->anaglyph) { col.rgb = (int3){ col.r * 30 + col.g * 59 + col.b * 11, col.r * 30 + col.g * 70, col.r * 30 + col.b * 70 } / 100; }
-				Color color = ColorFromHex(col.r << 24 | col.g << 16 | col.b << 8);
+				uint8_t v = (index & 0x08) << 3;
+				uint8_t r = ((index & 0x04) >> 2) * 191 + v;
+				uint8_t g = ((index & 0x02) >> 1) * 191 + v;
+				uint8_t b = (index & 0x01) * 191 + v;
+				if (font->settings->anaglyph) {
+					uint8_t ar = (r * 30 + g * 59 + b * 11) / 100;
+					uint8_t ag = (r * 30 + g * 70) / 100;
+					uint8_t ab = (r * 30 + b * 70) / 100;
+					r = ar;
+					g = ag;
+					b = ab;
+				}
+				color = r << 24 | g << 16 | b << 8;
 				i += 2;
-				if (darken) { color.rgb >>= 2; }
-				ShapeRendererColor(ColorToFloat4(color).rgb);
+				if (darken) { color = (color & 0xfcfcfc) >> 2; }
+				ShapeRendererColor(color);
 			}
 			
 			int u = str[i] % 16 << 3;
 			int v = str[i] / 16 << 3;
 			float s = 7.99;
-			ShapeRendererVertexUV((float3){ x + w, y + s, 0.0 }, (float2){ u, v + s } / 128.0);
-			ShapeRendererVertexUV((float3){ x + w + s, y + s, 0.0 }, (float2){ u + s, v + s } / 128.0);
-			ShapeRendererVertexUV((float3){ x + w + s, y, 0.0 }, (float2){ u + s, v } / 128.0);
-			ShapeRendererVertexUV((float3){ x + w, y, 0.0 }, (float2){ u, v } / 128.0);
+			ShapeRendererVertexUV(x + w, y + s, 0.0, u / 128.0, (v + s) / 128.0);
+			ShapeRendererVertexUV(x + w + s, y + s, 0.0, (u + s) / 128.0, (v + s) / 128.0);
+			ShapeRendererVertexUV(x + w + s, y, 0.0, (u + s) / 128.0, v / 128.0);
+			ShapeRendererVertexUV(x + w, y, 0.0, u / 128.0 , v / 128.0);
 			w += font->widthMap[str[i]];
 		}
 		ShapeRendererEnd();
 	}
 }
 
-void FontRendererRender(FontRenderer font, char * str, int x, int y, Color color) {
+void FontRendererRender(FontRenderer font, char * str, int x, int y, uint32_t color) {
 	Render(font, str, x + 1, y + 1, color, true);
 	Render(font, str, x, y, color, false);
 }
 
-void FontRendererRenderNoShadow(FontRenderer font, char * str, int x, int y, Color color) {
+void FontRendererRenderNoShadow(FontRenderer font, char * str, int x, int y, uint32_t color) {
 	Render(font, str, x, y, color, false);
 }
 

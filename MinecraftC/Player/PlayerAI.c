@@ -19,14 +19,18 @@ PlayerAI PlayerAICreate(Player parent) {
 void PlayerAIUpdate(PlayerAI ai) {
 	PlayerData player = ai->parent->typeData;
 	ai->jumping = player->input->jumping;
-	ai->xy = player->input->xy;
+	ai->x = player->input->x;
+	ai->y = player->input->y;
 }
 
 void PlayerAITick(PlayerAI ai, Level level, Entity mob) {
 	ai->noActionTime++;
 	Entity player = LevelGetPlayer(level);
 	if (ai->noActionTime > 600 && RandomGeneratorIntegerRange(ai->random, 0, 799) == 0 && player != NULL) {
-		if (sqdistance3f(player->position, mob->position) < 1024.0) { ai->noActionTime = 0; }
+		float dx = mob->x - player->x;
+		float dy = mob->y - player->y;
+		float dz = mob->z - player->z;
+		if (dx * dx + dy * dy + dz * dz < 1024.0) { ai->noActionTime = 0; }
 		else { EntityRemove(mob); }
 	}
 	
@@ -38,18 +42,19 @@ void PlayerAITick(PlayerAI ai, Level level, Entity mob) {
 	bool inWater = EntityIsInWater(mob);
 	bool inLava = EntityIsInLava(mob);
 	if (ai->jumping) {
-		if (inWater) { mob->delta.y += 0.04; }
-		else if (inLava) { mob->delta.y += 0.04; }
+		if (inWater) { mob->yd += 0.04; }
+		else if (inLava) { mob->yd += 0.04; }
 		else if (mob->onGround) { PlayerAIJumpFromGround(ai); }
 	}
 	
-	ai->xy *= 0.98;
+	ai->x *= 0.98;
+	ai->y *= 0.98;
 	ai->rotation *= 0.9;
-	PlayerTravel(mob, ai->xy.x, ai->xy.y);
+	PlayerTravel(mob, ai->x, ai->y);
 }
 
 void PlayerAIJumpFromGround(PlayerAI ai) {
-	ai->mob->delta.y = 0.42;
+	ai->mob->yd = 0.42;
 }
 
 void PlayerAIDestroy(PlayerAI ai) {

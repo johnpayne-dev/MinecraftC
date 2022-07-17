@@ -11,11 +11,11 @@ typedef struct Renderer {
 	Entity entity;
 	RandomGenerator random;
 	float buffer[16];
-	float4 fogColor;
+	float fogR, fogG, fogB;
 } * Renderer;
 
 Renderer RendererCreate(struct Minecraft * minecraft);
-float3 RendererGetPlayerVector(Renderer renderer, float t);
+Vector3D RendererGetPlayerVector(Renderer renderer, float t);
 void RendererApplyBobbing(Renderer renderer, float t);
 void RendererSetLighting(Renderer renderer, bool lighting);
 void RendererEnableGUIMode(Renderer renderer);

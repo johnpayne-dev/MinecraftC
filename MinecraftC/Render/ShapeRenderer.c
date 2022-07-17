@@ -48,36 +48,43 @@ void ShapeRendererClear() {
 	ShapeRenderer.length = 0;
 }
 
-void ShapeRendererColor(float3 color) {
+void ShapeRendererColorf(float r, float g, float b) {
 	if (!ShapeRenderer.noColor) {
 		if (!ShapeRenderer.hasColor) { ShapeRenderer.vertexLength += 3; }
 		ShapeRenderer.hasColor = true;
-		ShapeRenderer.rgb = color;
+		ShapeRenderer.r = r;
+		ShapeRenderer.g = g;
+		ShapeRenderer.b = b;
 	}
 }
 
-void ShapeRendererVertexUV(float3 vertex, float2 uv) {
-	if (!ShapeRenderer.hasTexture) { ShapeRenderer.vertexLength += 2; }
-	ShapeRenderer.hasTexture = true;
-	ShapeRenderer.uv = uv;
-	ShapeRendererVertex(vertex);
+void ShapeRendererColor(uint32_t c) {
+	ShapeRendererColorf((c >> 24) / 255.0, ((c >> 16) & 0xff) / 255.0, ((c >> 8) & 0xff) / 255.0);
 }
 
-void ShapeRendererVertex(float3 vertex) {
+void ShapeRendererVertexUV(float x, float y, float z, float u, float v) {
+	if (!ShapeRenderer.hasTexture) { ShapeRenderer.vertexLength += 2; }
+	ShapeRenderer.hasTexture = true;
+	ShapeRenderer.u = u;
+	ShapeRenderer.v = v;
+	ShapeRendererVertex(x, y, z);
+}
+
+void ShapeRendererVertex(float x, float y, float z) {
 	if (ShapeRenderer.hasTexture) {
-		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.uv.x;
-		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.uv.y;
+		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.u;
+		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.v;
 	}
 	
 	if (ShapeRenderer.hasColor) {
-		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.rgb.r;
-		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.rgb.g;
-		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.rgb.b;
+		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.r;
+		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.g;
+		ShapeRenderer.buffer[ShapeRenderer.length++] = ShapeRenderer.b;
 	}
 	
-	ShapeRenderer.buffer[ShapeRenderer.length++] = vertex.x;
-	ShapeRenderer.buffer[ShapeRenderer.length++] = vertex.y;
-	ShapeRenderer.buffer[ShapeRenderer.length++] = vertex.z;
+	ShapeRenderer.buffer[ShapeRenderer.length++] = x;
+	ShapeRenderer.buffer[ShapeRenderer.length++] = y;
+	ShapeRenderer.buffer[ShapeRenderer.length++] = z;
 	
 	ShapeRenderer.vertices++;
 	if (ShapeRenderer.vertices % 4 == 0 && ShapeRenderer.length >= MaxFloats - (ShapeRenderer.vertexLength * 4)) {
@@ -90,8 +97,8 @@ void ShapeRendererNoColor() {
 	ShapeRenderer.noColor = true;
 }
 
-void ShapeRendererNormal(float3 normal) {
-	glNormal3f(normal.x, normal.y, normal.z);
+void ShapeRendererNormal(float nx, float ny, float nz) {
+	glNormal3f(nx, ny, nz);
 }
 
 void ShapeRendererDeinitialize() {

@@ -1,6 +1,6 @@
 #pragma once
 #include <stdbool.h>
-#include "../../Utilities/LinearMath.h"
+#include <stdint.h>
 
 typedef enum AnimatedTextureType {
 	AnimatedTextureTypeNone,

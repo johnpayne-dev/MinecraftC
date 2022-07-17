@@ -1,5 +1,4 @@
 #pragma once
-#include "../Utilities/LinearMath.h"
 #include "../Utilities/List.h"
 #include "Button.h"
 #include "FontRenderer.h"
@@ -30,7 +29,7 @@ typedef struct GUIScreen {
 } * GUIScreen;
 
 GUIScreen GUIScreenCreate(void);
-void GUIScreenRender(GUIScreen screen, int2 mousePos);
+void GUIScreenRender(GUIScreen screen, int mouseX, int mouseY);
 void GUIScreenOnKeyPressed(GUIScreen screen, char eventChar, int eventKey);
 void GUIScreenOnMouseClicked(GUIScreen screen, int x, int y, int button);
 void GUIScreenOnButtonClicked(GUIScreen screen, Button button);

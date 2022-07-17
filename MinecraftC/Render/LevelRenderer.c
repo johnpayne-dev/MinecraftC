@@ -10,7 +10,9 @@ LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures) 
 		.chunks = ListCreate(sizeof(Chunk)),
 		.chunkDataCache = MemoryAllocate(65536 * sizeof(int)),
 		.ticks = 0,
-		.lastLoad = one3f * -9999.0,
+		.lastLoadX = -9999.0,
+		.lastLoadY = -9999.0,
+		.lastLoadZ = -9999.0,
 		.minecraft = minecraft,
 		.textures = textures,
 		.listID = glGenLists(2),
@@ -24,23 +26,21 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 		for (int i = 0; i < renderer->chunkCacheCount; i++) { ChunkDispose(renderer->chunkCache[i]); }
 		MemoryFree(renderer->chunkCache);
 		MemoryFree(renderer->loadQueue);
-		/*renderer->Chunks = ListClear(renderer->Chunks);
-		for (int i = 0; i < 65536; i++) { renderer->ChunkDataCache[i] = 0; }
-		glDeleteLists(renderer->BaseListID, 4096 << 6 << 1);
-		renderer->BaseListID = glGenLists(4096 << 6 << 1);*/
 	}
 	
-	renderer->chunkCount = (int3){ renderer->level->width, renderer->level->depth, renderer->level->height } / 16;
-	renderer->chunkCacheCount = renderer->chunkCount.x * renderer->chunkCount.y * renderer->chunkCount.z;
+	renderer->xChunks = renderer->level->width / 16;
+	renderer->yChunks = renderer->level->depth / 16;
+	renderer->zChunks = renderer->level->height / 16;
+	renderer->chunkCacheCount = renderer->xChunks * renderer->yChunks * renderer->zChunks;
 	renderer->chunkCache = MemoryAllocate(renderer->chunkCacheCount * sizeof(Chunk));
 	renderer->loadQueue = MemoryAllocate(renderer->chunkCacheCount * sizeof(Chunk));
 	
 	int l = 0;
-	for (int i = 0; i < renderer->chunkCount.x; i++) {
-		for (int j = 0; j < renderer->chunkCount.y; j++) {
-			for (int k = 0; k < renderer->chunkCount.z; k++) {
-				int c = (k * renderer->chunkCount.y + j) * renderer->chunkCount.x + i;
-				renderer->chunkCache[c] = ChunkCreate(renderer->level, (int3){ i, j, k } << 4, 16, renderer->baseListID + l);
+	for (int i = 0; i < renderer->xChunks; i++) {
+		for (int j = 0; j < renderer->yChunks; j++) {
+			for (int k = 0; k < renderer->zChunks; k++) {
+				int c = (k * renderer->yChunks + j) * renderer->xChunks + i;
+				renderer->chunkCache[c] = ChunkCreate(renderer->level, i << 4, j << 4, k << 4, 16, renderer->baseListID + l);
 				renderer->loadQueue[c] = renderer->chunkCache[c];
 				l += 2;
 			}
@@ -60,10 +60,10 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 		for (int j = -a * b; j < renderer->level->height + a * b; j += a) {
 			float g = ground;
 			if (i >= 0 && j >= 0 && i < renderer->level->width && j < renderer->level->height) { g = 0.0; }
-			ShapeRendererVertexUV((float3){ i, g, j + a }, (float2){ 0.0, a });
-			ShapeRendererVertexUV((float3){ i + a, g, j + a }, (float2){ a, a });
-			ShapeRendererVertexUV((float3){ i + a, g, j }, (float2){ a, 0.0 });
-			ShapeRendererVertexUV((float3){ i, g, j }, (float2){ 0.0, 0.0 });
+			ShapeRendererVertexUV(i, g, j + a, 0.0, a);
+			ShapeRendererVertexUV(i + a, g, j + a, a, a);
+			ShapeRendererVertexUV(i + a, g, j, a, 0.0);
+			ShapeRendererVertexUV(i, g, j, 0.0, 0.0);
 		}
 	}
 	ShapeRendererEnd();
@@ -71,25 +71,25 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 	glColor3f(0.8, 0.8, 0.8);
 	ShapeRendererBegin();
 	for (int i = 0; i < renderer->level->width; i += a) {
-		ShapeRendererVertexUV((float3){ i, 0.0, 0.0 }, (float2){ 0.0, 0.0 });
-		ShapeRendererVertexUV((float3){ i + a, 0.0, 0.0 }, (float2){ a, 0.0 });
-		ShapeRendererVertexUV((float3){ i + a, ground, 0.0 }, (float2){ a, ground });
-		ShapeRendererVertexUV((float3){ i, ground, 0.0 }, (float2){ 0.0, ground });
-		ShapeRendererVertexUV((float3){ i, ground, renderer->level->height }, (float2){ 0.0, ground });
-		ShapeRendererVertexUV((float3){ i + a, ground, renderer->level->height }, (float2){ a, ground });
-		ShapeRendererVertexUV((float3){ i + a, 0.0, renderer->level->height }, (float2){ a, 0.0 });
-		ShapeRendererVertexUV((float3){ i, 0.0, renderer->level->height }, (float2){ 0.0, 0.0 });
+		ShapeRendererVertexUV(i, 0.0, 0.0, 0.0, 0.0);
+		ShapeRendererVertexUV(i + a, 0.0, 0.0, a, 0.0);
+		ShapeRendererVertexUV(i + a, ground, 0.0, a, ground);
+		ShapeRendererVertexUV(i, ground, 0.0, 0.0, ground);
+		ShapeRendererVertexUV(i, ground, renderer->level->height, 0.0, ground);
+		ShapeRendererVertexUV(i + a, ground, renderer->level->height, a, ground);
+		ShapeRendererVertexUV(i + a, 0.0, renderer->level->height, a, 0.0);
+		ShapeRendererVertexUV(i, 0.0, renderer->level->height, 0.0, 0.0);
 	}
 	glColor3f(0.6, 0.6, 0.6);
 	for (int i = 0; i < renderer->level->height; i += a) {
-		ShapeRendererVertexUV((float3){ 0.0, ground, i }, (float2){ 0.0, 0.0 });
-		ShapeRendererVertexUV((float3){ 0.0, ground, i + a }, (float2){ a, 0.0 });
-		ShapeRendererVertexUV((float3){ 0.0, 0.0, i + a }, (float2){ a, ground });
-		ShapeRendererVertexUV((float3){ 0.0, 0.0, i }, (float2){ 0.0, ground });
-		ShapeRendererVertexUV((float3){ renderer->level->width, 0.0, i }, (float2){ 0.0, ground });
-		ShapeRendererVertexUV((float3){ renderer->level->width, 0.0, i + a }, (float2){ a, ground });
-		ShapeRendererVertexUV((float3){ renderer->level->width, ground, i + a }, (float2){ a, 0.0 });
-		ShapeRendererVertexUV((float3){ renderer->level->width, ground, i }, (float2){ 0.0, 0.0 });
+		ShapeRendererVertexUV(0.0, ground, i, 0.0, 0.0);
+		ShapeRendererVertexUV(0.0, ground, i + a, a, 0.0);
+		ShapeRendererVertexUV(0.0, 0.0, i + a, a, ground);
+		ShapeRendererVertexUV(0.0, 0.0, i, 0.0, ground);
+		ShapeRendererVertexUV(renderer->level->width, 0.0, i, 0.0, ground);
+		ShapeRendererVertexUV(renderer->level->width, 0.0, i + a, a, ground);
+		ShapeRendererVertexUV(renderer->level->width, ground, i + a, a, 0.0);
+		ShapeRendererVertexUV(renderer->level->width, ground, i, 0.0, 0.0);
 	}
 	ShapeRendererEnd();
 	glEndList();
@@ -103,27 +103,31 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 		for (int j = -a * b; j < renderer->level->height + a * b; j += a) {
 			float w = water - 0.1;
 			if (i < 0 || j < 0 || i >= renderer->level->width || j >= renderer->level->height) {
-				ShapeRendererVertexUV((float3){ i, w, j + a }, (float2){ 0.0, a });
-				ShapeRendererVertexUV((float3){ i + a, w, j + a }, (float2){ a, a });
-				ShapeRendererVertexUV((float3){ i + a, w, j }, (float2){ a, 0.0 });
-				ShapeRendererVertexUV((float3){ i, w, j }, (float2){ 0.0, 0.0 });
-				ShapeRendererVertexUV((float3){ i, w, j }, (float2){ 0.0, 0.0 });
-				ShapeRendererVertexUV((float3){ i + a, w, j }, (float2){ a, 0.0 });
-				ShapeRendererVertexUV((float3){ i + a, w, j + a }, (float2){ a, a });
-				ShapeRendererVertexUV((float3){ i, w, j + a }, (float2){ 0.0, a });
+				ShapeRendererVertexUV(i, w, j + a, 0.0, a);
+				ShapeRendererVertexUV(i + a, w, j + a, a, a);
+				ShapeRendererVertexUV(i + a, w, j, a, 0.0);
+				ShapeRendererVertexUV(i, w, j, 0.0, 0.0);
+				ShapeRendererVertexUV(i, w, j, 0.0, 0.0);
+				ShapeRendererVertexUV(i + a, w, j, a, 0.0);
+				ShapeRendererVertexUV(i + a, w, j + a, a, a);
+				ShapeRendererVertexUV(i, w, j + a, 0.0, a);
 			}
 		}
 	}
 	ShapeRendererEnd();
 	glDisable(GL_BLEND);
 	glEndList();
-	LevelRendererQueueChunks(renderer, (int3){ 0, 0, 0 }, (int3){ renderer->level->width, renderer->level->depth, renderer->level->height });
+	LevelRendererQueueChunks(renderer, 0, 0, 0, renderer->level->width, renderer->level->depth, renderer->level->height);
 }
 
 int LevelRendererSortChunks(LevelRenderer renderer, Player player, int pass) {
-	float3 v = player->position - renderer->lastLoad;
-	if (length3f(v) > 8.0) {
-		renderer->lastLoad = player->position;
+	float vx = player->x - renderer->lastLoadX;
+	float vy = player->y - renderer->lastLoadY;
+	float vz = player->z - renderer->lastLoadZ;
+	if (vx * vx + vy * vy + vz * vz > 64.0) {
+		renderer->lastLoadX = player->x;
+		renderer->lastLoadY = player->y;
+		renderer->lastLoadZ = player->z;
 		qsort(renderer->loadQueue, renderer->chunkCacheCount, sizeof(Chunk), ChunkDistanceComparator);
 	}
 	
@@ -136,19 +140,23 @@ int LevelRendererSortChunks(LevelRenderer renderer, Player player, int pass) {
 	return count;
 }
 
-void LevelRendererQueueChunks(LevelRenderer renderer, int3 v0, int3 v1) {
-	v0 /= 16;
-	v1 /= 16;
-	v0.x = v0.x < 0 ? 0 : v0.x;
-	v0.y = v0.y < 0 ? 0 : v0.y;
-	v0.z = v0.z < 0 ? 0 : v0.z;
-	v1.x = v1.x > renderer->chunkCount.x - 1 ? renderer->chunkCount.x - 1 : v1.x;
-	v1.y = v1.y > renderer->chunkCount.y - 1 ? renderer->chunkCount.y - 1 : v1.y;
-	v1.z = v1.z > renderer->chunkCount.z - 1 ? renderer->chunkCount.z - 1 : v1.z;
-	for (int x = v0.x; x <= v1.x; x++) {
-		for (int y = v0.y; y <= v1.y; y++) {
-			for (int z = v0.z; z <= v1.z; z++) {
-				Chunk chunk = renderer->chunkCache[(z * renderer->chunkCount.y + y) * renderer->chunkCount.x + x];
+void LevelRendererQueueChunks(LevelRenderer renderer, int x0, int y0, int z0, int x1, int y1, int z1) {
+	x0 /= 16;
+	y0 /= 16;
+	z0 /= 16;
+	x1 /= 16;
+	y1 /= 16;
+	z1 /= 16;
+	x0 = x0 < 0 ? 0 : x0;
+	y0 = y0 < 0 ? 0 : y0;
+	z0 = z0 < 0 ? 0 : z0;
+	x1 = x1 > renderer->xChunks - 1 ? renderer->xChunks - 1 : x1;
+	y1 = y1 > renderer->yChunks - 1 ? renderer->yChunks - 1 : y1;
+	z1 = z1 > renderer->zChunks - 1 ? renderer->zChunks - 1 : z1;
+	for (int x = x0; x <= x1; x++) {
+		for (int y = y0; y <= y1; y++) {
+			for (int z = z0; z <= z1; z++) {
+				Chunk chunk = renderer->chunkCache[(z * renderer->yChunks + y) * renderer->xChunks + x];
 				if (!chunk->loaded) {
 					chunk->loaded = true;
 					renderer->chunks = ListPush(renderer->chunks, &chunk);

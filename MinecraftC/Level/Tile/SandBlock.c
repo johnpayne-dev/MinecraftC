@@ -6,21 +6,21 @@ SandBlock SandBlockCreate(BlockType type, int texture) {
 }
 
 static void Fall(SandBlock block, Level level, int x, int y, int z) {
-	int3 v = { x, y, z };
+	int vx = x, vy = y, vz = z;
 	while (true) {
-		BlockType tile = LevelGetTile(level, v.x, v.y - 1, v.z);
+		BlockType tile = LevelGetTile(level, vx, vy - 1, vz);
 		LiquidType liquidTile = tile == BlockTypeNone ? LiquidTypeNone : BlockGetLiquidType(Blocks.table[tile]);
-		if (!(tile == BlockTypeNone ? true : (liquidTile == LiquidTypeWater ? true : liquidTile == LiquidTypeLava)) || v.y <= 0) {
-			if (y != v.y) {
-				tile = LevelGetTile(level, v.x, v.y, v.z);
+		if (!(tile == BlockTypeNone ? true : (liquidTile == LiquidTypeWater ? true : liquidTile == LiquidTypeLava)) || vy <= 0) {
+			if (y != vy) {
+				tile = LevelGetTile(level, vx, vy, vz);
 				if (tile != BlockTypeNone && BlockGetLiquidType(Blocks.table[tile]) != LiquidTypeNone) {
-					LevelSetTileNoUpdate(level, v.x, v.y, v.z, BlockTypeNone);
+					LevelSetTileNoUpdate(level, vx, vy, vz, BlockTypeNone);
 				}
-				LevelSwap(level, (int3){ x, y, z }, v);
+				LevelSwap(level, x, y, z, vx, vy, vz);
 			}
 			return;
 		}
-		v.y--;
+		vy--;
 	}
 }
 

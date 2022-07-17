@@ -40,10 +40,10 @@ void OptionsScreenOnButtonClicked(OptionsScreen screen, Button button) {
 	}
 }
 
-void OptionsScreenRender(OptionsScreen screen, int2 mousePos) {
+void OptionsScreenRender(OptionsScreen screen, int mx, int my) {
 	OptionsScreenData this = screen->typeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->font, this->title, (int2){ screen->width / 2, 20 }, ColorWhite);
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, this->title, screen->width / 2, 20, 0xffffffff);
 }
 
 void OptionsScreenDestroy(OptionsScreen screen) {

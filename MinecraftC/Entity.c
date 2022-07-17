@@ -28,17 +28,18 @@ Entity EntityCreate(Level level) {
 		.hovered = false,
 		.level = level,
 	};
-	EntitySetPosition(entity, zero3f);
+	EntitySetPosition(entity, 0.0, 0.0, 0.0);
 	return entity;
 }
 
 void EntityResetPosition(Entity entity) {
 	if (entity->type == EntityTypePlayer) { return PlayerResetPosition(entity); }
 	if (entity->level != NULL) {
-		float2 spawn = { entity->level->spawn.x + 0.5, entity->level->spawn.y };
+		float spawnX = entity->level->xSpawn + 0.5;
+		float spawnY = entity->level->ySpawn;
 		
-		for (float z = entity->level->spawn.z + 0.5; z > 0.0; z++) {
-			EntitySetPosition(entity, (float3){ spawn.x, spawn.y, z });
+		for (float z = entity->level->zSpawn + 0.5; z > 0.0; z++) {
+			EntitySetPosition(entity, spawnX, spawnY, z);
 			list(AABB) cubes = LevelGetCubes(entity->level, entity->aabb);
 			if (ListCount(cubes) == 0) {
 				ListDestroy(cubes);
@@ -47,9 +48,11 @@ void EntityResetPosition(Entity entity) {
 			ListDestroy(cubes);
 		}
 		
-		entity->delta = zero3f;
-		entity->rotation.y = entity->level->spawnRotation;
-		entity->rotation.x = 0.0;
+		entity->xd = 0.0;
+		entity->yd = 0.0;
+		entity->zd = 0.0;
+		entity->yRot = entity->level->spawnRotation;
+		entity->xRot = 0.0;
 	}
 }
 
@@ -62,23 +65,29 @@ void EntitySetSize(Entity entity, float w, float h) {
 	entity->aabbHeight = h;
 }
 
-void EntitySetPosition(Entity entity, float3 pos) {
-	entity->position = pos;
+void EntitySetPosition(Entity entity, float x, float y, float z) {
+	entity->x = x;
+	entity->y = y;
+	entity->z = z;
 	float w = entity->aabbWidth / 2.0;
 	float h = entity->aabbHeight / 2.0;
-	entity->aabb = (AABB){ .v0 = { pos.x - w, pos.y - h, pos.z - w }, .v1 = { pos.x + w, pos.y + h, pos.z + w } };
+	entity->aabb = (AABB){ .x0 = x - w, .y0 = y - h, .z0 = z - w, .x1 = x + w, .y1 = y + h, .z1 = z + w };
 }
 
-void EntityTurn(Entity entity, float2 angle) {
-	float2 old = entity->rotation;
-	entity->rotation += (float2){ -angle.x, angle.y } * 0.15;
-	entity->rotation.x = entity->rotation.x < -90.0 ? -90.0 : (entity->rotation.x > 90.0 ? 90.0 : entity->rotation.x);
-	entity->oldRotation += entity->rotation - old;
+void EntityTurn(Entity entity, float rx, float ry) {
+	float orx = entity->xRot;
+	float ory = entity->yRot;
+	entity->xRot -= rx * 0.15;
+	entity->yRot += ry * 0.15;
+	entity->xRot = entity->xRot < -90.0 ? -90.0 : (entity->xRot > 90.0 ? 90.0 : entity->xRot);
+	entity->xRotO += entity->xRot - orx;
+	entity->yRotO += entity->yRot - ory;
 }
 
-void EntityInterpolateTurn(Entity entity, float2 angle) {
-	entity->rotation += (float2){ -angle.x, angle.y } * 0.15;
-	entity->rotation.x = entity->rotation.x < -90.0 ? -90.0 : (entity->rotation.x > 90.0 ? 90.0 : entity->rotation.x);
+void EntityInterpolateTurn(Entity entity, float rx, float ry) {
+	entity->xRot -= rx * 0.15;
+	entity->yRot += ry * 0.15;
+	entity->xRot = entity->xRot < -90.0 ? -90.0 : (entity->xRot > 90.0 ? 90.0 : entity->xRot);
 }
 
 void EntityTick(Entity entity) {
@@ -86,109 +95,147 @@ void EntityTick(Entity entity) {
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
 	
 	entity->oldWalkDistance = entity->walkDistance;
-	entity->oldPosition = entity->position;
-	entity->oldRotation = entity->rotation;
+	entity->xo = entity->x;
+	entity->yo = entity->y;
+	entity->zo = entity->z;
+	entity->xRotO = entity->xRot;
+	entity->yRotO = entity->yRot;
 	
 	if (entity->type == EntityTypePlayer) { PlayerTick(entity); return; }
 }
 
-bool EntityIsFree(Entity entity, float3 a) {
-	AABB aabb = AABBMove(entity->aabb, a);
+bool EntityIsFree(Entity entity, float ax, float ay, float az) {
+	AABB aabb = AABBMove(entity->aabb, ax, ay, az);
 	list(AABB) cubes = LevelGetCubes(entity->level, aabb);
 	bool free = ListCount(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
 	ListDestroy(cubes);
 	return free;
 }
 
-bool EntityIsFreeScaled(Entity entity, float3 a, float s) {
-	AABB aabb = AABBMove(AABBGrow(entity->aabb, one3f * s), a);
+bool EntityIsFreeScaled(Entity entity, float ax, float ay, float az, float s) {
+	AABB aabb = AABBMove(AABBGrow(entity->aabb, s, s, s), ax, ay, az);
 	list(AABB) cubes = LevelGetCubes(entity->level, aabb);
 	bool free = ListCount(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
 	ListDestroy(cubes);
 	return free;
 }
 
-void EntityMove(Entity entity, float3 a) {
+void EntityMove(Entity entity, float ax, float ay, float az) {
 	if (entity->noPhysics) {
-		entity->aabb = AABBMove(entity->aabb, a);
-		entity->position.xz = (entity->aabb.v0.xz + entity->aabb.v1.xz) / 2.0;
-		entity->position.y = entity->aabb.v0.y + entity->heightOffset - entity->ySlideOffset;
+		entity->aabb = AABBMove(entity->aabb, ax, ay, az);
+		entity->x = (entity->aabb.x0 + entity->aabb.x1) / 2.0;
+		entity->z = (entity->aabb.z0 + entity->aabb.z1) / 2.0;
+		entity->y = entity->aabb.y0 + entity->heightOffset - entity->ySlideOffset;
 	} else {
-		float2 xz = entity->position.xz;
-		float3 old = a;
+		float x = entity->x;
+		float z = entity->z;
+		float ox = ax;
+		float oy = ay;
+		float oz = az;
 		AABB oldAABB = entity->aabb;
-		list(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, a));
+		list(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, ax, ay, az));
 		
 		for (int i = 0; i < ListCount(cubes); i++) {
-			AABB aabb = { .v0 = { ((float *)&cubes[i].v0)[0], ((float *)&cubes[i].v0)[1], ((float *)&cubes[i].v0)[2] }, .v1 = { ((float *)&cubes[i].v1)[0], ((float *)&cubes[i].v1)[1], ((float *)&cubes[i].v1)[2] } };
-			a.y = AABBClipYCollide(aabb, entity->aabb, a.y);
+			AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
+			ay = AABBClipYCollide(aabb, entity->aabb, ay);
 		}
-		entity->aabb = AABBMove(entity->aabb, up3f * a.y);
-		if (!entity->slide && old.y != a.y) { a = zero3f; }
+		entity->aabb = AABBMove(entity->aabb, 0.0, ay, 0.0);
+		if (!entity->slide && oy != ay) {
+			ax = 0.0;
+			ay = 0.0;
+			az = 0.0;
+		}
 		for (int i = 0; i < ListCount(cubes); i++) {
-			AABB aabb = { .v0 = { ((float *)&cubes[i].v0)[0], ((float *)&cubes[i].v0)[1], ((float *)&cubes[i].v0)[2] }, .v1 = { ((float *)&cubes[i].v1)[0], ((float *)&cubes[i].v1)[1], ((float *)&cubes[i].v1)[2] } };
-			a.x = AABBClipXCollide(aabb, entity->aabb, a.x);
+			AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
+			ax = AABBClipXCollide(aabb, entity->aabb, ax);
 		}
-		entity->aabb = AABBMove(entity->aabb, right3f * a.x);
-		if (!entity->slide && old.x != a.x) { a = zero3f; }
+		entity->aabb = AABBMove(entity->aabb, ax, 0.0, 0.0);
+		if (!entity->slide && ox != ax) {
+			ax = 0.0;
+			ay = 0.0;
+			az = 0.0;
+		}
 		for (int i = 0; i < ListCount(cubes); i++) {
-			AABB aabb = { .v0 = { ((float *)&cubes[i].v0)[0], ((float *)&cubes[i].v0)[1], ((float *)&cubes[i].v0)[2] }, .v1 = { ((float *)&cubes[i].v1)[0], ((float *)&cubes[i].v1)[1], ((float *)&cubes[i].v1)[2] } };
-			a.z = AABBClipZCollide(aabb, entity->aabb, a.z);
+			AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
+			az = AABBClipZCollide(aabb, entity->aabb, az);
 		}
-		entity->aabb = AABBMove(entity->aabb, forward3f * a.z);
-		if (!entity->slide && old.z != a.z) { a = zero3f; }
-		bool onGround = entity->onGround || (old.y != a.y && old.y < 0.0);
+		entity->aabb = AABBMove(entity->aabb, 0.0, 0.0, az);
+		if (!entity->slide && oz != az) {
+			ax = 0.0;
+			ay = 0.0;
+			az = 0.0;
+		}
+		bool onGround = entity->onGround || (oy != ay && oy < 0.0);
 		ListDestroy(cubes);
 		
-		if (entity->footSize > 0.0 && onGround && entity->ySlideOffset < 0.05 && (old.x != a.x || old.z != a.z)) {
-			float3 b = a;
-			a = (float3){ old.x, entity->footSize, old.z };
+		if (entity->footSize > 0.0 && onGround && entity->ySlideOffset < 0.05 && (ox != ax || oz != az)) {
+			float bx = ax;
+			float by = ay;
+			float bz = az;
+			ax = ox;
+			ay = entity->footSize;
+			az = oz;
 			AABB tempAABB = entity->aabb;
 			entity->aabb = oldAABB;
-			list(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, (float3){ old.x, a.y, old.z }));
+			list(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, ox, ay, oz));
 			
 			for (int i = 0; i < ListCount(cubes); i++) {
-				AABB aabb = { .v0 = { ((float *)&cubes[i].v0)[0], ((float *)&cubes[i].v0)[1], ((float *)&cubes[i].v0)[2] }, .v1 = { ((float *)&cubes[i].v1)[0], ((float *)&cubes[i].v1)[1], ((float *)&cubes[i].v1)[2] } };
-				a.y = AABBClipYCollide(aabb, entity->aabb, a.y);
+				AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
+				ay = AABBClipYCollide(aabb, entity->aabb, ay);
 			}
-			entity->aabb = AABBMove(entity->aabb, up3f * a.y);
-			if (!entity->slide && old.y != a.y) { a = zero3f; }
+			entity->aabb = AABBMove(entity->aabb, 0.0, ay, 0.0);
+			if (!entity->slide && oy != ay) {
+				ax = 0.0;
+				ay = 0.0;
+				az = 0.0;
+			}
 			for (int i = 0; i < ListCount(cubes); i++) {
-				AABB aabb = { .v0 = { ((float *)&cubes[i].v0)[0], ((float *)&cubes[i].v0)[1], ((float *)&cubes[i].v0)[2] }, .v1 = { ((float *)&cubes[i].v1)[0], ((float *)&cubes[i].v1)[1], ((float *)&cubes[i].v1)[2] } };
-				a.x = AABBClipXCollide(aabb, entity->aabb, a.x);
+				AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
+				ax = AABBClipXCollide(aabb, entity->aabb, ax);
 			}
-			entity->aabb = AABBMove(entity->aabb, right3f * a.x);
-			if (!entity->slide && old.x != a.x) { a = zero3f; }
+			entity->aabb = AABBMove(entity->aabb, ax, 0.0, 0.0);
+			if (!entity->slide && ox != ax) {
+				ax = 0.0;
+				ay = 0.0;
+				az = 0.0;
+			}
 			for (int i = 0; i < ListCount(cubes); i++) {
-				AABB aabb = { .v0 = { ((float *)&cubes[i].v0)[0], ((float *)&cubes[i].v0)[1], ((float *)&cubes[i].v0)[2] }, .v1 = { ((float *)&cubes[i].v1)[0], ((float *)&cubes[i].v1)[1], ((float *)&cubes[i].v1)[2] } };
-				a.z = AABBClipZCollide(aabb, entity->aabb, a.z);
+				AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
+				az = AABBClipZCollide(aabb, entity->aabb, az);
 			}
-			entity->aabb = AABBMove(entity->aabb, forward3f * a.z);
-			if (!entity->slide && old.z != a.z) { a = zero3f; }
+			entity->aabb = AABBMove(entity->aabb, 0.0, 0.0, az);
+			if (!entity->slide && oz != az) {
+				ax = 0.0;
+				ay = 0.0;
+				az = 0.0;
+			}
 			ListDestroy(cubes);
 			
-			if (b.x * b.x + b.z * b.z >= a.x * a.x + a.z * a.z) {
-				a = b;
+			if (bx * bx + bz * bz >= ax * ax + az * az) {
+				ax = bx;
+				ay = by;
+				az = bz;
 				entity->aabb = tempAABB;
 			} else { entity->ySlideOffset += 0.5; }
 		}
 		
-		entity->horizontalCollision = old.x != a.x || old.z != a.z;
-		entity->onGround = old.y != a.y && old.y < 0.0;
-		entity->collision = entity->horizontalCollision || old.y != a.y;
+		entity->horizontalCollision = ox != ax || oz != az;
+		entity->onGround = oy != ay && oy < 0.0;
+		entity->collision = entity->horizontalCollision || oy != ay;
 		if (entity->onGround) {
 			if (entity->fallDistance > 0.0) { entity->fallDistance = 0.0; }
-		} else if (a.y < 0.0) { entity->fallDistance -= a.y; }
+		} else if (ay < 0.0) { entity->fallDistance -= ay; }
 		
-		if (old.x != a.x) { entity->delta.x = 0.0; }
-		if (old.y != a.y) { entity->delta.y = 0.0; }
-		if (old.z != a.z) { entity->delta.z = 0.0; }
+		if (ox != ax) { entity->xd = 0.0; }
+		if (oy != ay) { entity->yd = 0.0; }
+		if (oz != az) { entity->zd = 0.0; }
 		
-		entity->position.xz = (entity->aabb.v0.xz + entity->aabb.v1.xz) / 2.0;
-		entity->position.y = entity->aabb.v0.y + entity->heightOffset - entity->ySlideOffset;
-		entity->walkDistance += distance2f(entity->position.xz, xz) * 0.6;
+		entity->x = (entity->aabb.x0 + entity->aabb.x1) / 2.0;
+		entity->z = (entity->aabb.z0 + entity->aabb.z1) / 2.0;
+		entity->y = entity->aabb.y0 + entity->heightOffset - entity->ySlideOffset;
+		entity->walkDistance += sqrtf((entity->x - x) * (entity->x - x) + (entity->z - z) * (entity->z - z)) * 0.6;
 		if (entity->makeStepSound) {
-			BlockType blockType = LevelGetTile(entity->level, entity->position.x, entity->position.y - entity->heightOffset - 0.2, entity->position.z);
+			BlockType blockType = LevelGetTile(entity->level, entity->x, entity->y - entity->heightOffset - 0.2, entity->z);
 			if (entity->walkDistance > entity->nextStep && blockType > 0) {
 				entity->nextStep++;
 				TileSound sound = Blocks.table[blockType]->sound;
@@ -202,37 +249,38 @@ void EntityMove(Entity entity, float3 a) {
 }
 
 bool EntityIsInWater(Entity entity) {
-	return LevelContainsLiquid(entity->level, AABBGrow(entity->aabb, up3f * -0.4), LiquidTypeWater);
+	return LevelContainsLiquid(entity->level, AABBGrow(entity->aabb, 0.0, -0.4, 0.0), LiquidTypeWater);
 }
 
 bool EntityIsUnderWater(Entity entity) {
-	BlockType blockType = LevelGetTile(entity->level, entity->position.x, entity->position.y, entity->position.z);
+	BlockType blockType = LevelGetTile(entity->level, entity->x, entity->y, entity->z);
 	return blockType != 0 ? BlockGetLiquidType(Blocks.table[blockType]) == LiquidTypeWater : false;
 }
 
 bool EntityIsInLava(Entity entity) {
-	return LevelContainsLiquid(entity->level, AABBGrow(entity->aabb, up3f * -0.4), LiquidTypeLava);
+	return LevelContainsLiquid(entity->level, AABBGrow(entity->aabb, 0.0, -0.4, 0.0), LiquidTypeLava);
 }
 
-void EntityMoveRelative(Entity entity, float2 xz, float speed) {
-	float len = length2f(xz);
+void EntityMoveRelative(Entity entity, float x, float z, float speed) {
+	float len = sqrtf(x * x + z * z);
 	if (len >= 0.01) {
 		if (len < 1.0) { len = 1.0; }
 		len = speed / len;
-		xz *= len;
-		float s = tsin(entity->rotation.y * rad);
-		float c = tcos(entity->rotation.y * rad);
-		entity->delta.x += xz.x * c - xz.y * s;
-		entity->delta.z += xz.y * c + xz.x * s;
+		x *= len;
+		z *= len;
+		float s = tsin(entity->yRot * M_PI / 180.0);
+		float c = tcos(entity->yRot * M_PI / 180.0);
+		entity->xd += x * c - z * s;
+		entity->zd += z * c + x * s;
 	}
 }
 
 bool EntityIsLit(Entity entity) {
-	return LevelIsLit(entity->level, entity->position.x, entity->position.y, entity->position.z);
+	return LevelIsLit(entity->level, entity->x, entity->y, entity->z);
 }
 
 float EntityGetBrightness(Entity entity, float t) {
-	return LevelGetBrightness(entity->level, entity->position.x, entity->position.y, entity->position.z);
+	return LevelGetBrightness(entity->level, entity->x, entity->y, entity->z);
 }
 
 void EntitySetLevel(Entity entity, Level level) {
@@ -243,39 +291,16 @@ void EntityPlaySound(Entity entity, const char * name, float volume, float pitch
 	LevelPlaySound(entity->level, name, entity, volume, pitch);
 }
 
-void EntityMoveTo(Entity entity, float3 pos, float2 rot) {
-	entity->oldPosition = entity->position;
-	entity->position = pos;
-	entity->rotation = rot;
-	EntitySetPosition(entity, pos);
-}
-
-float EntityDistanceTo(Entity entityA, Entity entityB) {
-	return distance3f(entityA->position, entityB->position);
-}
-
-float EntityDistanceToPoint(Entity entity, float3 point) {
-	return distance3f(entity->position, point);
-}
-
-float EntitySquaredDistanceTo(Entity entityA, Entity entityB) {
-	return sqdistance3f(entityA->position, entityB->position);
-}
-
-void EntityPushTowards(Entity entity, float3 point) {
-	entity->delta += point;
-}
-
-bool EntityIntersects(Entity entity, float3 v0, float3 v1) {
-	return AABBIntersects(entity->aabb, (AABB){ v0, v1 });
-}
-
-bool EntityShouldRender(Entity entity, float3 v) {
-	return EntityShouldRenderAtSquaredDistance(entity, sqdistance3f(entity->position, v));
-}
-
-bool EntityShouldRenderAtSquaredDistance(Entity entity, float v) {
-	return v < pow(AABBGetSize(entity->aabb) * 64.0, 2.0);
+void EntityMoveTo(Entity entity, float x, float y, float z, float rx, float ry) {
+	entity->xo = entity->x;
+	entity->yo = entity->y;
+	entity->zo = entity->z;
+	entity->x = x;
+	entity->y = y;
+	entity->z = z;
+	entity->xRot = rx;
+	entity->yRot = ry;
+	EntitySetPosition(entity, x, y, z);
 }
 
 bool EntityIsPickable(Entity entity) {

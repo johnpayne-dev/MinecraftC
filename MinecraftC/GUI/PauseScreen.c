@@ -39,7 +39,7 @@ void PauseScreenOnButtonClicked(PauseScreen screen, Button button) {
 	}
 }
 
-void PauseScreenRender(PauseScreen screen, int2 mousePos) {
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->font, "Game menu", (int2){ screen->width / 2, 20 }, ColorWhite);
+void PauseScreenRender(PauseScreen screen, int mx, int my) {
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, "Game menu", screen->width / 2, 20, 0xffffffff);
 }

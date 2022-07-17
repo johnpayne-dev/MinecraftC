@@ -23,22 +23,30 @@ static void PopulateOre(LevelGenerator generator, BlockType ore, int a1, int a2,
 	int ii = w * d * h / 256 / 64 * a1 / 100;
 	for (int i = 0; i < ii; i++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, i * 100 / (ii - 1) / 4 + a2 * 100 / 4);
-		float3 v1 = { RandomGeneratorUniform(generator->random) * w, RandomGeneratorUniform(generator->random) * h, RandomGeneratorUniform(generator->random) * d };
+		float x1 = RandomGeneratorUniform(generator->random) * w;
+		float y1 = RandomGeneratorUniform(generator->random) * h;
+		float z1 = RandomGeneratorUniform(generator->random) * d;
 		int jj = (RandomGeneratorUniform(generator->random) + RandomGeneratorUniform(generator->random)) * 75.0 * a1 / 100.0;
-		float2 r1 = (float2){ RandomGeneratorUniform(generator->random), RandomGeneratorUniform(generator->random) } * 2.0 * pi;
-		float2 r2 = { 0.0, 0.0 };
+		float r1x = RandomGeneratorUniform(generator->random) * 2.0 * M_PI;
+		float r1y = RandomGeneratorUniform(generator->random) * 2.0 * M_PI;
+		float r2x = 0.0;
+		float r2y = 0.0;
 		for (int j = 0; j < jj; j++) {
-			v1 += (float3){ tsin(r1.x) * tcos(r1.y), tsin(r1.y), tcos(r1.x) * tcos(r1.y) };
-			r1.x += r2.x * 0.2;
-			r2.x = r2.x * 0.9 + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
-			r1.y = (r1.y + r2.y * 0.5) * 0.5;
-			r2.y = r2.y * 0.9 + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
-			float v2 = tsin(j * pi / jj) * a1 / 100.0 + 1.0;
-			for (int x = v1.x - v2; x <= (int)(v1.x + v2); x++) {
-				for (int y = v1.y - v2; y <= (int)(v1.y + v2); y++) {
-					for (int z = v1.z - v2; z <= (int)(v1.z + v2); z++) {
-						float3 v3 = (float3){ x, y, z } - v1;
-						if (dot3f(v3, v3) + v3.y * v3.y < v2 * v2 && x >= 1 && y >= 1 && z >= 1 && x < w - 1 && y < h - 1 && z < d - 1) {
+			x1 += tsin(r1x) * tcos(r1y);
+			y1 += tsin(r1y);
+			z1 += tcos(r1x) * tcos(r1y);
+			r1x += r2x * 0.2;
+			r2x = r2x * 0.9 + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
+			r1y = (r1y + r2y * 0.5) * 0.5;
+			r2y = r2y * 0.9 + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
+			float v2 = tsin(j * M_PI / jj) * a1 / 100.0 + 1.0;
+			for (int x = x1 - v2; x <= (int)(x1 + v2); x++) {
+				for (int y = y1 - v2; y <= (int)(y1 + v2); y++) {
+					for (int z = z1 - v2; z <= (int)(z1 + v2); z++) {
+						float x2 = x - x1;
+						float y2 = y - y1;
+						float z2 = z - z1;
+						if (x2 * x2 + 2.0 * y2 * y2 + z2 * z2 < v2 * v2 && x >= 1 && y >= 1 && z >= 1 && x < w - 1 && y < h - 1 && z < d - 1) {
 							int c = (y * d + z) * w + x;
 							if (generator->blocks[c] == BlockTypeStone) { generator->blocks[c] = ore; }
 						}
@@ -147,9 +155,9 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
- 			float v1 = NoiseCompute(n1, (float2){ x, y } * 1.3) / 6.0 - 4.0;
-			float v2 = NoiseCompute(n2, (float2){ x, y } * 1.3) / 5.0 + 6.0;
-			if (NoiseCompute(n3, (float2){ x, y }) / 8.0 > 0.0) { v2 = v1; }
+ 			float v1 = NoiseCompute(n1, x * 1.3, y * 1.3) / 6.0 - 4.0;
+			float v2 = NoiseCompute(n2, x * 1.3, y * 1.3) / 5.0 + 6.0;
+			if (NoiseCompute(n3, x, y) / 8.0 > 0.0) { v2 = v1; }
 			float m = fmaxf(v1, v2) / 2.0;
 			if (m < 0.0) { m *= 0.8; }
 			heights[x + y * w] = m;
@@ -170,8 +178,8 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++)
 		{
-			float v1 = NoiseCompute(n1, (float2){ x, y } * 2.0) / 8.0;
-			int v2 = NoiseCompute(n2, (float2){ x, y } * 2.0) > 0.0 ? 1 : 0;
+			float v1 = NoiseCompute(n1, x * 2.0, y * 2.0) / 8.0;
+			int v2 = NoiseCompute(n2, x * 2.0, y * 2.0) > 0.0 ? 1 : 0;
 			if (v1 > 2.0) { heights[x + y * w] = ((heights[x + y * w] - v2) / 2 << 1) + v2; }
 		}
 	}
@@ -187,7 +195,7 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
-			int v1 = (int)(NoiseCompute(n, (float2){ x, y }) / 24.0) - 4;
+			int v1 = (int)(NoiseCompute(n, x, y) / 24.0) - 4;
 			int v2 = heights[x + y * w] + generator->waterLevel;
 			int v3 = v2 + v1;
 			heights[x + y * w] = v2 > v3 ? v2 : v3;
@@ -209,27 +217,38 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	int ii = w * d * h / 256 / 64 << 1;
 	for (int i = 0; i < ii; i++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, i * 100 / (ii - 1));
-		float3 v1 = { RandomGeneratorUniform(generator->random) * w, RandomGeneratorUniform(generator->random) * h, RandomGeneratorUniform(generator->random) * d };
+		
+		float x1 = RandomGeneratorUniform(generator->random) * w;
+		float y1 = RandomGeneratorUniform(generator->random) * h;
+		float z1 = RandomGeneratorUniform(generator->random) * d;
 		int jj = (RandomGeneratorUniform(generator->random) + RandomGeneratorUniform(generator->random)) * 200.0;
-		float2 r1 = (float2){ RandomGeneratorUniform(generator->random), RandomGeneratorUniform(generator->random) } * 2.0 * pi;
-		float2 r2 = { 0.0, 0.0 };
+		float r1x = RandomGeneratorUniform(generator->random) * 2.0 * M_PI;
+		float r1y = RandomGeneratorUniform(generator->random) * 2.0 * M_PI;
+		float r2x = 0.0;
+		float r2y = 0.0;
 		float v2 = RandomGeneratorUniform(generator->random) * RandomGeneratorUniform(generator->random);
 		for (int j = 0; j < jj; j++) {
-			v1 += (float3){ tsin(r1.x) * tcos(r1.y), tsin(r1.y), tcos(r1.x) * tcos(r1.y) };
-			r1.x = (r1.x + r1.x * 0.2) * 0.9;
-			r2.x = r1.x + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
-			r1.y = (r1.y + r2.y * 0.5) * 0.5;
-			r2.y = r2.y * 0.75 + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
+			x1 += tsin(r1x) * tcos(r1y);
+			y1 += tsin(r1y);
+			z1 += tcos(r1x) * tcos(r1y);
+			r1x = (r1x + r1x * 0.2) * 0.9;
+			r2x = r1x + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
+			r1y = (r1y + r2y * 0.5) * 0.5;
+			r2y = r2y * 0.75 + RandomGeneratorUniform(generator->random) - RandomGeneratorUniform(generator->random);
 			if (RandomGeneratorUniform(generator->random) >= 0.25) {
-				float3 v3 = v1 + ((float3){ RandomGeneratorUniform(generator->random), RandomGeneratorUniform(generator->random), RandomGeneratorUniform(generator->random) } * 4.0 - 2.0) * 0.2;
-				float v4 = (h - v3.y) / h;
+				float x2 = x1 + (RandomGeneratorUniform(generator->random) * 4.0 - 2.0) * 0.2;
+				float y2 = y1 + (RandomGeneratorUniform(generator->random) * 4.0 - 2.0) * 0.2;
+				float z2 = z1 + (RandomGeneratorUniform(generator->random) * 4.0 - 2.0) * 0.2;
+				float v4 = (h - y2) / h;
 				v4 = 1.2 + (v4 * 3.5 + 1.0) * v2;
-				v4 *= tsin(j * pi / jj);
-				for (int x = v3.x - v4; x <= (int)(v3.x + v4); x++) {
-					for (int y = v3.y - v4; y <= (int)(v3.y + v4); y++) {
-						for (int z = v3.z - v4; z <= (int)(v3.z + v4); z++) {
-							float3 v5 = (float3){ x, y, z } - v3;
-							if (dot3f(v5, v5) + v5.y * v5.y < v4 * v4 && x >= 1 && y >= 1 && z >= 1 && x < w - 1 && y < h - 1 && z < d - 1) {
+				v4 *= tsin(j * M_PI / jj);
+				for (int x = x2 - v4; x <= (int)(x2 + v4); x++) {
+					for (int y = y2 - v4; y <= (int)(y2 + v4); y++) {
+						for (int z = z2 - v4; z <= (int)(z2 + v4); z++) {
+							float x3 = x - x2;
+							float y3 = y - y2;
+							float z3 = z - z2;
+							if (x3 * x3 + 2.0 * y3 * y3 + z3 * z3 < v4 * v4 && x >= 1 && y >= 1 && z >= 1 && x < w - 1 && y < h - 1 && z < d - 1) {
 								int c = (y * d + z) * w + x;
 								if (generator->blocks[c] == BlockTypeStone) { generator->blocks[c] = BlockTypeNone; }
 							}
@@ -281,8 +300,8 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
-			bool v1 = NoiseCompute(n1, (float2){ x, y }) > 8.0;
-			bool v2 = NoiseCompute(n2, (float2){ x, y }) > 12.0;
+			bool v1 = NoiseCompute(n1, x, y) > 8.0;
+			bool v2 = NoiseCompute(n2, x, y) > 12.0;
 			int z = heights[x + y * w];
 			int c = (z * d + y) * w + x;
 			BlockType above = generator->blocks[((z + 1) * d + y) * w + x];

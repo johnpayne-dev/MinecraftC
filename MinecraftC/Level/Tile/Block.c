@@ -88,7 +88,7 @@ Block BlockCreate(BlockType type, int textureID) {
 		.explodable = true,
 	};
 	Blocks.table[type] = block;
-	BlockSetBounds(block, zero3f, one3f);
+	BlockSetBounds(block, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
 	Blocks.opaque[type] = BlockIsSolid(block);
 	Blocks.cube[type] = BlockIsCube(block);
 	Blocks.liquid[type] = false;
@@ -119,9 +119,13 @@ void BlockSetPhysics(Block block, bool physics) {
 	Blocks.physics[block->type] = physics;
 }
 
-void BlockSetBounds(Block block, float3 v0, float3 v1) {
-	block->xyz0 = v0;
-	block->xyz1 = v1;
+void BlockSetBounds(Block block, float x0, float y0, float z0, float x1, float y1, float z1) {
+	block->x0 = x0;
+	block->y0 = y0;
+	block->z0 = z0;
+	block->x1 = x1;
+	block->y1 = y1;
+	block->z1 = z1;
 }
 
 void BlockSetTickDelay(Block block, int tickDelay) {
@@ -131,17 +135,17 @@ void BlockSetTickDelay(Block block, int tickDelay) {
 void BlockRenderFullBrightness(Block block) {
 	if (IsFlowerBlock(block->type)) { FlowerBlockRenderFullBrightness(block); return; }
 	
-	ShapeRendererColor(one3f * 0.5);
+	ShapeRendererColorf(0.5, 0.5, 0.5);
 	BlockRenderInside(block, -2, 0, 0, 0);
-	ShapeRendererColor(one3f);
+	ShapeRendererColorf(1.0, 1.0, 1.0);
 	BlockRenderInside(block, -2, 0, 0, 1);
-	ShapeRendererColor(one3f * 0.8);
+	ShapeRendererColorf(0.8, 0.8, 0.8);
 	BlockRenderInside(block, -2, 0, 0, 2);
-	ShapeRendererColor(one3f * 0.8);
+	ShapeRendererColorf(0.8, 0.8, 0.8);
 	BlockRenderInside(block, -2, 0, 0, 3);
-	ShapeRendererColor(one3f * 0.6);
+	ShapeRendererColorf(0.6, 0.6, 0.6);
 	BlockRenderInside(block, -2, 0, 0, 4);
-	ShapeRendererColor(one3f * 0.6);
+	ShapeRendererColorf(0.6, 0.6, 0.6);
 	BlockRenderInside(block, -2, 0, 0, 5);
 }
 
@@ -174,56 +178,63 @@ void BlockRenderInside(Block block, int x, int y, int z, int side) {
 }
 
 void BlockRenderSideWithTexture(Block block, int x, int y, int z, int side, int tex) {
-	int2 uv0 = (int2){ tex % 16, tex / 16 } << 4;
-	float2 uv1 = float2i(uv0) / 256.0;
-	float2 uv2 = (float2i(uv0) + 15.99) / 256.0;
+	int u0 = (tex % 16) << 4;
+	int v0 = (tex / 16) << 4;
+	float u1 = u0 / 256.0;
+	float v1 = v0 / 256.0;
+	float u2 = (u0 + 15.99) / 256.0;
+	float v2 = (v0 + 15.99) / 256.0;
 	if (side >= 2 && tex < 240) {
-		if (block->xyz0.y >= 0.0 && block->xyz1.y <= 1.0) {
-			uv1.y = (uv0.y + block->xyz0.y * 15.99) / 256.0;
-			uv2.y = (uv0.y + block->xyz1.y * 15.99) / 256.0;
+		if (block->y0 >= 0.0 && block->y1 <= 1.0) {
+			v1 = (v0 + block->y0 * 15.99) / 256.0;
+			v2 = (v0 + block->y1 * 15.99) / 256.0;
 		} else {
-			uv1.y = uv0.y / 256.0;
-			uv2.y = (uv0.y + 15.99) / 256.0;
+			v1 = v0 / 256.0;
+			v2 = (v0 + 15.99) / 256.0;
 		}
 	}
-	float3 v0 = (float3){ x, y, z } + block->xyz0;
-	float3 v1 = (float3){ x, y, z } + block->xyz1;
+	float x0 = x + block->x0;
+	float y0 = y + block->y0;
+	float z0 = z + block->z0;
+	float x1 = x + block->x1;
+	float y1 = y + block->y1;
+	float z1 = z + block->z1;
 	
 	if (side == 0) {
-		ShapeRendererVertexUV((float3){ v0.x, v0.y, v1.z }, (float2){ uv1.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v0.x, v0.y, v0.z }, (float2){ uv1.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v1.x, v0.y, v0.z }, (float2){ uv2.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v1.x, v0.y, v1.z }, (float2){ uv2.x, uv2.y });
+		ShapeRendererVertexUV(x0, y0, z1, u1, v2);
+		ShapeRendererVertexUV(x0, y0, z0, u1, v1);
+		ShapeRendererVertexUV(x1, y0, z0, u2, v1);
+		ShapeRendererVertexUV(x1, y0, z1, u2, v2);
 	}
 	if (side == 1) {
-		ShapeRendererVertexUV((float3){ v1.x, v1.y, v1.z }, (float2){ uv2.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v1.x, v1.y, v0.z }, (float2){ uv2.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v0.x, v1.y, v0.z }, (float2){ uv1.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v0.x, v1.y, v1.z }, (float2){ uv1.x, uv2.y });
+		ShapeRendererVertexUV(x1, y1, z1, u2, v2);
+		ShapeRendererVertexUV(x1, y1, z0, u2, v1);
+		ShapeRendererVertexUV(x0, y1, z0, u1, v1);
+		ShapeRendererVertexUV(x0, y1, z1, u1, v2);
 	}
 	if (side == 2) {
-		ShapeRendererVertexUV((float3){ v0.x, v1.y, v0.z }, (float2){ uv2.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v1.x, v1.y, v0.z }, (float2){ uv1.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v1.x, v0.y, v0.z }, (float2){ uv1.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v0.x, v0.y, v0.z }, (float2){ uv2.x, uv2.y });
+		ShapeRendererVertexUV(x0, y1, z0, u2, v1);
+		ShapeRendererVertexUV(x1, y1, z0, u1, v1);
+		ShapeRendererVertexUV(x1, y0, z0, u1, v2);
+		ShapeRendererVertexUV(x0, y0, z0, u2, v2);
 	}
 	if (side == 3) {
-		ShapeRendererVertexUV((float3){ v0.x, v1.y, v1.z }, (float2){ uv1.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v0.x, v0.y, v1.z }, (float2){ uv1.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v1.x, v0.y, v1.z }, (float2){ uv2.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v1.x, v1.y, v1.z }, (float2){ uv2.x, uv1.y });
+		ShapeRendererVertexUV(x0, y1, z1, u1, v1);
+		ShapeRendererVertexUV(x0, y0, z1, u1, v2);
+		ShapeRendererVertexUV(x1, y0, z1, u2, v2);
+		ShapeRendererVertexUV(x1, y1, z1, u2, v1);
 	}
 	if (side == 4) {
-		ShapeRendererVertexUV((float3){ v0.x, v1.y, v1.z }, (float2){ uv2.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v0.x, v1.y, v0.z }, (float2){ uv1.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v0.x, v0.y, v0.z }, (float2){ uv1.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v0.x, v0.y, v1.z }, (float2){ uv2.x, uv2.y });
+		ShapeRendererVertexUV(x0, y1, z1, u2, v1);
+		ShapeRendererVertexUV(x0, y1, z0, u1, v1);
+		ShapeRendererVertexUV(x0, y0, z0, u1, v2);
+		ShapeRendererVertexUV(x0, y0, z1, u2, v2);
 	}
 	if (side == 5) {
-		ShapeRendererVertexUV((float3){ v1.x, v0.y, v1.z }, (float2){ uv1.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v1.x, v0.y, v0.z }, (float2){ uv2.x, uv2.y });
-		ShapeRendererVertexUV((float3){ v1.x, v1.y, v0.z }, (float2){ uv2.x, uv1.y });
-		ShapeRendererVertexUV((float3){ v1.x, v1.y, v1.z }, (float2){ uv1.x, uv1.y });
+		ShapeRendererVertexUV(x1, y0, z1, u1, v2);
+		ShapeRendererVertexUV(x1, y0, z0, u2, v2);
+		ShapeRendererVertexUV(x1, y1, z0, u2, v1);
+		ShapeRendererVertexUV(x1, y1, z1, u1, v1);
 	}
 }
 
@@ -233,13 +244,13 @@ void BlockRenderSide(Block block, int x, int y, int z, int side) {
 
 AABB BlockGetSelectionAABB(Block block, int x, int y, int z) {
 	if (IsLiquidBlock(block->type)) { return LiquidBlockGetSelectionAABB(block, x, y, z); }
-	return (AABB){ .v0 = (float3){ x, y, z } + block->xyz0, .v1 = (float3){ x, y, z } + block->xyz1 };
+	return (AABB){ .x0 = x + block->x0, .y0 = y + block->y0, .z0 = z + block->z0, .x1 = x + block->x1, .y1 = y + block->y1, .z1 = z + block->z1 };
 }
 
 AABB BlockGetCollisionAABB(Block block, int x, int y, int z) {
 	if (IsFlowerBlock(block->type)) { return FlowerBlockGetCollisionAABB(block, x, y, z); }
 	if (IsLiquidBlock(block->type)) { return AABBNull; }
-	return (AABB){ .v0 = (float3){ x, y, z } + block->xyz0, .v1 = (float3){ x, y, z } + block->xyz1 };
+	return (AABB){ .x0 = x + block->x0, .y0 = y + block->y0, .z0 = z + block->z0, .x1 = x + block->x1, .y1 = y + block->y1, .z1 = z + block->z1 };
 }
 
 bool BlockIsOpaque(Block block) {
@@ -270,8 +281,10 @@ void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, Par
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 4; k++) {
-				float3 v = (float3){ x, y, z } + ((float3){ i, j, k } + 0.5) / 4.0;
-				ParticleManagerSpawnParticle(particles, TerrainParticleCreate(level, v, v - (float3){ x, y, z } - 0.5, block));
+				float xd = x + (i + 0.5) / 4.0;
+				float yd = y + (j + 0.5) / 4.0;
+				float zd = z + (k + 0.5) / 4.0;
+				ParticleManagerSpawnParticle(particles, TerrainParticleCreate(level, xd, yd, zd, xd - x - 0.5, yd - y - 0.5, zd - z - 0.5, block));
 			}
 		}
 	}
@@ -279,14 +292,16 @@ void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, Par
 
 void BlockSpawnBlockParticles(Block block, Level level, int x, int y, int z, int side, ParticleManager particles) {
 	float f = 0.1;
-	float3 v = (float3){ x, y, z } + RandomUniform() * (block->xyz1 - block->xyz0 - f * 2.0) + f + block->xyz0;
-	if (side == 0) { v.y = y + block->xyz0.y - f; }
-	if (side == 1) { v.y = y + block->xyz1.y + f; }
-	if (side == 2) { v.z = z + block->xyz0.z - f; }
-	if (side == 3) { v.z = z + block->xyz1.z + f; }
-	if (side == 4) { v.x = x + block->xyz0.x - f; }
-	if (side == 5) { v.x = x + block->xyz1.x + f; }
-	ParticleManagerSpawnParticle(particles, ParticleScale(ParticleSetPower(TerrainParticleCreate(level, v, 0.0, block), 0.2), 0.6));
+	float vx = x + RandomUniform() * (block->x1 - block->x0 - f * 2.0) + f + block->x0;
+	float vy = y + RandomUniform() * (block->y1 - block->y0 - f * 2.0) + f + block->y0;
+	float vz = z + RandomUniform() * (block->z1 - block->z0 - f * 2.0) + f + block->z0;
+	if (side == 0) { vy = y + block->y0 - f; }
+	if (side == 1) { vy = y + block->y1 + f; }
+	if (side == 2) { vz = z + block->z0 - f; }
+	if (side == 3) { vz = z + block->z1 + f; }
+	if (side == 4) { vx = x + block->x0 - f; }
+	if (side == 5) { vx = x + block->x1 + f; }
+	ParticleManagerSpawnParticle(particles, ParticleScale(ParticleSetPower(TerrainParticleCreate(level, vx, vy, vz, 0.0, 0.0, 0.0, block), 0.2), 0.6));
 }
 
 LiquidType BlockGetLiquidType(Block block) {
@@ -327,12 +342,12 @@ void BlockRenderPreview(Block block) {
 	if (IsFlowerBlock(block->type)) { FlowerBlockRenderPreview(block); return; }
 	ShapeRendererBegin();
 	for (int i = 0; i < 6; i++) {
-		if (i == 0) { ShapeRendererNormal(up3f); }
-		if (i == 1) { ShapeRendererNormal(-up3f); }
-		if (i == 2) { ShapeRendererNormal(forward3f); }
-		if (i == 3) { ShapeRendererNormal(-forward3f); }
-		if (i == 4) { ShapeRendererNormal(right3f); }
-		if (i == 5) { ShapeRendererNormal(-right3f); }
+		if (i == 0) { ShapeRendererNormal(0.0, 1.0, 0.0); }
+		if (i == 1) { ShapeRendererNormal(0.0, -1.0, 0.0); }
+		if (i == 2) { ShapeRendererNormal(0.0, 0.0, 1.0); }
+		if (i == 3) { ShapeRendererNormal(0.0, 0.0, -1.0); }
+		if (i == 4) { ShapeRendererNormal(1.0, 0.0, 0.0); }
+		if (i == 5) { ShapeRendererNormal(-1.0, 0.0, 0.0); }
 		BlockRenderInside(block, 0, 0, 0, i);
 	}
 	ShapeRendererEnd();
@@ -342,11 +357,13 @@ bool BlockCanExplode(Block block) {
 	return block->explodable;
 }
 
-MovingObjectPosition BlockClip(Block block, int x, int y, int z, float3 v1, float3 v2) {
-	MovingObjectPosition pos = AABBClip((AABB){ block->xyz0, block->xyz1 }, v1 - (float3){ x, y, z }, v2 - (float3){ x, y, z });
+MovingObjectPosition BlockClip(Block block, int x, int y, int z, Vector3D v1, Vector3D v2) {
+	MovingObjectPosition pos = AABBClip((AABB){ block->x0, block->y0, block->z0, block->x1, block->y1, block->z1 }, Vector3DSubtract(v1, (Vector3D){ x, y, z }), Vector3DSubtract(v2, (Vector3D){ x, y, z }));
 	if (!pos.null) {
-		pos.xyz = (int3){ x, y, z };
-		pos.vector += float3i(pos.xyz);
+		pos.x = x;
+		pos.y = y;
+		pos.z = z;
+		pos.vector = Vector3DAdd(pos.vector, (Vector3D){ x, y, z });
 	}
 	return pos;
 }
@@ -359,40 +376,40 @@ bool BlockRender(Block block, Level level, int x, int y, int z) {
 	if (IsFlowerBlock(block->type)) { return FlowerBlockRender(block, level, x, y, z); }
 	
 	bool rendered = false;
-	float3 col = { 0.5, 0.8, 0.6 };
+	//float3 col = { 0.5, 0.8, 0.6 };
 	if (BlockCanRenderSide(block, level, x, y - 1, z, 0)) {
 		float brightness = BlockGetBrightness(block, level, x, y - 1, z);
-		ShapeRendererColor(one3f * col.x * brightness);
+		ShapeRendererColorf(0.5 * brightness, 0.5 * brightness, 0.5 * brightness);
 		BlockRenderInside(block, x, y, z, 0);
 		rendered = true;
 	}
 	if (BlockCanRenderSide(block, level, x, y + 1, z, 1)) {
 		float brightness = BlockGetBrightness(block, level, x, y + 1, z);
-		ShapeRendererColor(one3f * brightness);
+		ShapeRendererColorf(brightness, brightness, brightness);
 		BlockRenderInside(block, x, y, z, 1);
 		rendered = true;
 	}
 	if (BlockCanRenderSide(block, level, x, y, z - 1, 2)) {
 		float brightness = BlockGetBrightness(block, level, x, y, z - 1);
-		ShapeRendererColor(one3f * col.y * brightness);
+		ShapeRendererColorf(0.8 * brightness, 0.8 * brightness, 0.8 * brightness);
 		BlockRenderInside(block, x, y, z, 2);
 		rendered = true;
 	}
 	if (BlockCanRenderSide(block, level, x, y, z + 1, 3)) {
 		float brightness = BlockGetBrightness(block, level, x, y, z + 1);
-		ShapeRendererColor(one3f * col.y * brightness);
+		ShapeRendererColorf(0.8 * brightness, 0.8 * brightness, 0.8 * brightness);
 		BlockRenderInside(block, x, y, z, 3);
 		rendered = true;
 	}
 	if (BlockCanRenderSide(block, level, x - 1, y, z, 4)) {
 		float brightness = BlockGetBrightness(block, level, x - 1, y, z);
-		ShapeRendererColor(one3f * col.z * brightness);
+		ShapeRendererColorf(0.6 * brightness, 0.6 * brightness, 0.6 * brightness);
 		BlockRenderInside(block, x, y, z, 4);
 		rendered = true;
 	}
 	if (BlockCanRenderSide(block, level, x + 1, y, z, 5)) {
 		float brightness = BlockGetBrightness(block, level, x + 1, y, z);
-		ShapeRendererColor(one3f * col.z * brightness);
+		ShapeRendererColorf(0.6 * brightness, 0.6 * brightness, 0.6 * brightness);
 		BlockRenderInside(block, x, y, z, 5);
 		rendered = true;
 	}

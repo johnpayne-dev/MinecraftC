@@ -4,18 +4,22 @@
 #include "../Utilities/SinTable.h"
 #include "../Utilities/OpenGL.h"
 
-PrimedTNT PrimedTNTCreate(Level level, float3 pos) {
+PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z) {
 	Entity entity = EntityCreate(level);
 	entity->type = EntityTypePrimedTNT;
 	entity->typeData = MemoryAllocate(sizeof(struct PrimedTNTData));
 	EntitySetSize(entity, 0.98, 0.98);
 	entity->heightOffset = entity->aabbHeight / 2.0;
-	EntitySetPosition(entity, pos);
+	EntitySetPosition(entity, x, y, z);
 	entity->makeStepSound = false;
-	entity->oldPosition = pos;
-	float r = RandomUniform() * 2.0 * pi;
+	entity->xo = x;
+	entity->yo = y;
+	entity->zo = z;
+	float r = RandomUniform() * 2.0 * M_PI;
 	PrimedTNTData this = entity->typeData;
-	this->delta = (float3){ -tsin(r * pi / 180.0) * 0.02, 0.2, -cos(r * pi / 180.0) * 0.02 };
+	this->xd = -tsin(r * M_PI / 180.0) * 0.02;
+	this->yd = 0.2;
+	this->zd = -cos(r * M_PI / 180.0) * 0.02;
 	this->life = 40;
 	this->defused = false;
 	return entity;
@@ -31,40 +35,52 @@ bool PrimedTNTIsPickable(PrimedTNT entity) {
 
 void PrimedTNTTick(PrimedTNT entity) {
 	PrimedTNTData this = entity->typeData;
-	entity->oldPosition = entity->position;
-	this->delta.y -= 0.04;
-	EntityMove(entity, this->delta);
-	this->delta *= 0.98;
-	if (entity->onGround) { this->delta *= (float3){ 0.7, -0.5, 0.7 }; }
+	entity->xo = entity->x;
+	entity->yo = entity->y;
+	entity->zo = entity->z;
+	this->yd -= 0.04;
+	EntityMove(entity, this->xd, this->yd, this->zd);
+	this->xd *= 0.98;
+	this->yd *= 0.98;
+	this->zd *= 0.98;
+	if (entity->onGround) {
+		this->xd *= 0.7;
+		this->yd *= -0.5;
+		this->zd *= 0.7;
+	}
 	
 	if (!this->defused) {
 		this->life--;
 		if (this->life > 0) {
-			ParticleManagerSpawnParticle(entity->level->particleEngine, SmokeParticleCreate(entity->level, entity->position + up3f * 0.6));
+			ParticleManagerSpawnParticle(entity->level->particleEngine, SmokeParticleCreate(entity->level, entity->x, entity->y + 0.6, entity->z));
 		} else {
 			EntityRemove(entity);
 			RandomGenerator random = RandomGeneratorCreate(time(NULL));
 			float radius = 4.0;
-			LevelExplode(entity->level, NULL, entity->position, radius);
+			LevelExplode(entity->level, NULL, entity->x, entity->y, entity->z, radius);
 			for (int i = 0; i < 100; i++) {
-				float3 offset = (float3){ RandomGeneratorNormal(random, 1.0), RandomGeneratorNormal(random, 1.0), RandomGeneratorNormal(random, 1.0) } * radius / 4.0;
-				float3 vel = offset / dot3f(offset, offset);
-				ParticleManagerSpawnParticle(entity->level->particleEngine, TerrainParticleCreate(entity->level, entity->position + offset, vel, Blocks.table[BlockTypeTNT]));
+				float ox = RandomGeneratorNormal(random, 1.0) * radius / 4.0;
+				float oy = RandomGeneratorNormal(random, 1.0) * radius / 4.0;
+				float oz = RandomGeneratorNormal(random, 1.0) * radius / 4.0;
+				float l = ox * ox + oy * oy + oz * oz;
+				ParticleManagerSpawnParticle(entity->level->particleEngine, TerrainParticleCreate(entity->level, entity->x + ox, entity->y + oy, entity->z + oz, ox / l, oy / l, oz / l, Blocks.table[BlockTypeTNT]));
 			}
 			RandomGeneratorDestroy(random);
 		}
 	}
 }
 
-void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float t) {
+void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float dt) {
 	PrimedTNTData this = tnt->typeData;
 	int texture = TextureManagerLoad(textures, "Terrain.png");
 	glBindTexture(GL_TEXTURE_2D, texture);
-	float brightness = LevelGetBrightness(tnt->level, tnt->position.x, tnt->position.y, tnt->position.z);
+	float brightness = LevelGetBrightness(tnt->level, tnt->x, tnt->y, tnt->z);
 	glPushMatrix();
 	glColor4f(brightness, brightness, brightness, 1.0);
-	float3 v = tnt->oldPosition + (tnt->position - tnt->oldPosition) * t - 0.5;
-	glTranslatef(v.x, v.y, v.z);
+	float vx = tnt->xo + (tnt->x - tnt->xo) * dt - 0.5;
+	float vy = tnt->yo + (tnt->y - tnt->yo) * dt - 0.5;
+	float vz = tnt->zo + (tnt->z - tnt->zo) * dt - 0.5;
+	glTranslatef(vx, vy, vz);
 	glPushMatrix();
 	BlockRenderPreview(Blocks.table[BlockTypeTNT]);
 	glDisable(GL_TEXTURE_2D);

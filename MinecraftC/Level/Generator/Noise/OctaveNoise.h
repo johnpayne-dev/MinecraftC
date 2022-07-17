@@ -10,5 +10,5 @@ typedef struct OctaveNoiseData {
 } * OctaveNoiseData;
 
 OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount);
-float OctaveNoiseCompute(OctaveNoise noise, float2 v);
+float OctaveNoiseCompute(OctaveNoise noise, float x, float y);
 void OctaveNoiseDestroy(OctaveNoise noise);

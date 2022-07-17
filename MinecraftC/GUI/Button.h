@@ -1,10 +1,10 @@
 #pragma once
-#include "../Utilities/LinearMath.h"
+#include <stdbool.h>
 #include "../Utilities/String.h"
 
 typedef struct Button {
-	int2 position;
-	int2 size;
+	int x, y;
+	int width, height;
 	String text;
 	int id;
 	bool active;

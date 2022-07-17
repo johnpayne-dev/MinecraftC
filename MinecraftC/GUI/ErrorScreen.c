@@ -14,11 +14,11 @@ ErrorScreen ErrorScreenCreate(char * title, char * text) {
 void ErrorScreenOnOpen(ErrorScreen screen) {
 }
 
-void ErrorScreenRender(ErrorScreen screen, int2 mousePos) {
+void ErrorScreenRender(ErrorScreen screen, int mx, int my) {
 	ErrorScreenData this = screen->typeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x402020FF), ColorFromHex(0x501010FF));
-	ScreenDrawCenteredString(screen->font, this->title, (int2){ screen->width / 2, 90 }, ColorWhite);
-	ScreenDrawCenteredString(screen->font, this->text, (int2){ screen->width / 2, 110 }, ColorWhite);
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x402020FF, 0x501010FF);
+	ScreenDrawCenteredString(screen->font, this->title, screen->width / 2, 90, 0xffffffff);
+	ScreenDrawCenteredString(screen->font, this->text, screen->width / 2, 110, 0xffffffff);
 }
 
 void ErrorScreenOnKeyPressed(ErrorScreen screen, char eventChar, int eventKey) {

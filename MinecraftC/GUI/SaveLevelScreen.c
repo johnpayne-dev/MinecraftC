@@ -35,11 +35,11 @@ void SaveLevelScreenOpenLevelFromFile(SaveLevelScreen screen, char * file) {
 	MinecraftSetCurrentScreen(screen->minecraft, this->parent);
 }
 
-void SaveLevelScreenRender(SaveLevelScreen screen, int2 mousePos) {
+void SaveLevelScreenRender(SaveLevelScreen screen, int mx, int my) {
 	if (!screen->minecraft->session->hasPaid) {
-		ScreenDrawFadingBox((int2){ screen->width / 2 - 80, 72 }, (int2){ screen->width / 2 + 80, 120 }, ColorFromHex(0x000000E0), ColorFromHex(0x000000E0));
-		ScreenDrawCenteredString(screen->font, "Premium only!", (int2){ screen->width / 2, 80 }, ColorFromHex(0xFF9090FF));
-		ScreenDrawCenteredString(screen->font, "Purchase the game to be able", (int2){ screen->width / 2, 96 }, ColorFromHex(0xE08080FF));
-		ScreenDrawCenteredString(screen->font, "to save your levels online.", (int2){ screen->width / 2, 104 }, ColorFromHex(0xE08080FF));
+		ScreenDrawFadingBox(screen->width / 2 - 80, 72, screen->width / 2 + 80, 120, 0x000000E0, 0x000000E0);
+		ScreenDrawCenteredString(screen->font, "Premium only!", screen->width / 2, 80, 0xFF9090FF);
+		ScreenDrawCenteredString(screen->font, "Purchase the game to be able", screen->width / 2, 96, 0xE08080FF);
+		ScreenDrawCenteredString(screen->font, "to save your levels online.", screen->width / 2, 104, 0xE08080FF);
 	}
 }

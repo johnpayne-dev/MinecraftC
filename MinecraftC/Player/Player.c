@@ -7,7 +7,7 @@ Player PlayerCreate(Level level) {
 	entity->type = EntityTypePlayer;
 	entity->footSize = 0.5;
 	entity->heightOffset = 1.62;
-	EntitySetPosition(entity, entity->position);
+	EntitySetPosition(entity, entity->x, entity->y, entity->z);
 	PlayerData player = MemoryAllocate(sizeof(struct PlayerData));
 	*player = (struct PlayerData) {
 		.rotationA = (RandomUniform() + 1.0) * 0.01,
@@ -18,7 +18,7 @@ Player PlayerCreate(Level level) {
 		.bobbingStrength = 1.0,
 		.renderOffset = 0.0,
 		.timeOffset = RandomUniform() * 12398.0,
-		.rotation = 2.0 * pi * RandomUniform(),
+		.rotation = 2.0 * M_PI * RandomUniform(),
 		.speed = 1.0,
 		.ai = PlayerAICreate(entity),
 		.rotationOffset = 180.0,
@@ -40,18 +40,20 @@ void PlayerTick(Player player) {
 	
 	this->oldAnimationStep = this->animationStep;
 	this->oldBodyRotation = this->bodyRotation;
-	player->oldRotation = player->rotation;
+	player->xRotO = player->xRot;
+	player->yRotO = player->yRot;
 	this->tickCount++;
 	PlayerStepAI(player);
 	this->oldRun = this->run;
-	float2 d = player->position.xz - player->oldPosition.xz;
-	float len = length2f(d);
+	float dx = player->x - player->xo;
+	float dz = player->z - player->zo;
+	float len = sqrtf(dx * dx + dz * dz);
 	float rot = this->bodyRotation;
 	float f1 = 0.0, f2 = 0.0;
 	if (len > 0.05) {
 		f2 = 1.0;
 		f1 = len * 3.0;
-		rot = atan2(d.y, d.x) * deg - 90.0;
+		rot = atan2(dz, dx) * (180.0 / M_PI) - 90.0;
 	}
 	if (!player->onGround) { f2 = 0.0; }
 	this->run += (f2 - this->run) * 0.3;
@@ -60,45 +62,54 @@ void PlayerTick(Player player) {
 	for (a = rot - this->bodyRotation; a < -180.0; a += 360.0);
 	while (a >= 180.0) { a -= 360.0; }
 	this->bodyRotation += a * 0.1;
-	for (a = player->rotation.y - this->bodyRotation; a < -180.0; a += 360.0);
+	for (a = player->yRot - this->bodyRotation; a < -180.0; a += 360.0);
 	while (a >= 180.0) { a -= 360.0; }
 	bool b = a < -90.0 || a >= 90.0;
 	if (a < -75.0) { a = -75.0; }
 	if (a > 75.0) { a = 75.0; }
-	this->bodyRotation = player->rotation.y - a;
+	this->bodyRotation = player->yRot - a;
 	this->bodyRotation += a * 0.1;
 	if (b) { f1 = -f1; }
-	while (player->rotation.y - player->oldRotation.y < -180.0) { player->oldRotation.y -= 360.0; }
-	while (player->rotation.y - player->oldRotation.y >= 180.0) { player->oldRotation.y += 360.0; }
+	while (player->yRot - player->yRotO < -180.0) { player->yRotO -= 360.0; }
+	while (player->yRot - player->yRotO >= 180.0) { player->yRotO += 360.0; }
 	while (this->bodyRotation - this->oldBodyRotation < -180.0) { this->oldBodyRotation -= 360.0; }
 	while (this->bodyRotation - this->oldBodyRotation >= 180.0) { this->oldBodyRotation += 360.0; }
-	while (player->rotation.x - player->oldRotation.x < -180.0) { player->oldRotation.x -= 360.0; }
-	while (player->rotation.x - player->oldRotation.x >= 180.0) { player->oldRotation.x += 360.0; }
+	while (player->xRot - player->xRotO < -180.0) { player->xRotO -= 360.0; }
+	while (player->xRot - player->xRotO >= 180.0) { player->xRotO += 360.0; }
 
 	this->animationStep += f1;
 }
 
 void PlayerTravel(Player player, float x, float y) {
 	if (EntityIsInWater(player)) {
-		float z = player->position.y;
-		EntityMoveRelative(player, (float2){ x, y }, 0.02);
-		EntityMove(player, player->delta);
-		player->delta *= 0.8;
-		player->delta.y -= 0.02;
-		if (player->horizontalCollision && EntityIsFree(player, player->delta + up3f * (0.6 - player->position.y + z))) { player->delta.y = 0.3; }
+		float z = player->y;
+		EntityMoveRelative(player, x, y, 0.02);
+		EntityMove(player, player->xd, player->yd, player->zd);
+		player->xd *= 0.8;
+		player->yd *= 0.8;
+		player->zd *= 0.8;
+		player->yd -= 0.02;
+		if (player->horizontalCollision && EntityIsFree(player, player->xd, player->yd + 0.6 - player->y + z, player->zd)) { player->yd = 0.3; }
 	} else if (EntityIsInLava(player)) {
-		float z = player->position.y;
-		EntityMoveRelative(player, (float2){ x, y }, 0.02);
-		EntityMove(player, player->delta);
-		player->delta *= 0.5;
-		player->delta.y -= 0.02;
-		if (player->horizontalCollision && EntityIsFree(player, player->delta + up3f * (0.6 - player->position.y + z))) { player->delta.y = 0.3; }
+		float z = player->y;
+		EntityMoveRelative(player, x, y, 0.02);
+		EntityMove(player, player->xd, player->yd, player->zd);
+		player->xd *= 0.5;
+		player->yd *= 0.5;
+		player->zd *= 0.5;
+		player->yd -= 0.02;
+		if (player->horizontalCollision && EntityIsFree(player, player->xd, player->yd + 0.6 - player->y + z, player->zd)) { player->yd = 0.3; }
 	} else {
-		EntityMoveRelative(player, (float2){ x, y }, player->onGround ? 0.1 : 0.02);
-		EntityMove(player, player->delta);
-		player->delta *= (float3){ 0.91, 0.98, 0.91 };
-		player->delta.y -= 0.08;
-		if (player->onGround) { player->delta.xz *= 0.6; }
+		EntityMoveRelative(player, x, y, player->onGround ? 0.1 : 0.02);
+		EntityMove(player, player->xd, player->yd, player->zd);
+		player->xd *= 0.91;
+		player->yd *= 0.98;
+		player->zd *= 0.91;
+		player->yd -= 0.08;
+		if (player->onGround) {
+			player->xd *= 0.6;
+			player->zd *= 0.6;
+		}
 	}
 }
 
@@ -117,8 +128,8 @@ void PlayerStepAI(Player player) {
 	this->oldBobbing = this->bobbing;
 	InputHandlerUpdateMovement(this->input);
 	PlayerAITick(this->ai, player->level, player);
-	float bob = length2f(player->delta.xz);
-	float tilt = atan(-player->delta.y * 0.2) * 15.0;
+	float bob = sqrtf(player->xd * player->xd + player->zd * player->zd);
+	float tilt = atan(-player->yd * 0.2) * 15.0;
 	if (bob > 0.1) { bob = 0.1; }
 	if (!player->onGround) { bob = 0.0; }
 	if (player->onGround) { tilt = 0.0; }

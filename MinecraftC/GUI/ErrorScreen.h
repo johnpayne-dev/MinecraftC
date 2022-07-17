@@ -10,6 +10,6 @@ typedef struct ErrorScreenData {
 
 ErrorScreen ErrorScreenCreate(char * title, char * text);
 void ErrorScreenOnOpen(ErrorScreen screen);
-void ErrorScreenRender(ErrorScreen screen, int2 mousePos);
+void ErrorScreenRender(ErrorScreen screen, int mx, int my);
 void ErrorScreenOnKeyPressed(ErrorScreen screen, char eventChar, int eventKey);
 void ErrorScreenDestroy(ErrorScreen screen);

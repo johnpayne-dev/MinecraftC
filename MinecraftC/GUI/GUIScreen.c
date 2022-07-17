@@ -22,33 +22,37 @@ GUIScreen GUIScreenCreate() {
 	return screen;
 }
 
-void GUIScreenRender(GUIScreen screen, int2 m) {
-	if (screen->type == GUIScreenTypeBlockSelect) { BlockSelectScreenRender(screen, m); return; }
-	if (screen->type == GUIScreenTypeChatInput) { ChatInputScreenRender(screen, m); return; }
-	if (screen->type == GUIScreenTypeControls) { ControlsScreenRender(screen, m); }
-	if (screen->type == GUIScreenTypeError) { ErrorScreenRender(screen, m); }
-	if (screen->type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenRender(screen, m); }
-	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenRender(screen, m); }
-	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenRender(screen, m); return; }
-	if (screen->type == GUIScreenTypeOptions) { OptionsScreenRender(screen, m); }
-	if (screen->type == GUIScreenTypePause) { PauseScreenRender(screen, m); }
-	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenRender(screen, m); return; }
+void GUIScreenRender(GUIScreen screen, int mx, int my) {
+	if (screen->type == GUIScreenTypeBlockSelect) { BlockSelectScreenRender(screen, mx, my); return; }
+	if (screen->type == GUIScreenTypeChatInput) { ChatInputScreenRender(screen, mx, my); return; }
+	if (screen->type == GUIScreenTypeControls) { ControlsScreenRender(screen, mx, my); }
+	if (screen->type == GUIScreenTypeError) { ErrorScreenRender(screen, mx, my); }
+	if (screen->type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenRender(screen, mx, my); }
+	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenRender(screen, mx, my); }
+	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenRender(screen, mx, my); return; }
+	if (screen->type == GUIScreenTypeOptions) { OptionsScreenRender(screen, mx, my); }
+	if (screen->type == GUIScreenTypePause) { PauseScreenRender(screen, mx, my); }
+	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenRender(screen, mx, my); return; }
 	
 	for (int i = 0; i < ListCount(screen->buttons); i++) {
 		Button button = screen->buttons[i];
 		if (button->visible) {
 			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(screen->minecraft->textureManager, "GUI/GUI.png"));
 			glColor4f(1.0, 1.0, 1.0, 1.0);
-			bool hovered = m.x >= button->position.x && m.y >= button->position.y && m.x < button->position.x + button->size.x && m.y < button->position.y + button->size.y;
+			bool hovered = mx >= button->x && my >= button->y && mx < button->x + button->width && my < button->y + button->height;
 			int state = 1;
 			if (!button->active) { state = 0; }
 			else if (hovered) { state = 2; }
 			
-			ScreenDrawImage(button->position, (int2){ 0, 46 + state * 20 }, button->size / (int2){ 2, 1 }, 0.0);
-			ScreenDrawImage(button->position + (int2){ button->size.x / 2, 0 }, (int2){ 200 - button->size.x / 2, 46 + state * 20 }, button->size / (int2){ 2, 1 }, 0.0);
-			if (!button->active) { ScreenDrawCenteredString(screen->font, button->text, button->position + (int2){ button->size.x / 2, (button->size.y - 8) / 2 }, ColorFromHex(0xa0a0a0ff)); }
-			else if (hovered) { ScreenDrawCenteredString(screen->font, button->text, button->position + (int2){ button->size.x / 2, (button->size.y - 8) / 2 }, ColorFromHex(0xffffa0ff)); }
-			else { ScreenDrawCenteredString(screen->font, button->text, button->position + (int2){ button->size.x / 2, (button->size.y - 8) / 2 }, ColorFromHex(0xe0e0e0ff)); }
+			ScreenDrawImage(button->x, button->y, 0, 46 + state * 20, button->width / 2, button->height, 0.0);
+			ScreenDrawImage(button->x + button->width / 2, button->y, 200 - button->width / 2, 46 + state * 20, button->width / 2, button->height, 0.0);
+			if (!button->active) {
+				ScreenDrawCenteredString(screen->font, button->text, button->x + button->width / 2, button->y + (button->height - 8) / 2, 0xa0a0a0ff);
+			} else if (hovered) {
+				ScreenDrawCenteredString(screen->font, button->text, button->x + button->width / 2, button->y + (button->height - 8) / 2, 0xffffa0ff);
+			} else {
+				ScreenDrawCenteredString(screen->font, button->text, button->x + button->width / 2, button->y + (button->height - 8) / 2, 0xe0e0e0ff);
+			}
 		}
 	}
 }
@@ -70,7 +74,9 @@ void GUIScreenOnMouseClicked(GUIScreen screen, int x, int y, int button) {
 	if (button == SDL_BUTTON_LEFT) {
 		for (int i = 0; i < ListCount(screen->buttons); i++) {
 			Button button = screen->buttons[i];
-			if (button->active && x >= button->position.x && y >= button->position.y && x < button->position.x + button->size.x && y < button->position.y + button->size.y) { GUIScreenOnButtonClicked(screen, button); }
+			if (button->active && x >= button->x && y >= button->y && x < button->x + button->width && y < button->y + button->height) {
+				GUIScreenOnButtonClicked(screen, button);
+			}
 		}
 	}
 }

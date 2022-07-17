@@ -1,5 +1,4 @@
 #pragma once
-#include "../../../Utilities/LinearMath.h"
 
 typedef enum NoiseType {
 	NoiseTypeNone,
@@ -14,5 +13,5 @@ typedef struct Noise {
 } * Noise;
 
 Noise NoiseCreate(void);
-float NoiseCompute(Noise noise, float2 v);
+float NoiseCompute(Noise noise, float x, float y);
 void NoiseDestroy(Noise noise);

@@ -1,6 +1,7 @@
 #include "Random.h"
 #include "Memory.h"
 #include <stdlib.h>
+#include <math.h>
 
 RandomGenerator RandomGeneratorCreate(uint64_t seed) {
 	RandomGenerator generator = malloc(sizeof(struct RandomGenerator));
@@ -37,7 +38,7 @@ double RandomGeneratorNormal(RandomGenerator generator, double stddev) {
 	}
 
 	double r = sqrt(-2.0 * log(1.0 - RandomGeneratorUniform(generator)));
-	double phi = 2.0 * pi * (1.0 - RandomGeneratorUniform(generator));
+	double phi = 2.0 * M_PI * (1.0 - RandomGeneratorUniform(generator));
 
 	generator->lastNormal = r * cos(phi);
 	return r * sin(phi) * stddev;

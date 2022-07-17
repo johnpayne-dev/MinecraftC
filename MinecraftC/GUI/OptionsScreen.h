@@ -13,5 +13,5 @@ typedef struct OptionsScreenData {
 OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings);
 void OptionsScreenOnOpen(OptionsScreen screen);
 void OptionsScreenOnButtonClicked(OptionsScreen screen, Button button);
-void OptionsScreenRender(OptionsScreen screen, int2 mousePos);
+void OptionsScreenRender(OptionsScreen screen, int mx, int my);
 void OptionsScreenDestroy(OptionsScreen screen);

@@ -31,9 +31,9 @@ void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen screen, Button butto
 	}
 }
 
-void GenerateLevelScreenRender(GenerateLevelScreen screen, int2 mousePos) {
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->width, screen->height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->font, "Generate new level", (int2){ screen->width / 2, 40 }, ColorWhite);
+void GenerateLevelScreenRender(GenerateLevelScreen screen, int mx, int my) {
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, "Generate new level", screen->width / 2, 40, 0xffffffff);
 }
 
 void GenerateLevelScreenDestroy(GenerateLevelScreen screen) {

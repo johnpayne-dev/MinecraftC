@@ -15,11 +15,11 @@ int TNTBlockGetDropCount(TNTBlock block) {
 }
 
 void TNTBlockExplode(TNTBlock block, Level level, int x, int y, int z) {
-	PrimedTNT tnt = PrimedTNTCreate(level, (float3){ x, y, z } + 0.5f);
+	PrimedTNT tnt = PrimedTNTCreate(level, x + 0.5, y + 0.5, z + 0.5);
 	((PrimedTNTData)tnt->typeData)->life = RandomIntegerRange(5, 14);
 	LevelAddEntity(level, tnt);
 }
 
 void TNTBlockSpawnBreakParticles(TNTBlock block, Level level, int x, int y, int z, ParticleManager particles) {
-	LevelAddEntity(level, PrimedTNTCreate(level, (float3){ x, y, z } + 0.5f));
+	LevelAddEntity(level, PrimedTNTCreate(level, x + 0.5, y + 0.5, z + 0.5f));
 }

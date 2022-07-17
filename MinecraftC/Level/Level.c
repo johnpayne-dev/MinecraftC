@@ -29,9 +29,9 @@ void LevelInitializeTransient(Level level) {
 	//LevelCalculateLightDepths(level, 0, 0, level->Width, level->Height);
 	//level->Random = RandomGeneratorCreate(0);
 	//level->RandomValue = (int)RandomGeneratorInteger(level->Random);
-	level->skyColor = ColorFromHex(0x99CCFFFF);
-	level->fogColor = ColorWhite;
-	level->cloudColor = ColorWhite;
+	level->skyColor = 0x99CCFFFF;
+	level->fogColor = 0xffffffff;
+	level->cloudColor = 0xffffffff;
 	LevelFindSpawn(level);
 }
 
@@ -52,14 +52,22 @@ void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks) {
 
 void LevelFindSpawn(Level level) {
 	int i = 0;
-	int3 v = { 0, 0, 0 };
+	int x, y, z;
 	do {
 		i++;
-		v.xz = (int2){ RandomIntegerRange(level->width / 4, level->width / 2), RandomIntegerRange(level->height / 4, level->height / 2) };
-		v.y = LevelGetHighestTile(level, v.x, v.z) + 1;
-		if (i == 10000) { level->spawn = (int3){ v.x, -100, v.z }; return; }
-	} while (v.y <= LevelGetWaterLevel(level));
-	level->spawn = v;
+		x = RandomIntegerRange(level->width / 4, level->width / 2);
+		z = RandomIntegerRange(level->height / 4, level->height / 2);
+		y = LevelGetHighestTile(level, x, z) + 1;
+		if (i == 10000) {
+			level->xSpawn = x;
+			level->ySpawn = -100;
+			level->zSpawn = z;
+			return;
+		}
+	} while (y <= LevelGetWaterLevel(level));
+	level->xSpawn = x;
+	level->ySpawn = y;
+	level->zSpawn = z;
 	return;
 }
 
@@ -73,7 +81,9 @@ void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1) {
 			if (blocker != k) {
 				int min = blocker < k ? blocker : k;
 				int max = blocker > k ? blocker : k;
-				for (int l = 0; l < ListCount(level->renderers); l++) { LevelRendererQueueChunks(level->renderers[l], (int3){ i, min, j } - 1, (int3){ i, max, j } + 1); }
+				for (int l = 0; l < ListCount(level->renderers); l++) {
+					LevelRendererQueueChunks(level->renderers[l], i - 1, min - 1, j - 1, i + 1, max + 1, j + 1);
+				}
 			}
 		}
 	}
@@ -97,29 +107,22 @@ bool LevelIsLightBlocker(Level level, int x, int y, int z) {
 
 list(AABB) LevelGetCubes(Level level, AABB box) {
 	list(AABB) list = ListCreate(sizeof(AABB));
-	int3 v0 = int3f(box.v0);
-	int3 v1 = int3f(box.v1) + 1;
-	if (box.v0.x < 0.0) { v0.x--; }
-	if (box.v0.y < 0.0) { v0.y--; }
-	if (box.v0.z < 0.0) { v0.z--; }
-	for (int i = v0.x; i < v1.x; i++)
-	{
-		for (int j = v0.y; j < v1.y; j++)
-		{
-			for (int k = v0.z; k < v1.z; k++)
-			{
+	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
+	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
+	if (box.x0 < 0.0) { x0--; }
+	if (box.y0 < 0.0) { y0--; }
+	if (box.z0 < 0.0) { z0--; }
+	for (int i = x0; i < x1; i++) {
+		for (int j = y0; j < y1; j++) {
+			for (int k = z0; k < z1; k++) {
 				AABB aabb = { 0 };
-				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height)
-				{
+				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height) {
 					Block block = Blocks.table[LevelGetTile(level, i, j, k)];
-					if (block != NULL)
-					{
+					if (block != NULL) {
 						aabb = BlockGetCollisionAABB(block, i, j, k);
 						if (!AABBIsNull(aabb) && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
 					}
-				}
-				else if (i < 0 || j < 0 || k < 0 || i >= level->width || k >= level->height)
-				{
+				} else if (i < 0 || j < 0 || k < 0 || i >= level->width || k >= level->height) {
 					AABB aabb = BlockGetCollisionAABB(Blocks.table[BlockTypeBedrock], i, j, k);
 					if (!AABBIsNull(aabb) && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
 				}
@@ -129,14 +132,14 @@ list(AABB) LevelGetCubes(Level level, AABB box) {
 	return list;
 }
 
-void LevelSwap(Level level, int3 a, int3 b) {
+void LevelSwap(Level level, int x0, int y0, int z0, int x1, int y1, int z1) {
 	if (!level->networkMode) {
-		BlockType t1 = LevelGetTile(level, a.x, a.y, a.z);
-		BlockType t2 = LevelGetTile(level, b.x, b.y, b.z);
-		LevelSetTileNoNeighborChange(level, a.x, a.y, a.z, t2);
-		LevelSetTileNoNeighborChange(level, b.x, b.y, b.z, t1);
-		LevelUpdateNeighborsAt(level, a.x, a.y, a.z, t2);
-		LevelUpdateNeighborsAt(level, b.x, b.y, b.z, t1);
+		BlockType t1 = LevelGetTile(level, x0, y0, z0);
+		BlockType t2 = LevelGetTile(level, x1, y1, z1);
+		LevelSetTileNoNeighborChange(level, x0, y0, z0, t2);
+		LevelSetTileNoNeighborChange(level, x1, y1, z1, t1);
+		LevelUpdateNeighborsAt(level, x0, y0, z0, t2);
+		LevelUpdateNeighborsAt(level, x1, y1, z1, t1);
 	}
 }
 
@@ -173,7 +176,7 @@ bool LevelNetSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType
 	if (tile != BlockTypeNone) { BlockOnAdded(Blocks.table[tile], level, x, y, z); }
 	LevelCalculateLightDepths(level, x, z, 1, 1);
 	for (int j = 0; j < ListCount(level->renderers); j++) {
-		LevelRendererQueueChunks(level->renderers[j], (int3){ x, y, z } - 1, (int3){ x, y, z } + 1);
+		LevelRendererQueueChunks(level->renderers[j], x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
 	}
 	return true;
 }
@@ -237,9 +240,9 @@ void LevelTick(Level level) {
 				nextTick.Ticks--;
 				level->tickList = ListPush(level->tickList, &nextTick);
 			} else {
-				BlockType tile = level->blocks[(nextTick.Position.y * level->height + nextTick.Position.z) * level->width + nextTick.Position.x];
-				if (LevelIsInBounds(level, nextTick.Position.x, nextTick.Position.y, nextTick.Position.z) && tile == nextTick.Tile && tile != BlockTypeNone) {
-					BlockUpdate(Blocks.table[tile], level, nextTick.Position.x, nextTick.Position.y, nextTick.Position.z, level->random);
+				BlockType tile = level->blocks[(nextTick.y * level->height + nextTick.z) * level->width + nextTick.x];
+				if (LevelIsInBounds(level, nextTick.x, nextTick.y, nextTick.z) && tile == nextTick.Tile && tile != BlockTypeNone) {
+					BlockUpdate(Blocks.table[tile], level, nextTick.x, nextTick.y, nextTick.z, level->random);
 				}
 			}
 		}
@@ -273,20 +276,20 @@ float LevelGetWaterLevel(Level level) {
 }
 
 bool LevelContainsAnyLiquid(Level level, AABB box) {
-	int3 v0 = int3f(box.v0);
-	int3 v1 = int3f(box.v1) + 1;
-	if (box.v0.x < 0.0) { v0.x--; }
-	if (box.v0.y < 0.0) { v0.y--; }
-	if (box.v0.z < 0.0) { v0.z--; }
-	if (v0.x < 0) { v0.x = 0; }
-	if (v0.y < 0) { v0.y = 0; }
-	if (v0.z < 0) { v0.z = 0; }
-	if (v1.x > level->width) { v1.x = level->width; }
-	if (v1.y > level->depth) { v1.y = level->depth; }
-	if (v1.z > level->height) { v1.z = level->height; }
-	for (int i = v0.x; i < v1.x; i++) {
-		for (int j = v0.y; j < v1.y; j++) {
-			for (int k = v0.z; k < v1.z; k++) {
+	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
+	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
+	if (box.x0 < 0.0) { x0--; }
+	if (box.y0 < 0.0) { y0--; }
+	if (box.z0 < 0.0) { z0--; }
+	if (x0 < 0) { x0 = 0; }
+	if (y0 < 0) { y0 = 0; }
+	if (z0 < 0) { z0 = 0; }
+	if (x1 > level->width) { x1 = level->width; }
+	if (y1 > level->depth) { y1 = level->depth; }
+	if (z1 > level->height) { z1 = level->height; }
+	for (int i = x0; i < x1; i++) {
+		for (int j = y0; j < y1; j++) {
+			for (int k = z0; k < z1; k++) {
 				Block block = Blocks.table[LevelGetTile(level, i, j, k)];
 				if (block != NULL && BlockGetLiquidType(block) != LiquidTypeNone) { return true; }
 			}
@@ -296,20 +299,20 @@ bool LevelContainsAnyLiquid(Level level, AABB box) {
 }
 
 bool LevelContainsLiquid(Level level, AABB box, LiquidType liquidID) {
-	int3 v0 = int3f(box.v0);
-	int3 v1 = int3f(box.v1) + 1;
-	if (box.v0.x < 0.0) { v0.x--; }
-	if (box.v0.y < 0.0) { v0.y--; }
-	if (box.v0.z < 0.0) { v0.z--; }
-	if (v0.x < 0) { v0.x = 0; }
-	if (v0.y < 0) { v0.y = 0; }
-	if (v0.z < 0) { v0.z = 0; }
-	if (v1.x > level->width) { v1.x = level->width; }
-	if (v1.y > level->depth) { v1.y = level->depth; }
-	if (v1.z > level->height) { v1.z = level->height; }
-	for (int i = v0.x; i < v1.x; i++) {
-		for (int j = v0.y; j < v1.y; j++) {
-			for (int k = v0.z; k < v1.z; k++) {
+	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
+	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
+	if (box.x0 < 0.0) { x0--; }
+	if (box.y0 < 0.0) { y0--; }
+	if (box.z0 < 0.0) { z0--; }
+	if (x0 < 0) { x0 = 0; }
+	if (y0 < 0) { y0 = 0; }
+	if (z0 < 0) { z0 = 0; }
+	if (x1 > level->width) { x1 = level->width; }
+	if (y1 > level->depth) { y1 = level->depth; }
+	if (z1 > level->height) { z1 = level->height; }
+	for (int i = x0; i < x1; i++) {
+		for (int j = y0; j < y1; j++) {
+			for (int k = z0; k < z1; k++) {
 				Block block = Blocks.table[LevelGetTile(level, i, j, k)];
 				if (block != NULL && BlockGetLiquidType(block) == liquidID) { return true; }
 			}
@@ -320,8 +323,7 @@ bool LevelContainsLiquid(Level level, AABB box, LiquidType liquidID) {
 
 void LevelAddToNextTick(Level level, int x, int y, int z, BlockType tile) {
 	if (level->networkMode) { return; }
-	
-	NextTickListEntry tick = { .Position = { x, y, z }, .Tile = tile };
+	NextTickListEntry tick = { .x = x, .y = y, .z = z, .Tile = tile };
 	if (tile != BlockTypeNone) { tick.Ticks = BlockGetTickDelay(Blocks.table[tile]); }
 	level->tickList = ListPush(level->tickList, &tick);
 }
@@ -331,15 +333,15 @@ static bool IsSolid(Level level, float x, float y, float z) {
 	return tile != BlockTypeNone && BlockIsSolid(Blocks.table[tile]);
 }
 
-bool LevelIsSolidSearch(Level level, float3 v, float r) {
-	if (IsSolid(level, v.x - r, v.y - r, v.z - r)) { return true; }
-	if (IsSolid(level, v.x + r, v.y - r, v.z - r)) { return true; }
-	if (IsSolid(level, v.x - r, v.y + r, v.z - r)) { return true; }
-	if (IsSolid(level, v.x + r, v.y + r, v.z - r)) { return true; }
-	if (IsSolid(level, v.x - r, v.y - r, v.z + r)) { return true; }
-	if (IsSolid(level, v.x + r, v.y - r, v.z + r)) { return true; }
-	if (IsSolid(level, v.x - r, v.y + r, v.z + r)) { return true; }
-	if (IsSolid(level, v.x + r, v.y + r, v.z + r)) { return true; }
+bool LevelIsSolidSearch(Level level, float x, float y, float z, float r) {
+	if (IsSolid(level, x - r, y - r, z - r)) { return true; }
+	if (IsSolid(level, x + r, y - r, z - r)) { return true; }
+	if (IsSolid(level, x - r, y + r, z - r)) { return true; }
+	if (IsSolid(level, x + r, y + r, z - r)) { return true; }
+	if (IsSolid(level, x - r, y - r, z + r)) { return true; }
+	if (IsSolid(level, x + r, y - r, z + r)) { return true; }
+	if (IsSolid(level, x - r, y + r, z + r)) { return true; }
+	if (IsSolid(level, x + r, y + r, z + r)) { return true; }
 	return false;
 }
 
@@ -350,7 +352,9 @@ int LevelGetHighestTile(Level level, int x, int z) {
 }
 
 void LevelSetSpawnPosition(Level level, int x, int y, int z, float rotation) {
-	level->spawn = (int3){ x, y, z };
+	level->xSpawn = x;
+	level->ySpawn = y;
+	level->zSpawn = z;
 	level->spawnRotation = rotation;
 }
 
@@ -358,68 +362,28 @@ float LevelGetBrightness(Level level, int x, int y, int z) {
 	return LevelIsLit(level, x, y, z) ? 1.0 : 0.6;
 }
 
-float LevelGetCaveness(Level level, float3 pos, float degrees) {
-	int3 v = int3f(pos);
+float LevelGetCaveness(Level level, float px, float py, float pz, float degrees) {
+	int vx = (int)px, vy = (int)py, vz = (int)pz;
 	float n = 0.0, m = 0.0;
-	for (int x = v.x - 6; x <= v.x + 6; x++) {
-		for (int z = v.z - 6; z <= v.z + 6; z++) {
-			if (LevelIsInBounds(level, x, v.y, z) && !LevelIsSolidTile(level, x, v.y, z)) {
-				float ax = x + 0.5 - pos.x;
-				float az = z + 0.5 - pos.z;
+	for (int x = vx - 6; x <= vx + 6; x++) {
+		for (int z = vz - 6; z <= vz + 6; z++) {
+			if (LevelIsInBounds(level, x, vy, z) && !LevelIsSolidTile(level, x, vy, z)) {
+				float ax = x + 0.5 - px;
+				float az = z + 0.5 - pz;
 				float a;
-				for (a = atan2(az, ax) - degrees * rad + pi / 2.0; a < -pi; a += 2.0 * pi);
-				while (a >= pi) { a -= 2.0 * pi; }
+				for (a = atan2(az, ax) - degrees * (M_PI / 180.0) + M_PI / 2.0; a < -M_PI; a += 2.0 * M_PI);
+				while (a >= M_PI) { a -= 2.0 * M_PI; }
 				if (a < 0.0) { a = -a; }
-				float l = 1.0 / length3f((float3){ ax, 2.0, az });
+				float l = 1.0 / sqrtf(ax * ax + 4.0 + az * az);
 				if (a > 1.0) { l = 0.0; }
 				if (l < 0.0) { l = 0.0; }
 				m += l;
-				if (LevelIsLit(level, x, v.y, z)) { n += l; }
+				if (LevelIsLit(level, x, vy, z)) { n += l; }
 			}
 		}
 	}
 	if (m == 0.0) { return 0.0; }
 	else { return n / m; }
-}
-
-float LevelGetCavenessEntity(Level level, Entity entity) {
-	float2 r1 = { tcos(-entity->rotation.y * deg + pi), tsin(-entity->rotation.y * deg + pi) };
-	float2 r2 = { tcos(-entity->rotation.x * deg), tsin(-entity->rotation.x * deg) };
-	float3 p = entity->position;
-	float f = 0.0, g = 0.0;
-	for (int i = 0; i <= 200; i++) {
-		float a = (i / 200.0 - 0.5) * 2.0;
-		int j = 0;
-		while (j <= 200) {
-			float b = (j / 200.0 - 0.5) * 1.6;
-			float c = r2.x * b + r2.y;
-			b = r2.x - r2.y * b;
-			float d = r1.x * a + r1.y * b;
-			d = r1.x * b - r1.y * a;
-			int k = 0;
-			while (true) {
-				if (k < 10) {
-					float3 q = p + (float3){ d, c, b } * 0.8 * k;
-					if (!IsSolid(level, q.x, q.y, q.z)) {
-						f++;
-						if (LevelIsLit(level, q.x, q.y, q.z)) { g++; }
-					}
-					k++;
-					continue;;
-				}
-				j++;
-				break;
-			}
-		}
-	}
-	
-	if (f == 0.0) { return 0.0; }
-	else {
-		float h = g / f / 0.1;
-		if (h > 1.0) { h = 1.0; }
-		h = 1.0 - h;
-		return 1.0 - h * h * h;
-	}
 }
 
 uint8_t * LevelCopyBlocks(Level level) {
@@ -442,51 +406,56 @@ void LevelSetNetworkMode(Level level, bool network) {
 	level->networkMode = network;
 }
 
-MovingObjectPosition LevelClip(Level level, float3 v0, float3 v1) {
+MovingObjectPosition LevelClip(Level level, Vector3D v0, Vector3D v1) {
 	if (v0.x == NAN || v0.y == NAN || v0.z == NAN) { return (MovingObjectPosition){ .null = true }; }
 	if (v1.x == NAN || v1.y == NAN || v1.z == NAN) { return (MovingObjectPosition){ .null = true }; }
-	int3 i0 = int3f(v0);
-	int3 i1 = int3f(v1);
+	int i0x = v0.x, i0y = v0.y, i0z = v0.z;
+	int i1x = v1.x, i1y = v1.y, i1z = v1.z;
 	
 	int i = 20;
 	while (i-- >= 0) {
 		if (v0.x == NAN || v0.y == NAN || v0.z == NAN) { return (MovingObjectPosition){ .null = true }; }
-		if (i0.x == i1.x && i0.y == i1.y && i0.z == i1.z) { return (MovingObjectPosition){ .null = true }; }
-		float3 a = one3f * 999.0;
-		if (i1.x > i0.x) { a.x = i0.x + 1.0; }
-		if (i1.x < i0.x) { a.x = i0.x; }
-		if (i1.y > i0.y) { a.y = i0.y + 1.0; }
-		if (i1.y < i0.y) { a.y = i0.y; }
-		if (i1.z > i0.z) { a.z = i0.z + 1.0; }
-		if (i1.z < i0.z) { a.z = i0.z; }
-		float3 b = one3f * 999.0;
-		float3 d = v1 - v0;
+		if (i0x == i1x && i0y == i1y && i0z == i1z) { return (MovingObjectPosition){ .null = true }; }
+		Vector3D a = { 999.0, 999.0, 999.0 };
+		if (i1x > i0x) { a.x = i0x + 1.0; }
+		if (i1x < i0x) { a.x = i0x; }
+		if (i1y > i0y) { a.y = i0y + 1.0; }
+		if (i1y < i0y) { a.y = i0y; }
+		if (i1z > i0z) { a.z = i0z + 1.0; }
+		if (i1z < i0z) { a.z = i0z; }
+		Vector3D b = { 999.0, 999.0, 999.0 };
+		Vector3D d = Vector3DSubtract(v1, v0);
 		if (a.x != 999.0) { b.x = (a.x - v0.x) / d.x; }
 		if (a.y != 999.0) { b.y = (a.y - v0.y) / d.y; }
 		if (a.z != 999.0) { b.z = (a.z - v0.z) / d.z; }
 		int c;
 		if (b.x < b.y && b.x < b.z) {
-			c = i1.x > i0.x ? 4 : 5;
+			c = i1x > i0x ? 4 : 5;
 			v0.x = a.x;
-			v0.yz += d.yz * b.x;
+			v0.y += d.y * b.x;
+			v0.z += d.z * b.x;
 		} else if (b.y < b.z) {
-			c = i1.y > i0.y ? 0 : 1;
+			c = i1y > i0y ? 0 : 1;
 			v0.y = a.y;
-			v0.xz += d.xz * b.y;
+			v0.x += d.x * b.y;
+			v0.z += d.z * b.y;
 		} else {
-			c = i1.z > i0.z ? 2 : 3;
+			c = i1z > i0z ? 2 : 3;
 			v0.z = a.z;
-			v0.xy += d.xy * b.z;
+			v0.x += d.x * b.z;
+			v0.y += d.y * b.z;
 		}
-		float3 v00 = (float3){ (int)v0.x, (int)v0.y, (int)v0.z };
-		i0 = int3f(v00);
-		if (c == 5) { i0.x--; v00.x++; }
-		if (c == 1) { i0.y--; v00.y++; }
-		if (c == 3) { i0.z--; v00.z++; }
-		BlockType tile = LevelGetTile(level, i0.x, i0.y, i0.z);
+		Vector3D v00 = { (int)v0.x, (int)v0.y, (int)v0.z };
+		i0x = v00.x;
+		i0y = v00.y;
+		i0z = v00.z;
+		if (c == 5) { i0x--; v00.x++; }
+		if (c == 1) { i0y--; v00.y++; }
+		if (c == 3) { i0z--; v00.z++; }
+		BlockType tile = LevelGetTile(level, i0x, i0y, i0z);
 		Block block = Blocks.table[tile];
 		if (tile != BlockTypeNone && BlockGetLiquidType(block) == LiquidTypeNone) {
-			MovingObjectPosition pos = BlockClip(block, i0.x, i0.y, i0.z, v0, v1);
+			MovingObjectPosition pos = BlockClip(block, i0x, i0y, i0z, v0, v1);
 			if (!pos.null) { return pos; }
 		}
 	}
@@ -496,7 +465,7 @@ MovingObjectPosition LevelClip(Level level, float3 v0, float3 v1) {
 void LevelPlaySound(Level level, const char * sound, Entity entity, float volume, float pitch) {
 }
 
-void LevelPlaySoundAt(Level level, const char * sound, float3 position, float volume, float pitch) {
+void LevelPlaySoundAt(Level level, const char * sound, float x, float y, float z, float volume, float pitch) {
 }
 
 bool LevelMaybeGrowTree(Level level, int x, int y, int z) {
@@ -553,16 +522,21 @@ void LevelRenderEntities(Level level, TextureManager textures, float dt) {
 	}
 }
 
-void LevelExplode(Level level, Entity entity, float3 pos, float radius) {
-	int3 v0 = int3f(pos - radius - 1.0);
-	int3 v1 = int3f(pos + radius + 1.0);
-	
-	for (int i = v0.x; i < v1.x; i++) {
-		for (int j = v1.y - 1; j >= v0.y; j--) {
-			for (int k = v0.z; k < v1.z; k++) {
-				float3 v = (float3){ i, j, k } + 0.5 - pos;
+void LevelExplode(Level level, Entity entity, float x, float y, float z, float radius) {
+	int x0 = x - radius - 1.0;
+	int y0 = y - radius - 1.0;
+	int z0 = z - radius - 1.0;
+	int x1 = x + radius + 1.0;
+	int y1 = y + radius + 1.0;
+	int z1 = z + radius + 1.0;
+	for (int i = x0; i < x1; i++) {
+		for (int j = y1 - 1; j >= y0; j--) {
+			for (int k = z0; k < z1; k++) {
+				float vx = i + 0.5 - x;
+				float vy = j + 0.5 - y;
+				float vz = k + 0.5 - z;
 				BlockType tile = LevelGetTile(level, i, j, k);
-				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height && length3f(v) < radius && tile > 0 && BlockCanExplode(Blocks.table[tile])) {
+				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height && vx * vx + vy * vy + vz * vz < radius * radius && tile > 0 && BlockCanExplode(Blocks.table[tile])) {
 					LevelSetTile(level, i, j, k, BlockTypeNone);
 					BlockExplode(Blocks.table[tile], level, i, j, k);
 				}

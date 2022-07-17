@@ -17,8 +17,10 @@ void GrassBlockUpdate(GrassBlock block, Level level, int x, int y, int z, Random
 			LevelSetTile(level, x, y, z, BlockTypeDirt);
 		} else {
 			for (int i = 0; i < 4; i++) {
-				int3 v = (int3){ x, y, z } + (int3){ (int)RandomGeneratorIntegerRange(random, 0, 2) - 1, (int)RandomGeneratorIntegerRange(random, 0, 4) - 3, (int)RandomGeneratorIntegerRange(random, 0, 2) - 1 };
-				if (LevelGetTile(level, v.x, v.y, v.z) == BlockTypeDirt && LevelIsLit(level, v.x, v.y, v.z)) { LevelSetTile(level, v.x, v.y, v.z, BlockTypeGrass); }
+				int vx = x + (int)RandomGeneratorIntegerRange(random, 0, 2) - 1;
+				int vy = y + (int)RandomGeneratorIntegerRange(random, 0, 4) - 3;
+				int vz = z + (int)RandomGeneratorIntegerRange(random, 0, 2) - 1;
+				if (LevelGetTile(level, vx, vy, vz) == BlockTypeDirt && LevelIsLit(level, vx, vy, vz)) { LevelSetTile(level, vx, vy, vz, BlockTypeGrass); }
 			}
 		}
 	}

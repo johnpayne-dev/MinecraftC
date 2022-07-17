@@ -51,8 +51,8 @@ int TextureManagerLoad(TextureManager manager, char * resource) {
 	uint8_t * pixels = malloc(4 * width * height);
 	if (manager->settings->anaglyph) {
 		for (int i = 0; i < 4 * width * height; i += 4) {
-			Color color = { (p[i + 0] * 30 + p[i + 1] * 59 + p[i + 2] * 11) / 100, (p[i + 0] * 30 + p[i + 1] * 70) / 100, (p[i + 0] * 30 + p[i + 2] * 70) / 100, p[i + 3] };
-			memcpy(pixels + i, &color, sizeof(Color));
+			uint8_t color[] = { (p[i + 0] * 30 + p[i + 1] * 59 + p[i + 2] * 11) / 100, (p[i + 0] * 30 + p[i + 1] * 70) / 100, (p[i + 0] * 30 + p[i + 2] * 70) / 100, p[i + 3] };
+			memcpy(pixels + i, color, sizeof(color));
 		}
 	} else { memcpy(pixels, p, 4 * width * height); }
 	
