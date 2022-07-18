@@ -1,33 +1,43 @@
 #pragma once
-#include <stdlib.h>
-#include "Memory.h"
 
-#define list(type) type*
+#include <stdint.h>
+#include <stdbool.h>
 
-list(void) ListCreate(unsigned int elementSize);
+#define List(type) type*
 
-unsigned int ListCount(list(void) list);
+List(void) ListCreate(uint32_t elementSize);
 
-unsigned int ListElementSize(list(void) list);
+uint32_t ListLength(List(void) list);
 
-unsigned int ListCapacity(list(void) list);
+uint32_t ListElementSize(List(void) list);
 
-list(void) ListInsert(list(void) list, void * value, int index);
+uint32_t ListCapacity(List(void) list);
 
-list(void) ListRemove(list(void) list, int index);
+List(void) ListInsert(List(void) list, void * value, int32_t index);
 
-list(void) ListPush(list(void) list, void * value);
+List(void) ListRemove(List(void) list, int32_t index);
 
-list(void) ListPop(list(void) list);
+List(void) ListPush(List(void) list, void * value);
 
-list(void) ListRemoveAll(list(void) list, void * value);
+List(void) ListPop(List(void) list);
 
-list(void) ListRemoveFirst(list(void) list, void * value);
+List(void) ListRemoveAll(List(void) list, void * value);
 
-list(void) ListRemoveLast(list(void) list, void * value);
+List(void) ListRemoveFirst(List(void) list, void * value);
 
-_Bool ListContains(list(void) list, void * value);
+List(void) ListRemoveLast(List(void) list, void * value);
 
-list(void) ListClear(list(void) list);
+void ListSet(List(void) list, int32_t index, void * value);
 
-void ListDestroy(list(void) list);
+void * ListGet(List(void) list, int32_t index);
+
+int32_t ListIndexOf(List(void) list, void * value);
+
+bool ListContains(List(void) list, void * value);
+
+List(void) ListClear(List(void) list);
+
+List(void) ListClone(List(void) list);
+
+void ListFree(List(void) list);
+

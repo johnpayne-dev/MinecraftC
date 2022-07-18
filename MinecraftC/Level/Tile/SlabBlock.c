@@ -3,7 +3,7 @@
 
 SlabBlock SlabBlockCreate(BlockType type, bool doubleSlab) {
 	Block block = BlockCreate(type, 6);
-	SlabBlockData slab = MemoryAllocate(sizeof(struct SlabBlockData));
+	SlabBlockData slab = malloc(sizeof(struct SlabBlockData));
 	block->typeData = slab;
 	*slab = (struct SlabBlockData){ .DoubleSlab = doubleSlab, };
 	if (!doubleSlab) { BlockSetBounds(block, 0, 0, 0, 1, 0.5, 1); }
@@ -43,5 +43,5 @@ bool SlabBlockCanRenderSide(SlabBlock block, struct Level * level, int x, int y,
 }
 
 void SlabBlockDestroy(SlabBlock block) {
-	MemoryFree(block->typeData);
+	free(block->typeData);
 }

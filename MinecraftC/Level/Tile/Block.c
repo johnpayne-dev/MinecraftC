@@ -81,7 +81,7 @@ void BlocksDeinitialize() {
 }
 
 Block BlockCreate(BlockType type, int textureID) {
-	Block block = MemoryAllocate(sizeof(struct Block));
+	Block block = malloc(sizeof(struct Block));
 	*block = (struct Block) {
 		.type = type,
 		.textureID = textureID,
@@ -399,5 +399,5 @@ int BlockGetRenderPass(Block block) {
 void BlockDestroy(Block block) {
 	if (IsLiquidBlock(block->type)) { LiquidBlockDestroy(block); }
 	if (IsSlabBlock(block->type)) { SlabBlockDestroy(block); }
-	MemoryFree(block);
+	free(block);
 }

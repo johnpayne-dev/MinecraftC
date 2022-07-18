@@ -6,7 +6,7 @@
 #include "../Particle/PrimedTNT.h"
 
 Level LevelCreate() {
-	Level level = MemoryAllocate(sizeof(struct Level));
+	Level level = malloc(sizeof(struct Level));
 	*level = (struct Level) {
 		.random = RandomGeneratorCreate(time(NULL)),
 		.tickList = ListCreate(sizeof(NextTickListEntry)),
@@ -36,9 +36,9 @@ void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks) {
 	level->width = w;
 	level->depth = d;
 	level->height = h;
-	level->blocks = MemoryAllocate(w * d * h);
+	level->blocks = malloc(w * d * h);
 	memcpy(level->blocks, blocks, w * d * h);
-	level->lightBlockers = MemoryAllocate(w * h * sizeof(int));
+	level->lightBlockers = malloc(w * h * sizeof(int));
 	for (int i = 0; i < w * h; i++) { level->lightBlockers[i] = level->depth - 1; }
 	LevelCalculateLightDepths(level, 0, 0, w, h);
 	if (level->renderer != NULL) { LevelRendererRefresh(level->renderer); }
@@ -93,8 +93,8 @@ bool LevelIsLightBlocker(Level level, int x, int y, int z) {
 	return block == NULL ? false : BlockIsOpaque(block);
 }
 
-list(AABB) LevelGetCubes(Level level, AABB box) {
-	list(AABB) list = ListCreate(sizeof(AABB));
+List(AABB) LevelGetCubes(Level level, AABB box) {
+	List(AABB) list = ListCreate(sizeof(AABB));
 	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
 	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
 	if (box.x0 < 0.0) { x0--; }
@@ -197,7 +197,7 @@ bool LevelIsSolidTile(Level level, int x, int y, int z) {
 }
 
 void LevelTickEntities(Level level) {
-	for (int i = 0; i < ListCount(level->entities); i++) {
+	for (int i = 0; i < ListLength(level->entities); i++) {
 		EntityTick(level->entities[i]);
 		if (level->entities[i]->removed) { level->entities = ListRemove(level->entities, i--); }
 	}
@@ -212,7 +212,7 @@ void LevelTick(Level level) {
 	while (1 << b < level->height) { b++; }
 	
 	if (level->tickCount % 5 == 0) {
-		for (int i = 0; i < ListCount(level->tickList); i++) {
+		for (int i = 0; i < ListLength(level->tickList); i++) {
 			NextTickListEntry nextTick = level->tickList[0];
 			level->tickList = ListRemove(level->tickList, 0);
 			if (nextTick.Ticks > 0) {
@@ -456,7 +456,7 @@ void LevelAddEntity(Level level, Entity entity) {
 }
 
 void LevelRenderEntities(Level level, TextureManager textures, float dt) {
-	for (int i = 0; i < ListCount(level->entities); i++) {
+	for (int i = 0; i < ListLength(level->entities); i++) {
 		EntityRender(level->entities[i], textures, dt);
 	}
 }
@@ -489,10 +489,10 @@ Entity LevelFindPlayer(Level level) {
 }
 
 void LevelDestroy(Level level) {
-	ListDestroy(level->entities);
+	ListFree(level->entities);
 	RandomGeneratorDestroy(level->random);
-	ListDestroy(level->tickList);
-	if (level->lightBlockers != NULL) { MemoryFree(level->lightBlockers); }
-	if (level->blocks != NULL) { MemoryFree(level->blocks); }
-	MemoryFree(level);
+	ListFree(level->tickList);
+	if (level->lightBlockers != NULL) { free(level->lightBlockers); }
+	if (level->blocks != NULL) { free(level->blocks); }
+	free(level);
 }

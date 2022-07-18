@@ -1,7 +1,7 @@
 #include "LevelIO.h"
 
 LevelIO LevelIOCreate(ProgressBarDisplay progress) {
-	LevelIO levelIO = MemoryAllocate(sizeof(struct LevelIO));
+	LevelIO levelIO = malloc(sizeof(struct LevelIO));
 	*levelIO = (struct LevelIO){ .progressBar = progress, };
 	return levelIO;
 }
@@ -17,5 +17,5 @@ Level LevelIOLoad(LevelIO levelIO, SDL_RWops * input) {
 }
 
 void LevelIODestroy(LevelIO levelIO) {
-	MemoryFree(levelIO);
+	free(levelIO);
 }

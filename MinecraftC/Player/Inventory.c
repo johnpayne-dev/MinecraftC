@@ -2,7 +2,7 @@
 #include "../SessionData.h"
 
 Inventory InventoryCreate() {
-	Inventory inventory = MemoryAllocate(sizeof(struct Inventory));
+	Inventory inventory = malloc(sizeof(struct Inventory));
 	*inventory = (struct Inventory) {
 		.selected = 0,
 	};
@@ -51,5 +51,5 @@ void InventoryReplaceSlotWithBlock(Inventory inventory, Block block) {
 }
 
 void InventoryDestroy(Inventory inventory) {
-	MemoryFree(inventory);
+	free(inventory);
 }

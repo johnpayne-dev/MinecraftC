@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 typedef struct HUDScreen {
-	list(ChatLine) chat;
+	List(ChatLine) chat;
 	RandomGenerator random;
 	struct Minecraft * minecraft;
 	int width, height;

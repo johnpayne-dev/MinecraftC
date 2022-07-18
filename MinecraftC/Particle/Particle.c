@@ -12,7 +12,7 @@ Particle ParticleCreate(Level level, float x, float y, float z, float xd, float 
 	entity->heightOffset = entity->aabbHeight / 2.0;
 	EntitySetPosition(entity, x, y, z);
 	entity->makeStepSound = false;
-	ParticleData this = MemoryAllocate(sizeof(struct ParticleData));
+	ParticleData this = malloc(sizeof(struct ParticleData));
 	*this = (struct ParticleData) {
 		.r = 1.0,
 		.g = 1.0,
@@ -83,5 +83,5 @@ int ParticleGetParticleTexture(Particle particle) {
 
 void ParticleDestroy(Particle particle) {
 	ParticleData this = particle->typeData;
-	MemoryFree(this);
+	free(this);
 }

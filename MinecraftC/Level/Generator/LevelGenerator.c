@@ -7,11 +7,11 @@
 #include "../../Utilities/SinTable.h"
 
 LevelGenerator LevelGeneratorCreate(ProgressBarDisplay progressBar) {
-	LevelGenerator generator = MemoryAllocate(sizeof(struct LevelGenerator));
+	LevelGenerator generator = malloc(sizeof(struct LevelGenerator));
 	*generator = (struct LevelGenerator) {
 		.progressBar = progressBar,
 		.random = RandomGeneratorCreate(time(NULL)),
-		.floodData = MemoryAllocate(1024 * 1024 * sizeof(int)),
+		.floodData = malloc(1024 * 1024 * sizeof(int)),
 	};
 	return generator;
 }
@@ -58,7 +58,7 @@ static void PopulateOre(LevelGenerator generator, BlockType ore, int a1, int a2,
 }
 
 static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, BlockType tile) {
-	list(int *) floodStack = ListCreate(sizeof(int *));
+	List(int *) floodStack = ListCreate(sizeof(int *));
 	
 	int xx = 1, zz = 1;
 	for (xx = 1; 1 << zz < generator->width; zz++);
@@ -72,10 +72,10 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 	while (i > 0) {
 		i--;
 		int f = generator->floodData[i];
-		if (i == 0 && ListCount(floodStack) > 0) {
-			MemoryFree(generator->floodData);
-			generator->floodData = floodStack[ListCount(floodStack) - 1];
-			floodStack = ListRemove(floodStack, ListCount(floodStack) - 1);
+		if (i == 0 && ListLength(floodStack) > 0) {
+			free(generator->floodData);
+			generator->floodData = floodStack[ListLength(floodStack) - 1];
+			floodStack = ListRemove(floodStack, ListLength(floodStack) - 1);
 		}
 		int v1 = f >> zz & d;
 		int v2 = f >> (zz + xx);
@@ -95,7 +95,7 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 				if (b4 && !b1) {
 					if (i == 1024 * 1024) {
 						floodStack = ListPush(floodStack, &generator->floodData);
-						generator->floodData = MemoryAllocate(1024 * 1024 * sizeof(int));
+						generator->floodData = malloc(1024 * 1024 * sizeof(int));
 						i = 0;
 					}
 					generator->floodData[i++] = f - generator->width;
@@ -107,7 +107,7 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 				if (b4 && !b2) {
 					if (i == 1024 * 1024) {
 						floodStack = ListPush(floodStack, &generator->floodData);
-						generator->floodData = MemoryAllocate(1024 * 1024 * sizeof(int));
+						generator->floodData = malloc(1024 * 1024 * sizeof(int));
 						i = 0;
 					}
 					generator->floodData[i++] = f + generator->width;
@@ -121,7 +121,7 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 				if (b4 && !b3) {
 					if (i == 1024 * 1024) {
 						floodStack = ListPush(floodStack, &generator->floodData);
-						generator->floodData = MemoryAllocate(1024 * 1024 * sizeof(int));
+						generator->floodData = malloc(1024 * 1024 * sizeof(int));
 						i = 0;
 					}
 					generator->floodData[i++] = f - ii;
@@ -131,8 +131,8 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 			f++;
 		}
 	}
-	for (int i = 0; i < ListCount(floodStack); i++) { MemoryFree(floodStack[i]); }
-	ListDestroy(floodStack);
+	for (int i = 0; i < ListLength(floodStack); i++) { free(floodStack[i]); }
+	ListFree(floodStack);
 	return j;
 }
 
@@ -142,7 +142,7 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	generator->depth = depth;
 	generator->height = 64;
 	generator->waterLevel = 32;
-	generator->blocks = MemoryAllocate(width * depth << 6);
+	generator->blocks = malloc(width * depth << 6);
 	int w = generator->width;
 	int h = generator->height;
 	int d = generator->depth;
@@ -151,7 +151,7 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	CombinedNoise n1 = CombinedNoiseCreate(OctaveNoiseCreate(generator->random, 8), OctaveNoiseCreate(generator->random, 8));
 	CombinedNoise n2 = CombinedNoiseCreate(OctaveNoiseCreate(generator->random, 8), OctaveNoiseCreate(generator->random, 8));
 	OctaveNoise n3 = OctaveNoiseCreate(generator->random, 6);
-	int * heights = MemoryAllocate(w * d * sizeof(int));
+	int * heights = malloc(w * d * sizeof(int));
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
@@ -389,13 +389,13 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 			}
 		}
 	}
-	MemoryFree(generator->blocks);
-	MemoryFree(heights);
+	free(generator->blocks);
+	free(heights);
 	return level;
 }
 
 void LevelGeneratorDestroy(LevelGenerator generator) {
 	RandomGeneratorDestroy(generator->random);
-	MemoryFree(generator->floodData);
-	MemoryFree(generator);
+	free(generator->floodData);
+	free(generator);
 }

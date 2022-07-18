@@ -8,7 +8,7 @@
 #include "../../Resources/Default.h"
 
 FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManager textures) {
-	FontRenderer font = MemoryAllocate(sizeof(struct FontRenderer));
+	FontRenderer font = malloc(sizeof(struct FontRenderer));
 	font->settings = settings;
 	font->textureName = name;
 	
@@ -48,7 +48,7 @@ static void Render(FontRenderer font, char * str, int x, int y, uint32_t color, 
 			if (str[i] == 38 && strlen(str) > i + 1) {
 				String hex = StringCreate("0123456789abcdef");
 				int index = StringIndexOf(hex, str[i + 1]);
-				StringDestroy(hex);
+				StringFree(hex);
 				if (index < 0) { index = 15; }
 				uint8_t v = (index & 0x08) << 3;
 				uint8_t r = ((index & 0x04) >> 2) * 191 + v;
@@ -108,11 +108,11 @@ String FontRendererStripColor(char * str) {
 	String string = StringCreate(str);
 	for (int i = 0; i < strlen(str); i++) {
 		if (str[i] == 38) { i++; }
-		else { string = StringConcat(string, (char[]){ str[i], '\0' }); }
+		else { StringConcat(&string, (char[]){ str[i], '\0' }); }
 	}
 	return string;
 }
 
 void FontRendererDestroy(FontRenderer font) {
-	MemoryFree(font);
+	free(font);
 }

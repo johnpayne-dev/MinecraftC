@@ -5,10 +5,10 @@
 #include "../Utilities/OpenGL.h"
 
 LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures) {
-	LevelRenderer renderer = MemoryAllocate(sizeof(struct LevelRenderer));
+	LevelRenderer renderer = malloc(sizeof(struct LevelRenderer));
 	*renderer = (struct LevelRenderer) {
 		.chunks = ListCreate(sizeof(Chunk)),
-		.chunkDataCache = MemoryAllocate(65536 * sizeof(int)),
+		.chunkDataCache = malloc(65536 * sizeof(int)),
 		.ticks = 0,
 		.lastLoadX = -9999.0,
 		.lastLoadY = -9999.0,
@@ -23,16 +23,16 @@ LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures) 
 void LevelRendererRefresh(LevelRenderer renderer) {
 	if (renderer->chunkCache != NULL) {
 		for (int i = 0; i < renderer->chunkCacheCount; i++) { ChunkDispose(renderer->chunkCache[i]); }
-		MemoryFree(renderer->chunkCache);
-		MemoryFree(renderer->loadQueue);
+		free(renderer->chunkCache);
+		free(renderer->loadQueue);
 	}
 	
 	renderer->xChunks = renderer->level->width / 16;
 	renderer->yChunks = renderer->level->depth / 16;
 	renderer->zChunks = renderer->level->height / 16;
 	renderer->chunkCacheCount = renderer->xChunks * renderer->yChunks * renderer->zChunks;
-	renderer->chunkCache = MemoryAllocate(renderer->chunkCacheCount * sizeof(Chunk));
-	renderer->loadQueue = MemoryAllocate(renderer->chunkCacheCount * sizeof(Chunk));
+	renderer->chunkCache = malloc(renderer->chunkCacheCount * sizeof(Chunk));
+	renderer->loadQueue = malloc(renderer->chunkCacheCount * sizeof(Chunk));
 	
 	int l = 0;
 	for (int i = 0; i < renderer->xChunks; i++) {
@@ -46,7 +46,7 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 		}
 	}
 	
-	for (int i = 0; i < ListCount(renderer->chunks); i++) { renderer->chunks[i]->loaded = false; }
+	for (int i = 0; i < ListLength(renderer->chunks); i++) { renderer->chunks[i]->loaded = false; }
 	renderer->chunks = ListClear(renderer->chunks);
 	
 	glNewList(renderer->listID, GL_COMPILE);
@@ -168,12 +168,12 @@ void LevelRendererQueueChunks(LevelRenderer renderer, int x0, int y0, int z0, in
 void LevelRendererDestroy(LevelRenderer renderer) {
 	glDeleteLists(renderer->baseListID, 4096 << 6 << 1);
 	glDeleteLists(renderer->listID, 2);
-	ListDestroy(renderer->chunks);
-	MemoryFree(renderer->chunkDataCache);
+	ListFree(renderer->chunks);
+	free(renderer->chunkDataCache);
 	if (renderer->chunkCache != NULL) {
 		for (int i = 0; i < renderer->chunkCacheCount; i++) { ChunkDestroy(renderer->chunkCache[i]); }
-		MemoryFree(renderer->chunkCache);
+		free(renderer->chunkCache);
 	}
-	if (renderer->loadQueue != NULL) { MemoryFree(renderer->loadQueue); }
-	MemoryFree(renderer);
+	if (renderer->loadQueue != NULL) { free(renderer->loadQueue); }
+	free(renderer);
 }

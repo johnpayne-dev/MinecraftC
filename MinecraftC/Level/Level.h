@@ -18,7 +18,7 @@ typedef struct Level {
 	int * lightBlockers;
 	RandomGenerator random;
 	int randomValue;
-	list(NextTickListEntry) tickList;
+	List(NextTickListEntry) tickList;
 	int waterLevel;
 	uint32_t skyColor;
 	uint32_t fogColor;
@@ -26,7 +26,7 @@ typedef struct Level {
 	int unprocessed;
 	int tickCount;
 	Entity player;
-	list(Entity) entities;
+	List(Entity) entities;
 	ParticleManager particleEngine;
 } * Level;
 
@@ -37,7 +37,7 @@ void LevelFindSpawn(Level level);
 void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1);
 void LevelSetRenderer(Level level, struct LevelRenderer * listener);
 bool LevelIsLightBlocker(Level level, int x, int y, int z);
-list(AABB) LevelGetCubes(Level level, AABB box);
+List(AABB) LevelGetCubes(Level level, AABB box);
 void LevelSwap(Level level, int x0, int y0, int z0, int x1, int y1, int z1);
 bool LevelSetTile(Level level, int x, int y, int z, BlockType tile);
 bool LevelNetSetTile(Level level, int x, int y, int z, BlockType tile);

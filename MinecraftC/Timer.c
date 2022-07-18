@@ -1,9 +1,9 @@
 #include "Timer.h"
-#include "Utilities/Memory.h"
 #include "Utilities/Time.h"
+#include <stdlib.h>
 
 Timer TimerCreate(float ticksPerSecond) {
-	Timer timer = MemoryAllocate(sizeof(struct Timer));
+	Timer timer = malloc(sizeof(struct Timer));
 	*timer = (struct Timer) {
 		.speed = 1.0,
 		.elapsedDelta = 0.0,
@@ -16,5 +16,5 @@ Timer TimerCreate(float ticksPerSecond) {
 }
 
 void TimerDestroy(Timer timer) {
-	MemoryFree(timer);
+	free(timer);
 }

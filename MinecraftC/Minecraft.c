@@ -15,7 +15,7 @@
 #include "Particle/PrimedTNT.h"
 
 Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fullScreen) {
-	Minecraft minecraft = MemoryAllocate(sizeof(struct Minecraft));
+	Minecraft minecraft = malloc(sizeof(struct Minecraft));
 	*minecraft = (struct Minecraft){ 0 };
 	minecraft->timer = TimerCreate(20.0);
 	minecraft->progressBar = ProgressBarDisplayCreate(minecraft);
@@ -137,7 +137,7 @@ static void OnMouseClicked(Minecraft minecraft, int button) {
 	}
 }
 
-static void Tick(Minecraft minecraft, list(SDL_Event) events) {
+static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 	/*if (this.soundPlayer != null)
 	{
 		SoundPlayer var1 = this.soundPlayer;
@@ -147,10 +147,10 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events) {
 	
 	HUDScreen hud = minecraft->hud;
 	hud->ticks++;
-	for (int i = 0; i < ListCount(hud->chat); i++) { hud->chat[i]->time++; }
+	for (int i = 0; i < ListLength(hud->chat); i++) { hud->chat[i]->time++; }
 	
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Terrain.png"));
-	for (int i = 0; i < ListCount(minecraft->textureManager->animations); i++) {
+	for (int i = 0; i < ListLength(minecraft->textureManager->animations); i++) {
 		AnimatedTexture texture = minecraft->textureManager->animations[i];
 		texture->anaglyph = minecraft->settings->anaglyph;
 		AnimatedTextureAnimate(texture);
@@ -160,7 +160,7 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events) {
 	
 	PlayerData player = minecraft->player->typeData;
 	if (minecraft->currentScreen == NULL || minecraft->currentScreen->grabsMouse) {
-		for (int i = 0; i < ListCount(events); i++) {
+		for (int i = 0; i < ListLength(events); i++) {
 			if (events[i].type == SDL_MOUSEWHEEL) { InventorySwapPaint(player->inventory, events[i].wheel.y); }
 			if (minecraft->currentScreen == NULL) {
 				if (!minecraft->hasMouse && events[i].type == SDL_MOUSEBUTTONDOWN) { MinecraftGrabMouse(minecraft); }
@@ -187,7 +187,7 @@ static void Tick(Minecraft minecraft, list(SDL_Event) events) {
 			} else { GUIScreenMouseEvent(minecraft->currentScreen, events[i]); }
 		}
 		
-		for (int i = 0; i < ListCount(events); i++) {
+		for (int i = 0; i < ListLength(events); i++) {
 			if (events[i].type == SDL_KEYDOWN || events[i].type == SDL_KEYUP) { PlayerSetKey(minecraft->player, events[i].key.keysym.scancode, events[i].type == SDL_KEYDOWN); }
 			if (events[i].type == SDL_KEYDOWN) {
 				if (minecraft->currentScreen != NULL) { GUIScreenKeyboardEvent(minecraft->currentScreen, events[i]); }
@@ -360,7 +360,7 @@ void MinecraftRun(Minecraft minecraft) {
 	
 	int frame = 0;
 	uint64_t start = TimeMilli();
-	list(SDL_Event) events = ListCreate(sizeof(SDL_Event));
+	List(SDL_Event) events = ListCreate(sizeof(SDL_Event));
 	while (minecraft->running) {
 		if (minecraft->timer->elapsedTicks > 0) { events = ListClear(events); };
 		SDL_Event event;
@@ -464,7 +464,7 @@ void MinecraftRun(Minecraft minecraft) {
 			minecraft->selected = LevelClip(minecraft->level, v, v2);
 			renderer->entity = NULL;
 			float a = 0.0;
-			for (int i = 0; i < ListCount(minecraft->level->entities); i++) {
+			for (int i = 0; i < ListLength(minecraft->level->entities); i++) {
 				Entity entity = minecraft->level->entities[i];
 				float dist = sqrtf((entity->x - minecraft->level->player->x) * (entity->x - minecraft->level->player->x) + (entity->y - minecraft->level->player->y) * (entity->y - minecraft->level->player->y) + (entity->z - minecraft->level->player->z) * (entity->z - minecraft->level->player->z));
 				if (EntityIsPickable(entity) && dist < reach) {
@@ -551,9 +551,9 @@ void MinecraftRun(Minecraft minecraft) {
 				Frustum frustum = FrustumUpdate();
 				LevelRenderer lrenderer = minecraft->levelRenderer;
 				for (int j = 0; j < lrenderer->chunkCacheCount; j++) { ChunkClip(lrenderer->chunkCache[j], frustum); }
-				qsort(lrenderer->chunks, ListCount(lrenderer->chunks), sizeof(Chunk), ChunkVisibleDistanceComparator);
+				qsort(lrenderer->chunks, ListLength(lrenderer->chunks), sizeof(Chunk), ChunkVisibleDistanceComparator);
 				
-				int limit = ListCount(lrenderer->chunks);
+				int limit = ListLength(lrenderer->chunks);
 				if (limit > 10) { limit = 10; }
 				for (int j = 0; j < limit; j++) {
 					Chunk chunk = lrenderer->chunks[0];
@@ -602,13 +602,13 @@ void MinecraftRun(Minecraft minecraft) {
 				float cs = c * tsin(player->xRot * M_PI / 180.0);
 				float c2 = tcos(player->xRot * M_PI / 180.0);
 				for (int j = 0; j < 2; j++) {
-					if (ListCount(particles->particles[j]) != 0) {
+					if (ListLength(particles->particles[j]) != 0) {
 						int tex = 0;
 						if (j == 0) { tex = TextureManagerLoad(minecraft->textureManager, "Particles.png"); }
 						if (j == 1) { tex = TextureManagerLoad(minecraft->textureManager, "Terrain.png"); }
 						glBindTexture(GL_TEXTURE_2D, tex);
 						ShapeRendererBegin();
-						for (int k = 0; k < ListCount(particles->particles[j]); k++) {
+						for (int k = 0; k < ListLength(particles->particles[j]); k++) {
 							ParticleRender(particles->particles[j][k], dt, c, c2, s, ss, cs);
 						}
 						ShapeRendererEnd();
@@ -846,9 +846,12 @@ void MinecraftRun(Minecraft minecraft) {
 		frame++;
 		
 		while (TimeMilli() >= start + 1000) {
-			String chunks = StringConcat(StringCreateFromInt(ChunkUpdates), " chunk updates");
-			minecraft->debug = StringConcat(StringConcat(StringSetFromInt(minecraft->debug, frame), " fps, "), chunks);
-			StringDestroy(chunks);
+			String chunks = StringCreateFromInt(ChunkUpdates);
+			StringConcat(&chunks, " chunk updates");
+			StringSetFromInt(&minecraft->debug, frame);
+			StringConcat(&minecraft->debug, " fps, ");
+			StringConcat(&minecraft->debug, chunks);
+			StringFree(chunks);
 			start += 1000;
 			frame = 0;
 			ChunkUpdates = 0;
@@ -920,7 +923,7 @@ void MinecraftSetLevel(Minecraft minecraft, Level level) {
 	if (minecraft->particleManager != NULL) {
 		if (level != NULL) { level->particleEngine = minecraft->particleManager; }
 		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < ListCount(minecraft->particleManager->particles[i]); j++) { ParticleDestroy(minecraft->particleManager->particles[i][j]); }
+			for (int j = 0; j < ListLength(minecraft->particleManager->particles[i]); j++) { ParticleDestroy(minecraft->particleManager->particles[i][j]); }
 			minecraft->particleManager->particles[i] = ListClear(minecraft->particleManager->particles[i]);
 		}
 	}
@@ -931,8 +934,8 @@ void MinecraftDestroy(Minecraft minecraft) {
 	ProgressBarDisplayDestroy(minecraft->progressBar);
 	RendererDestroy(minecraft->renderer);
 	LevelIODestroy(minecraft->levelIO);
-	StringDestroy(minecraft->debug);
-	MemoryFree(minecraft);
+	StringFree(minecraft->debug);
+	free(minecraft);
 }
 
 int main(int argc, char * argv[]) {

@@ -4,7 +4,7 @@
 WaterTexture WaterTextureCreate() {
 	WaterTexture texture = AnimatedTextureCreate(Blocks.table[BlockTypeWater]->textureID);
 	texture->type = AnimatedTextureTypeWater;
-	texture->typeData = MemoryAllocate(sizeof(struct WaterTextureData));
+	texture->typeData = malloc(sizeof(struct WaterTextureData));
 	*(WaterTextureData)texture->typeData = (struct WaterTextureData){ 0 };
 	return texture;
 }
@@ -61,5 +61,5 @@ void WaterTextureAnimate(WaterTexture texture) {
 
 void WaterTextureDestroy(WaterTexture texture) {
 	WaterTextureData this = texture->typeData;
-	MemoryFree(this);
+	free(this);
 }

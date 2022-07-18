@@ -2,7 +2,7 @@
 #include "Particle.h"
 
 typedef struct ParticleManager {
-	list(Particle) particles[2];
+	List(Particle) particles[2];
 	TextureManager textures;
 } * ParticleManager;
 

@@ -2,7 +2,7 @@
 #include "../Level/Level.h"
 
 ParticleManager ParticleMangerCreate(Level level, TextureManager textures) {
-	ParticleManager manager = MemoryAllocate(sizeof(struct ParticleManager));
+	ParticleManager manager = malloc(sizeof(struct ParticleManager));
 	*manager = (struct ParticleManager) {
 		.textures = textures,
 	};
@@ -18,7 +18,7 @@ void ParticleManagerSpawnParticle(ParticleManager manager, Particle particle) {
 
 void ParticleManagerTick(ParticleManager manager) {
 	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < ListCount(manager->particles[i]); j++) {
+		for (int j = 0; j < ListLength(manager->particles[i]); j++) {
 			ParticleTick(manager->particles[i][j]);
 			if (manager->particles[i][j]->removed) {
 				ParticleDestroy(manager->particles[i][j]);
@@ -29,6 +29,6 @@ void ParticleManagerTick(ParticleManager manager) {
 }
 
 void ParticleManagerDestroy(ParticleManager manager) {
-	for (int i = 0; i < 2; i++) { ListDestroy(manager->particles[i]); }
-	MemoryFree(manager);
+	for (int i = 0; i < 2; i++) { ListFree(manager->particles[i]); }
+	free(manager);
 }

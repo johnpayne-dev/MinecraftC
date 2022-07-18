@@ -7,7 +7,7 @@
 LoadLevelScreen LoadLevelScreenCreate(GUIScreen parent) {
 	GUIScreen screen = GUIScreenCreate();
 	screen->type = GUIScreenTypeLoadLevel;
-	screen->typeData = MemoryAllocate(sizeof(struct LoadLevelScreenData));
+	screen->typeData = malloc(sizeof(struct LoadLevelScreenData));
 	LoadLevelScreenData this = screen->typeData;
 	this->parent = parent;
 	this->title = "Load level";
@@ -29,7 +29,7 @@ void LoadLevelScreenSetLevels(LoadLevelScreen screen, char * levels[5]) {
 	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenSetLevels(screen, levels); return; }
 	for (int i = 0; i < 5; i++) {
 		screen->buttons[i]->active = !(strcmp(levels[i], "-") == 0);
-		screen->buttons[i]->text = StringSet(screen->buttons[i]->text, levels[i]);
+		StringSet(&screen->buttons[i]->text, levels[i]);
 		screen->buttons[i]->visible = true;
 	}
 }
@@ -119,5 +119,5 @@ void LoadLevelScreenRender(LoadLevelScreen screen, int mx, int my) {
 
 void LoadLevelScreenDestroy(LoadLevelScreen screen) {
 	LoadLevelScreenData this = screen->typeData;
-	MemoryFree(this);
+	free(this);
 }

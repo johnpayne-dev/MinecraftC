@@ -7,7 +7,7 @@ LiquidBlock LiquidBlockCreate(BlockType blockType, LiquidType liquidType) {
 	Blocks.liquid[blockType] = true;
 	BlockSetBounds(block, 0.01, -0.1 + 0.01, 0.01, 1.01, 0.9 + 0.01, 1.0 + 0.01);
 	BlockSetPhysics(block, true);
-	LiquidBlockData liquid = MemoryAllocate(sizeof(struct LiquidBlockData));
+	LiquidBlockData liquid = malloc(sizeof(struct LiquidBlockData));
 	*liquid = (struct LiquidBlockData) {
 		.type = liquidType,
 		.movingID = blockType,
@@ -142,5 +142,5 @@ int LiquidBlockGetRenderPass(LiquidBlock block) {
 }
 
 void LiquidBlockDestroy(LiquidBlock block) {
-	MemoryFree(block->typeData);
+	free(block->typeData);
 }

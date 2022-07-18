@@ -2,7 +2,6 @@
 #include "TextureManager.h"
 #include "../Utilities/Log.h"
 #include "../Utilities/OpenGL.h"
-
 #include "../../Resources/GUI/GUI.h"
 #include "../../Resources/GUI/Icons.h"
 #include "../../Resources/Clouds.h"
@@ -13,13 +12,14 @@
 #include "../../Resources/Rock.h"
 #include "../../Resources/Terrain.h"
 #include "../../Resources/Water.h"
+#include <stdlib.h>
 
 TextureManager TextureManagerCreate(GameSettings settings) {
-	TextureManager manager = MemoryAllocate(sizeof(struct TextureManager));
+	TextureManager manager = malloc(sizeof(struct TextureManager));
 	*manager = (struct TextureManager) {
 		.settings = settings,
 		.animations = ListCreate(sizeof(AnimatedTexture)),
-		.textureBuffer = MemoryAllocate(512 * 512),
+		.textureBuffer = malloc(512 * 512),
 		.textures = ListCreate(sizeof(unsigned int)),
 		.textureNames = ListCreate(sizeof(char *)),
 	};
@@ -29,7 +29,7 @@ TextureManager TextureManagerCreate(GameSettings settings) {
 int TextureManagerLoad(TextureManager manager, char * resource) {
 	bool loaded = false;
 	int index = -1;
-	for (int i = 0; i < ListCount(manager->textureNames); i++) {
+	for (int i = 0; i < ListLength(manager->textureNames); i++) {
 		if (strcmp(manager->textureNames[i], resource) == 0) { loaded = true; index = i; }
 	}
 	if (loaded) { return manager->textures[index]; }
@@ -69,7 +69,7 @@ int TextureManagerLoad(TextureManager manager, char * resource) {
 }
 
 void TextureManagerReload(TextureManager manager) {
-	for (int i = 0; i < ListCount(manager->textures); i++) { glDeleteTextures(1, &manager->textures[i]); }
+	for (int i = 0; i < ListLength(manager->textures); i++) { glDeleteTextures(1, &manager->textures[i]); }
 	manager->textures = ListClear(manager->textures);
 	manager->textureNames = ListClear(manager->textureNames);
 }
@@ -80,10 +80,10 @@ void TextureManagerRegisterAnimation(TextureManager manager, AnimatedTexture tex
 }
 
 void TextureManagerDestroy(TextureManager manager) {
-	ListDestroy(manager->textures);
-	ListDestroy(manager->textureNames);
-	ListDestroy(manager->animations);
-	MemoryFree(manager->textureBuffer);
-	MemoryFree(manager);
+	ListFree(manager->textures);
+	ListFree(manager->textureNames);
+	ListFree(manager->animations);
+	free(manager->textureBuffer);
+	free(manager);
 }
 

@@ -9,7 +9,7 @@ typedef struct SessionData {
 	bool hasPaid;
 } * SessionData;
 
-extern list(Block) SessionDataAllowedBlocks;
+extern List(Block) SessionDataAllowedBlocks;
 void SessionDataInitialize(void);
 void SessionDataDeinitialize(void);
 

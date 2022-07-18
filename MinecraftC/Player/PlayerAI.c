@@ -1,8 +1,9 @@
 #include "PlayerAI.h"
 #include "Player.h"
+#include <stdlib.h>
 
 PlayerAI PlayerAICreate(Player parent) {
-	PlayerAI ai = MemoryAllocate(sizeof(struct PlayerAI));
+	PlayerAI ai = malloc(sizeof(struct PlayerAI));
 	*ai = (struct PlayerAI) {
 		.random = RandomGeneratorCreate(TimeNano()),
 		.jumping = false,
@@ -41,6 +42,6 @@ void PlayerAIJumpFromGround(PlayerAI ai) {
 
 void PlayerAIDestroy(PlayerAI ai) {
 	RandomGeneratorDestroy(ai->random);
-	MemoryFree(ai);
+	free(ai);
 }
 

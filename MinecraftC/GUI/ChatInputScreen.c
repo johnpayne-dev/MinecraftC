@@ -6,7 +6,7 @@
 ChatInputScreen ChatInputScreenCreate() {
 	GUIScreen screen = GUIScreenCreate();
 	screen->type = GUIScreenTypeChatInput;
-	screen->typeData = MemoryAllocate(sizeof(struct ChatInputScreenData));
+	screen->typeData = malloc(sizeof(struct ChatInputScreenData));
 	ChatInputScreenData this = screen->typeData;
 	*this = (struct ChatInputScreenData) {
 		.message = StringCreate(""),
@@ -30,9 +30,11 @@ void ChatInputScreenTick(ChatInputScreen screen)
 void ChatInputScreenRender(ChatInputScreen screen, int mx, int my) {
 	ChatInputScreenData this = screen->typeData;
 	ScreenDrawBox(2, screen->height - 14, screen->width - 2, screen->height - 2, 0x00000080);
-	String msg = StringConcat(StringConcatFront("> ", StringCreate(this->message)), this->counter / 6 % 2 == 0 ? "_" : "");
+	String msg = StringCreate(this->message);
+	StringConcatFront("> ", &msg);
+	StringConcat(&msg, this->counter / 6 % 2 == 0 ? "_" : "");
 	ScreenDrawString(screen->font, msg, 4, screen->height - 12, 0xE0E0E0FF);
-	StringDestroy(msg);
+	StringFree(msg);
 }
 
 void ChatInputScreenOnKeyPressed(ChatInputScreen screen, char eventChar, int eventKey) {
@@ -51,17 +53,17 @@ void ChatInputScreenOnKeyPressed(ChatInputScreen screen, char eventChar, int eve
 		    && StringLength(this->message) > 0) { this->message = StringSub(this->message, 0, StringLength(this->message) - 1); }
 		String allowedChars = StringCreate("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\\\"#%/()=+?[]{}<>@|$;");
 		if (StringIndexOf(allowedChars, eventChar) >= 0 && StringLength(this->message) < 64 - (2)) {
-			this->message = StringConcat(this->message, (char[]){ eventChar, '\0' });
+			StringConcat(&this->message, (char[]){ eventChar, '\0' });
 		}
-		StringDestroy(allowedChars);
+		StringFree(allowedChars);
 	}
 }
 
 void ChatInputScreenOnMouseClicked(ChatInputScreen screen, int x, int y, int button) {
 	ChatInputScreenData this = screen->typeData;
 	if (button == SDL_BUTTON_LEFT && screen->minecraft->hud->hoveredPlayer != NULL) {
-		if (StringLength(this->message) > 0 && this->message[StringLength(this->message) - 1] != ' ') { this->message = StringConcat(this->message, " "); }
-		this->message = StringConcat(this->message, (char *)screen->minecraft->hud->hoveredPlayer);
+		if (StringLength(this->message) > 0 && this->message[StringLength(this->message) - 1] != ' ') { StringConcat(&this->message, " "); }
+		StringConcat(&this->message, (char *)screen->minecraft->hud->hoveredPlayer);
 		int len = 64 - (StringLength(screen->minecraft->session->userName) + 2);
 		if (StringLength(this->message) > len) { this->message = StringSub(this->message, 0, len); }
 	}
@@ -69,6 +71,6 @@ void ChatInputScreenOnMouseClicked(ChatInputScreen screen, int x, int y, int but
 
 void ChatInputScreenDestroy(ChatInputScreen screen) {
 	ChatInputScreenData this = screen->typeData;
-	StringDestroy(this->message);
-	MemoryFree(this);
+	StringFree(this->message);
+	free(this);
 }

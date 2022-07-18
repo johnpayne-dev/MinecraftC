@@ -1,14 +1,14 @@
 #include "OctaveNoise.h"
-#include "../../../Utilities/Memory.h"
+#include <stdlib.h>
 
 OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount) {
 	Noise noise = NoiseCreate();
 	noise->type = NoiseTypeOctave;
-	noise->typeData = MemoryAllocate(sizeof(struct OctaveNoiseData));
+	noise->typeData = malloc(sizeof(struct OctaveNoiseData));
 	OctaveNoiseData this = noise->typeData;
 	*this = (struct OctaveNoiseData) {
 		.octaveCount = octaveCount,
-		.octaves = MemoryAllocate(octaveCount * sizeof(PerlinNoise)),
+		.octaves = malloc(octaveCount * sizeof(PerlinNoise)),
 	};
 	for (int i = 0; i < octaveCount; i++) { this->octaves[i] = PerlinNoiseCreate(random); }
 	return noise;
@@ -28,6 +28,6 @@ float OctaveNoiseCompute(OctaveNoise noise, float x, float y) {
 void OctaveNoiseDestroy(OctaveNoise noise) {
 	OctaveNoiseData this = noise->typeData;
 	for (int i = 0; i < this->octaveCount; i++) { NoiseDestroy(this->octaves[i]); }
-	MemoryFree(this->octaves);
-	MemoryFree(this);
+	free(this->octaves);
+	free(this);
 }

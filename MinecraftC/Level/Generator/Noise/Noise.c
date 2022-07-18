@@ -2,10 +2,10 @@
 #include "OctaveNoise.h"
 #include "CombinedNoise.h"
 #include "PerlinNoise.h"
-#include "../../../Utilities/Memory.h"
+#include <stdlib.h>
 
 Noise NoiseCreate() {
-	Noise noise = MemoryAllocate(sizeof(struct Noise));
+	Noise noise = malloc(sizeof(struct Noise));
 	*noise = (struct Noise){ 0 };
 	return noise;
 }
@@ -21,5 +21,5 @@ void NoiseDestroy(Noise noise) {
 	if (noise->type == NoiseTypeOctave) { OctaveNoiseDestroy(noise); }
 	if (noise->type == NoiseTypePerlin) { PerlinNoiseDestroy(noise); }
 	if (noise->type == NoiseTypeCombined) { CombinedNoiseDestroy(noise); }
-	MemoryFree(noise);
+	free(noise);
 }

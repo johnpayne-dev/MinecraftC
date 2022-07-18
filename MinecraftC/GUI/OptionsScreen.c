@@ -6,7 +6,7 @@
 OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings) {
 	GUIScreen screen = GUIScreenCreate();
 	screen->type = GUIScreenTypeOptions;
-	screen->typeData = MemoryAllocate(sizeof(struct OptionsScreenData));
+	screen->typeData = malloc(sizeof(struct OptionsScreenData));
 	OptionsScreenData this = screen->typeData;
 	this->parent = parent;
 	this->settings = settings;
@@ -16,7 +16,7 @@ OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings) {
 
 void OptionsScreenOnOpen(OptionsScreen screen) {
 	OptionsScreenData this = screen->typeData;
-	for (int i = 0; i < ListCount(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
 	screen->buttons = ListClear(screen->buttons);
 	for (int i = 0; i < this->settings->settingsCount; i++) {
 		screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreateSize(i, screen->width / 2 - 155 + i % 2 * 160, screen->height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, GameSettingsGetSetting(this->settings, i)) });
@@ -31,7 +31,7 @@ void OptionsScreenOnButtonClicked(OptionsScreen screen, Button button) {
 	if (button->active) {
 		if (button->id < 100) {
 			GameSettingsToggleSetting(this->settings, button->id, 1);
-			button->text = StringSet(button->text, GameSettingsGetSetting(this->settings, button->id));
+			StringSet(&button->text, GameSettingsGetSetting(this->settings, button->id));
 		}
 		if (button->id == 100) { MinecraftSetCurrentScreen(screen->minecraft, ControlsScreenCreate(screen, this->settings)); }
 		if (button->id == 200) {
@@ -48,5 +48,5 @@ void OptionsScreenRender(OptionsScreen screen, int mx, int my) {
 
 void OptionsScreenDestroy(OptionsScreen screen) {
 	OptionsScreenData this = screen->typeData;
-	MemoryFree(this);
+	free(this);
 }

@@ -7,7 +7,7 @@
 #include "../Utilities/OpenGL.h"
 
 HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height) {
-	HUDScreen hud = MemoryAllocate(sizeof(struct HUDScreen));
+	HUDScreen hud = malloc(sizeof(struct HUDScreen));
 	*hud = (struct HUDScreen) {
 		.chat = ListCreate(sizeof(ChatLine)),
 		.random = RandomGeneratorCreate(time(NULL)),
@@ -62,7 +62,7 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 		maxLines = 20;
 		chatScreen = true;
 	}
-	for (int i = 0; i < ListCount(hud->chat) && i < maxLines; i++) {
+	for (int i = 0; i < ListLength(hud->chat) && i < maxLines; i++) {
 		if (hud->chat[i]->time < 200 || chatScreen) { FontRendererRender(hud->minecraft->font, hud->chat[i]->message, 2, hud->height - 28 - i * 9, 0xffffffff); }
 	}
 	
@@ -104,12 +104,12 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 
 void HUDScreenAddChat(HUDScreen screen, char * message) {
 	screen->chat = ListPush(screen->chat, &(ChatLine){ ChatLineCreate(message) });
-	while (ListCount(screen->chat) > 50) { screen->chat = ListRemove(screen->chat, 0); }
+	while (ListLength(screen->chat) > 50) { screen->chat = ListRemove(screen->chat, 0); }
 }
 
 void HUDScreenDestroy(HUDScreen hud) {
-	for (int i = 0; i < ListCount(hud->chat); i++) { ChatLineDestroy(hud->chat[i]); }
-	ListDestroy(hud->chat);
+	for (int i = 0; i < ListLength(hud->chat); i++) { ChatLineDestroy(hud->chat[i]); }
+	ListFree(hud->chat);
 	RandomGeneratorDestroy(hud->random);
-	MemoryFree(hud);
+	free(hud);
 }

@@ -6,7 +6,7 @@
 #include "Render/ShapeRenderer.h"
 
 ProgressBarDisplay ProgressBarDisplayCreate(Minecraft minecraft) {
-	ProgressBarDisplay display = MemoryAllocate(sizeof(struct ProgressBarDisplay));
+	ProgressBarDisplay display = malloc(sizeof(struct ProgressBarDisplay));
 	*display = (struct ProgressBarDisplay) {
 		.text = "",
 		.minecraft = minecraft,
@@ -83,5 +83,5 @@ void ProgressBarDisplaySetProgress(ProgressBarDisplay display, int progress) {
 }
 
 void ProgressBarDisplayDestroy(ProgressBarDisplay display) {
-	MemoryFree(display);
+	free(display);
 }

@@ -8,7 +8,7 @@ Player PlayerCreate(Level level) {
 	entity->footSize = 0.5;
 	entity->heightOffset = 1.62;
 	EntitySetPosition(entity, entity->x, entity->y, entity->z);
-	PlayerData player = MemoryAllocate(sizeof(struct PlayerData));
+	PlayerData player = malloc(sizeof(struct PlayerData));
 	*player = (struct PlayerData) {
 		.bodyRotation = 0.0,
 		.oldBodyRotation = 0.0,
@@ -134,5 +134,5 @@ void PlayerSetKey(Player player, int key, bool state) {
 void PlayerDestroy(Player player) {
 	PlayerData this = player->typeData;
 	InventoryDestroy(this->inventory);
-	MemoryFree(this);
+	free(this);
 }

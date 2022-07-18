@@ -6,7 +6,7 @@
 int ChunkUpdates = 0;
 
 Chunk ChunkCreate(Level level, int x, int y, int z, int chunkSize, int baseListID) {
-	Chunk chunk = MemoryAllocate(sizeof(struct Chunk));
+	Chunk chunk = malloc(sizeof(struct Chunk));
 	*chunk = (struct Chunk) {
 		.visible = false,
 		.level = level,
@@ -84,7 +84,7 @@ void ChunkClip(Chunk chunk, Frustum frustum) {
 }
 
 void ChunkDestroy(Chunk chunk) {
-	MemoryFree(chunk);
+	free(chunk);
 }
 
 int ChunkDistanceComparator(const void * a, const void * b) {

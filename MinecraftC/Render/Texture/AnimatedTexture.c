@@ -1,10 +1,10 @@
 #include "AnimatedTexture.h"
 #include "LavaTexture.h"
 #include "WaterTexture.h"
-#include "../../Utilities/Memory.h"
+#include <stdlib.h>
 
 AnimatedTexture AnimatedTextureCreate(int textureID) {
-	AnimatedTexture texture = MemoryAllocate(sizeof(struct AnimatedTexture));
+	AnimatedTexture texture = malloc(sizeof(struct AnimatedTexture));
 	*texture = (struct AnimatedTexture) {
 		.textureID = textureID,
 	};
@@ -19,5 +19,5 @@ void AnimatedTextureAnimate(AnimatedTexture texture) {
 void AnimatedTextureDestroy(AnimatedTexture texture) {
 	if (texture->type == AnimatedTextureTypeLava) { LavaTextureDestroy(texture); }
 	if (texture->type == AnimatedTextureTypeWater) { WaterTextureDestroy(texture); }
-	MemoryFree(texture);
+	free(texture);
 }

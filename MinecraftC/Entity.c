@@ -5,7 +5,7 @@
 #include "Particle/PrimedTNT.h"
 
 Entity EntityCreate(Level level) {
-	Entity entity = MemoryAllocate(sizeof(struct Entity));
+	Entity entity = malloc(sizeof(struct Entity));
 	*entity = (struct Entity) {
 		.onGround = false,
 		.horizontalCollision = false,
@@ -37,12 +37,12 @@ void EntityResetPosition(Entity entity) {
 		
 		for (float z = entity->level->zSpawn + 0.5; z > 0.0; z++) {
 			EntitySetPosition(entity, spawnX, spawnY, z);
-			list(AABB) cubes = LevelGetCubes(entity->level, entity->aabb);
-			if (ListCount(cubes) == 0) {
-				ListDestroy(cubes);
+			List(AABB) cubes = LevelGetCubes(entity->level, entity->aabb);
+			if (ListLength(cubes) == 0) {
+				ListFree(cubes);
 				break;
 			}
-			ListDestroy(cubes);
+			ListFree(cubes);
 		}
 		
 		entity->xd = 0.0;
@@ -97,9 +97,9 @@ void EntityTick(Entity entity) {
 
 bool EntityIsFree(Entity entity, float ax, float ay, float az) {
 	AABB aabb = AABBMove(entity->aabb, ax, ay, az);
-	list(AABB) cubes = LevelGetCubes(entity->level, aabb);
-	bool free = ListCount(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
-	ListDestroy(cubes);
+	List(AABB) cubes = LevelGetCubes(entity->level, aabb);
+	bool free = ListLength(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
+	ListFree(cubes);
 	return free;
 }
 
@@ -116,9 +116,9 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 		float oy = ay;
 		float oz = az;
 		AABB oldAABB = entity->aabb;
-		list(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, ax, ay, az));
+		List(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, ax, ay, az));
 		
-		for (int i = 0; i < ListCount(cubes); i++) {
+		for (int i = 0; i < ListLength(cubes); i++) {
 			AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
 			ay = AABBClipYCollide(aabb, entity->aabb, ay);
 		}
@@ -128,7 +128,7 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 			ay = 0.0;
 			az = 0.0;
 		}
-		for (int i = 0; i < ListCount(cubes); i++) {
+		for (int i = 0; i < ListLength(cubes); i++) {
 			AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
 			ax = AABBClipXCollide(aabb, entity->aabb, ax);
 		}
@@ -138,7 +138,7 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 			ay = 0.0;
 			az = 0.0;
 		}
-		for (int i = 0; i < ListCount(cubes); i++) {
+		for (int i = 0; i < ListLength(cubes); i++) {
 			AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
 			az = AABBClipZCollide(aabb, entity->aabb, az);
 		}
@@ -149,7 +149,7 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 			az = 0.0;
 		}
 		bool onGround = entity->onGround || (oy != ay && oy < 0.0);
-		ListDestroy(cubes);
+		ListFree(cubes);
 		
 		if (entity->footSize > 0.0 && onGround && entity->ySlideOffset < 0.05 && (ox != ax || oz != az)) {
 			float bx = ax;
@@ -160,9 +160,9 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 			az = oz;
 			AABB tempAABB = entity->aabb;
 			entity->aabb = oldAABB;
-			list(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, ox, ay, oz));
+			List(AABB) cubes = LevelGetCubes(entity->level, AABBExpand(entity->aabb, ox, ay, oz));
 			
-			for (int i = 0; i < ListCount(cubes); i++) {
+			for (int i = 0; i < ListLength(cubes); i++) {
 				AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
 				ay = AABBClipYCollide(aabb, entity->aabb, ay);
 			}
@@ -172,7 +172,7 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 				ay = 0.0;
 				az = 0.0;
 			}
-			for (int i = 0; i < ListCount(cubes); i++) {
+			for (int i = 0; i < ListLength(cubes); i++) {
 				AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
 				ax = AABBClipXCollide(aabb, entity->aabb, ax);
 			}
@@ -182,7 +182,7 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 				ay = 0.0;
 				az = 0.0;
 			}
-			for (int i = 0; i < ListCount(cubes); i++) {
+			for (int i = 0; i < ListLength(cubes); i++) {
 				AABB aabb = { .x0 = cubes[i].x0, .y0 = cubes[i].y0, .z0 = cubes[i].z0, .x1 = cubes[i].x1, .y1 = cubes[i].y1, .z1 = cubes[i].z1 };
 				az = AABBClipZCollide(aabb, entity->aabb, az);
 			}
@@ -192,7 +192,7 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 				ay = 0.0;
 				az = 0.0;
 			}
-			ListDestroy(cubes);
+			ListFree(cubes);
 			
 			if (bx * bx + bz * bz >= ax * ax + az * az) {
 				ax = bx;
@@ -282,5 +282,5 @@ void EntityRender(Entity entity, TextureManager textures, float t) {
 void EntityDestroy(Entity entity) {
 	if (entity->type == EntityTypePlayer) { PlayerDestroy(entity); }
 	if (entity->type == EntityTypeParticle) { ParticleDestroy(entity); }
-	MemoryFree(entity);
+	free(entity);
 }

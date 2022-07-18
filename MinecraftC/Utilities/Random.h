@@ -1,8 +1,7 @@
 #pragma once
 #include "Time.h"
 
-typedef struct RandomGenerator
-{
+typedef struct RandomGenerator {
 	uint64_t seed;
 	uint64_t state;
 	double lastNormal;

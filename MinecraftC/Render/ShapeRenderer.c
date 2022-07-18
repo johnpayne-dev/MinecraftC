@@ -1,13 +1,13 @@
 #include "ShapeRenderer.h"
-#include "../Utilities/Memory.h"
 #include "../Utilities/Log.h"
 #include "../Utilities/OpenGL.h"
+#include <stdlib.h>
 
 struct ShapeRenderer ShapeRenderer = { 0 };
 static int MaxFloats = 524288;
 
 void ShapeRendererInitialize() {
-	ShapeRenderer.buffer = MemoryAllocate(MaxFloats * sizeof(float));
+	ShapeRenderer.buffer = malloc(MaxFloats * sizeof(float));
 	ShapeRenderer.vertices = 0;
 	ShapeRenderer.hasColor = false;
 	ShapeRenderer.hasTexture = false;
@@ -102,5 +102,5 @@ void ShapeRendererNormal(float nx, float ny, float nz) {
 }
 
 void ShapeRendererDeinitialize() {
-	MemoryFree(ShapeRenderer.buffer);
+	free(ShapeRenderer.buffer);
 }

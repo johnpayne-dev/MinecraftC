@@ -6,7 +6,7 @@ typedef struct LevelRenderer {
 	Level level;
 	TextureManager textures;
 	int listID;
-	list(Chunk) chunks;
+	List(Chunk) chunks;
 	Chunk * loadQueue;
 	Chunk * chunkCache;
 	int chunkCacheCount;

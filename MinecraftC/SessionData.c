@@ -1,6 +1,6 @@
 #include "SessionData.h"
 
-list(Block) SessionDataAllowedBlocks = NULL;
+List(Block) SessionDataAllowedBlocks = NULL;
 
 void SessionDataInitialize() {
 	SessionDataAllowedBlocks = ListCreate(sizeof(Block));
@@ -49,11 +49,11 @@ void SessionDataInitialize() {
 }
 
 void SessionDataDeinitialize() {
-	ListDestroy(SessionDataAllowedBlocks);
+	ListFree(SessionDataAllowedBlocks);
 }
 
 SessionData SessionDataCreate(char * userName, char * sessionID) {
-	SessionData session = MemoryAllocate(sizeof(struct SessionData));
+	SessionData session = malloc(sizeof(struct SessionData));
 	*session = (struct SessionData) {
 		.userName = StringCreate(userName),
 		.sessionID = sessionID,
@@ -62,6 +62,6 @@ SessionData SessionDataCreate(char * userName, char * sessionID) {
 }
 
 void SessionDataDestroy(SessionData session) {
-	StringDestroy(session->userName);
-	MemoryFree(session);
+	StringFree(session->userName);
+	free(session);
 }

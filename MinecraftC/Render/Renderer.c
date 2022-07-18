@@ -4,7 +4,7 @@
 #include "../Utilities/OpenGL.h"
 
 Renderer RendererCreate(Minecraft minecraft) {
-	Renderer renderer = MemoryAllocate(sizeof(struct Renderer));
+	Renderer renderer = malloc(sizeof(struct Renderer));
 	*renderer = (struct Renderer) {
 		.minecraft = minecraft,
 		.fogColorMultiplier = 1.0,
@@ -100,5 +100,5 @@ void RendererUpdateFog(Renderer renderer) {
 
 void RendererDestroy(Renderer renderer) {
 	RandomGeneratorDestroy(renderer->random);
-	MemoryFree(renderer);
+	free(renderer);
 }

@@ -6,19 +6,19 @@
 LevelNameScreen LevelNameScreenCreate(GUIScreen parent, char * name, int id) {
 	GUIScreen screen = GUIScreenCreate();
 	screen->type = GUIScreenTypeLevelName;
-	screen->typeData = MemoryAllocate(sizeof(struct LevelNameScreenData));
+	screen->typeData = malloc(sizeof(struct LevelNameScreenData));
 	LevelNameScreenData this = screen->typeData;
 	this->title = "Enter level name:";
 	this->counter = 0;
 	this->parent = parent;
 	this->name = StringCreate(name);
-	if (strcmp(name, "-") == 0) { this->name = StringSet(this->name, ""); }
+	if (strcmp(name, "-") == 0) { StringSet(&this->name, ""); }
 	return screen;
 }
 
 void LevelNameScreenOnOpen(LevelNameScreen screen) {
 	LevelNameScreenData this = screen->typeData;
-	for (int i = 0; i < ListCount(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
 	screen->buttons = ListClear(screen->buttons);
 	//Keyboard.enableRepeatEvents(true);
 	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(0, screen->width / 2 - 100, screen->height / 4 + 120, "Save") });
@@ -43,9 +43,10 @@ void LevelNameScreenRender(LevelNameScreen screen, int mx, int my) {
 	int y = screen->height / 2 - 10;
 	ScreenDrawBox(x - 1, y - 1, x + 201, y + 21, 0xA0A0A0FF);
 	ScreenDrawBox(x, y, x + 200, y + 20, 0x000000ff);
-	String string = StringConcat(StringCreate(this->name), this->counter / 6 % 2 == 0 ? "_" : "");
+	String string = StringCreate(this->name);
+	StringConcat(&string, this->counter / 6 % 2 == 0 ? "_" : "");
 	ScreenDrawString(screen->font, string, x + 4, y + 6, 0xE0E0E0FF);
-	StringDestroy(string);
+	StringFree(string);
 }
 
 void LevelNameScreenOnKeyPressed(LevelNameScreen screen, char eventChar, int eventKey) {
@@ -54,7 +55,7 @@ void LevelNameScreenOnKeyPressed(LevelNameScreen screen, char eventChar, int eve
 	
 	String allowedChars = StringCreate("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\"#%/()=+?[]{}<>");
 	if (StringIndexOf(allowedChars, eventChar) >= 0 && StringLength(this->name) < 64) {
-		this->name = StringConcat(this->name, (char[]){ eventChar, '\0' });
+		StringConcat(&this->name, (char[]){ eventChar, '\0' });
 	}
 	
 	screen->buttons[0]->active = StringLength(this->name) > 0;
@@ -76,5 +77,5 @@ void LevelNameScreenOnButtonClicked(LevelNameScreen screen, Button button) {
 
 void LevelNameScreenDestroy(LevelNameScreen screen) {
 	LevelNameScreenData this = screen->typeData;
-	MemoryFree(this);
+	free(this);
 }

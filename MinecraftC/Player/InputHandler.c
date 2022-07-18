@@ -1,7 +1,7 @@
 #include "InputHandler.h"
 
 InputHandler InputHandlerCreate(GameSettings settings) {
-	InputHandler input = MemoryAllocate(sizeof(struct InputHandler));
+	InputHandler input = malloc(sizeof(struct InputHandler));
 	*input = (struct InputHandler) {
 		.settings = settings,
 	};
@@ -31,5 +31,5 @@ void InputHandlerUpdateMovement(InputHandler input) {
 }
 
 void InputHandlerDestroy(InputHandler input) {
-	MemoryFree(input);
+	free(input);
 }

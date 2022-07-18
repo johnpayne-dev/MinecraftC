@@ -7,7 +7,7 @@
 PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z) {
 	Entity entity = EntityCreate(level);
 	entity->type = EntityTypePrimedTNT;
-	entity->typeData = MemoryAllocate(sizeof(struct PrimedTNTData));
+	entity->typeData = malloc(sizeof(struct PrimedTNTData));
 	EntitySetSize(entity, 0.98, 0.98);
 	entity->heightOffset = entity->aabbHeight / 2.0;
 	EntitySetPosition(entity, x, y, z);
@@ -100,5 +100,5 @@ void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float dt) {
 }
 
 void PrimedTNTDestroy(PrimedTNT tnt) {
-	MemoryFree(tnt->typeData);
+	free(tnt->typeData);
 }

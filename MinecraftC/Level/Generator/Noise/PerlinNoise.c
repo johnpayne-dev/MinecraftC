@@ -1,11 +1,11 @@
 #include "PerlinNoise.h"
-#include "../../../Utilities/Memory.h"
 #include <math.h>
+#include <stdlib.h>
 
 PerlinNoise PerlinNoiseCreate(RandomGenerator random) {
 	Noise noise = NoiseCreate();
 	noise->type = NoiseTypePerlin;
-	noise->typeData = MemoryAllocate(sizeof(struct PerlinNoiseData));
+	noise->typeData = malloc(sizeof(struct PerlinNoiseData));
 	PerlinNoiseData this = noise->typeData;
 	for (int i = 0; i < 256; i++) { this->hash[i] = i; }
 	for (int i = 0; i < 256; i++) {
@@ -60,5 +60,5 @@ float PerlinNoiseCompute(PerlinNoise noise, float x, float y) {
 
 void PerlinNoiseDestroy(PerlinNoise noise) {
 	PerlinNoiseData this = noise->typeData;
-	MemoryFree(this);
+	free(this);
 }

@@ -4,7 +4,7 @@
 ErrorScreen ErrorScreenCreate(char * title, char * text) {
 	GUIScreen screen = GUIScreenCreate();
 	screen->type = GUIScreenTypeError;
-	screen->typeData = MemoryAllocate(sizeof(struct ErrorScreenData));
+	screen->typeData = malloc(sizeof(struct ErrorScreenData));
 	ErrorScreenData this = screen->typeData;
 	this->title = title;
 	this->text = text;
@@ -26,5 +26,5 @@ void ErrorScreenOnKeyPressed(ErrorScreen screen, char eventChar, int eventKey) {
 
 void ErrorScreenDestroy(ErrorScreen screen) {
 	ErrorScreenData this = screen->typeData;
-	MemoryFree(this);
+	free(this);
 }

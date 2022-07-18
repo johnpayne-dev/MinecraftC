@@ -14,7 +14,7 @@
 #include "../Utilities/OpenGL.h"
 
 GUIScreen GUIScreenCreate() {
-	GUIScreen screen = MemoryAllocate(sizeof(struct GUIScreen));
+	GUIScreen screen = malloc(sizeof(struct GUIScreen));
 	*screen = (struct GUIScreen) {
 		.buttons = ListCreate(sizeof(Button)),
 		.grabsMouse = false,
@@ -34,7 +34,7 @@ void GUIScreenRender(GUIScreen screen, int mx, int my) {
 	if (screen->type == GUIScreenTypePause) { PauseScreenRender(screen, mx, my); }
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenRender(screen, mx, my); return; }
 	
-	for (int i = 0; i < ListCount(screen->buttons); i++) {
+	for (int i = 0; i < ListLength(screen->buttons); i++) {
 		Button button = screen->buttons[i];
 		if (button->visible) {
 			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(screen->minecraft->textureManager, "GUI/GUI.png"));
@@ -72,7 +72,7 @@ void GUIScreenOnMouseClicked(GUIScreen screen, int x, int y, int button) {
 	if (screen->type == GUIScreenTypeBlockSelect) { BlockSelectScreenOnMouseClicked(screen, x, y, button); return; }
 	if (screen->type == GUIScreenTypeChatInput) { ChatInputScreenOnMouseClicked(screen, x, y, button); return; }
 	if (button == SDL_BUTTON_LEFT) {
-		for (int i = 0; i < ListCount(screen->buttons); i++) {
+		for (int i = 0; i < ListLength(screen->buttons); i++) {
 			Button button = screen->buttons[i];
 			if (button->active && x >= button->x && y >= button->y && x < button->x + button->width && y < button->y + button->height) {
 				GUIScreenOnButtonClicked(screen, button);
@@ -111,8 +111,8 @@ void GUIScreenOnOpen(GUIScreen screen) {
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnOpen(screen); return; }
 }
 
-void GUIScreenDoInput(GUIScreen screen, list(SDL_Event) events) {
-	for (int i = 0; i < ListCount(events); i++)
+void GUIScreenDoInput(GUIScreen screen, List(SDL_Event) events) {
+	for (int i = 0; i < ListLength(events); i++)
 	{
 		GUIScreenMouseEvent(screen, events[i]);
 		GUIScreenKeyboardEvent(screen, events[i]);
@@ -155,7 +155,7 @@ void GUIScreenDestroy(GUIScreen screen) {
 	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenDestroy(screen); }
 	if (screen->type == GUIScreenTypeOptions) { OptionsScreenDestroy(screen); }
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenDestroy(screen); }
-	for (int i = 0; i < ListCount(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
-	ListDestroy(screen->buttons);
-	MemoryFree(screen);
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
+	ListFree(screen->buttons);
+	free(screen);
 }

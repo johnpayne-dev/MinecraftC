@@ -13,7 +13,7 @@ PauseScreen PauseScreenCreate() {
 }
 
 void PauseScreenOnOpen(PauseScreen screen) {
-	for (int i = 0; i < ListCount(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(screen->buttons[i]); }
 	screen->buttons = ListClear(screen->buttons);
 	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(0, screen->width / 2 - 100, screen->height / 4, "Options...") });
 	screen->buttons = ListPush(screen->buttons, &(Button){ ButtonCreate(1, screen->width / 2 - 100, screen->height / 4 + 24, "Generate new level...") });

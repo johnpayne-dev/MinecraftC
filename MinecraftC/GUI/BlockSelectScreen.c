@@ -14,7 +14,7 @@ BlockSelectScreen BlockSelectScreenCreate() {
 }
 
 static int GetBlockOnScreen(BlockSelectScreen screen, int mx, int my) {
-	for (int32_t i = 0; i < ListCount(SessionDataAllowedBlocks); i++) {
+	for (int32_t i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
 		int x = screen->width / 2 + i % 9 * 24 + -108 - 3;
 		int y = screen->height / 2 + i / 9 * 24 + -60 + 3;
 		if (mx >= x && mx <= x + 24 && my >= y - 12 && my <= y + 12) { return i; }
@@ -33,7 +33,7 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
 	ScreenDrawCenteredString(screen->font, "Select block", screen->width / 2, 40, 0xffffffff);
 	
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(screen->minecraft->textureManager, "Terrain.png"));
-	for (int i = 0; i < ListCount(SessionDataAllowedBlocks); i++) {
+	for (int i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
 		Block block = SessionDataAllowedBlocks[i];
 		glPushMatrix();
 		int x = screen->width / 2 + i % 9 * 24 + -108;

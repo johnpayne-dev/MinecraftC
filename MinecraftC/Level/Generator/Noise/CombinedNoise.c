@@ -1,10 +1,10 @@
 #include "CombinedNoise.h"
-#include "../../../Utilities/Memory.h"
+#include <stdlib.h>
 
 CombinedNoise CombinedNoiseCreate(Noise n1, Noise n2) {
 	Noise noise = NoiseCreate();
 	noise->type = NoiseTypeCombined;
-	noise->typeData = MemoryAllocate(sizeof(struct CombinedNoiseData));
+	noise->typeData = malloc(sizeof(struct CombinedNoiseData));
 	CombinedNoiseData this = noise->typeData;
 	*this = (struct CombinedNoiseData) {
 		.noise1 = n1,
@@ -20,5 +20,5 @@ float CombinedNoiseCompute(CombinedNoise noise, float x, float y) {
 
 void CombinedNoiseDestroy(CombinedNoise noise) {
 	CombinedNoiseData this = noise->typeData;
-	MemoryFree(this);
+	free(this);
 }

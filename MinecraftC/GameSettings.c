@@ -12,7 +12,7 @@ static void Load(GameSettings settings) {
 	}
 	
 	int size = (int)SDL_RWsize(file);
-	char * text = MemoryAllocate(size);
+	char * text = malloc(size);
 	SDL_RWread(file, text, size, 1);
 	for (int i = 0, j = -1; i < size; i++) {
 		if (text[i] == '\n') {
@@ -30,16 +30,17 @@ static void Load(GameSettings settings) {
 			if (strcmp(line, "bobView") == 0) { settings->viewBobbing = strcmp(value, "true") == 0; }
 			if (strcmp(line, "anaglyph3d") == 0) { settings->anaglyph = strcmp(value, "true") == 0; }
 			if (strcmp(line, "limitFramerate") == 0) { settings->limitFramerate = strcmp(value, "true") == 0; }
-			for (int i = 0; i < ListCount(settings->bindings); i++) {
-				String keyName = StringConcatFront("key_", StringCreate(settings->bindings[i]->name));
+			for (int i = 0; i < ListLength(settings->bindings); i++) {
+				String keyName = StringCreate(settings->bindings[i]->name);
+				StringConcatFront("key_", &keyName);
 				if (strcmp(line, keyName) == 0) { settings->bindings[i]->key = StringToInt(value); }
-				StringDestroy(keyName);
+				StringFree(keyName);
 			}
-			StringDestroy(value);
-			StringDestroy(line);
+			StringFree(value);
+			StringFree(line);
 		}
 	}
-	MemoryFree(text);
+	free(text);
 	SDL_RWclose(file);
 }
 
@@ -51,36 +52,60 @@ static void Save(GameSettings settings) {
 	}
 	
 	String line = StringCreate("");
-	line = StringConcatFront("music:", StringSet(line, settings->music ? "true\n" : "false\n"));
+	StringSet(&line, settings->music ? "true\n" : "false\n");
+	StringConcatFront("music:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("sound:", StringSet(line, settings->sound ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->sound ? "true\n" : "false\n");
+	StringConcatFront("sound:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("invertYMouse:", StringSet(line, settings->invertMouse ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->invertMouse ? "true\n" : "false\n");
+	StringConcatFront("invertYMouse:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("invertYMouse:", StringSet(line, settings->invertMouse ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->invertMouse ? "true\n" : "false\n");
+	StringConcatFront("invertYMouse:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("showFrameRate:", StringSet(line, settings->showFrameRate ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->showFrameRate ? "true\n" : "false\n");
+	StringConcatFront("showFrameRate:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcat(StringConcatFront("viewDistance:", StringSetFromInt(line, settings->viewDistance)), "\n");
+	
+	StringSetFromInt(&line, settings->viewDistance);
+	StringConcatFront("viewDistance:", &line);
+	StringConcat(&line, "\n");
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("bobView:", StringSet(line, settings->viewBobbing ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->viewBobbing ? "true\n" : "false\n");
+	StringConcatFront("bobView:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("anaglyph3d:", StringSet(line, settings->anaglyph ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->anaglyph ? "true\n" : "false\n");
+	StringConcatFront("anaglyph3d:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	line = StringConcatFront("limitFramerate:", StringSet(line, settings->limitFramerate ? "true\n" : "false\n"));
+	
+	StringSet(&line, settings->limitFramerate ? "true\n" : "false\n");
+	StringConcatFront("limitFramerate:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
-	for (int i = 0; i < ListCount(settings->bindings); i++) {
-		String keyName = StringConcat(StringConcatFront("key_", StringCreate(settings->bindings[i]->name)), ":");
-		line = StringConcat(StringConcatFront(keyName, StringSetFromInt(line, settings->bindings[i]->key)), "\n");
+	
+	for (int i = 0; i < ListLength(settings->bindings); i++) {
+		String keyName = StringCreate(settings->bindings[i]->name);
+		StringConcatFront("key_", &keyName);
+		StringConcat(&keyName, ":");
+		
+		StringSetFromInt(&line, settings->bindings[i]->key);
+		StringConcatFront(keyName, &line);
+		StringConcat(&line, "\n");
 		SDL_RWwrite(file, line, StringLength(line), 1);
-		StringDestroy(keyName);
+		StringFree(keyName);
 	}
-	StringDestroy(line);
+	StringFree(line);
 	SDL_RWclose(file);
 }
 
 GameSettings GameSettingsCreate(Minecraft minecraft) {
-	GameSettings settings = MemoryAllocate(sizeof(struct GameSettings));
+	GameSettings settings = malloc(sizeof(struct GameSettings));
 	*settings = (struct GameSettings) {
 		.music = true,
 		.sound = true,
@@ -103,8 +128,9 @@ GameSettings GameSettingsCreate(Minecraft minecraft) {
 		.bindings = ListCreate(sizeof(KeyBinding *)),
 		.settingsCount = 8,
 		.minecraft = minecraft,
-		.file = StringConcat(StringCreate(minecraft->workingDirectory), "Options.txt"),
 	};
+	settings->file = StringCreate(minecraft->workingDirectory);
+	StringConcat(&settings->file, "Options.txt");
 	KeyBinding * bindings[] = { &settings->forwardKey, &settings->leftKey, &settings->backKey, &settings->rightKey, &settings->jumpKey, &settings->buildKey, &settings->chatKey, &settings->toggleFogKey, &settings->saveLocationKey, &settings->loadLocationKey };
 	for (int i = 0; i < sizeof(bindings) / sizeof(bindings[0]); i++) { settings->bindings = ListPush(settings->bindings, &bindings[i]); }
 	Load(settings);
@@ -112,7 +138,10 @@ GameSettings GameSettingsCreate(Minecraft minecraft) {
 }
 
 String GameSettingsGetBinding(GameSettings settings, int binding) {
-	return StringConcat(StringConcat(StringCreate(settings->bindings[binding]->name), ": "), (char *)SDL_GetKeyName(SDL_SCANCODE_TO_KEYCODE(settings->bindings[binding]->key)));
+	String string = StringCreate(settings->bindings[binding]->name);
+	StringConcat(&string, ": ");
+	StringConcat(&string, (char *)SDL_GetKeyName(SDL_SCANCODE_TO_KEYCODE(settings->bindings[binding]->key)));
+	return string;
 }
 
 void GameSettingsSetBinding(GameSettings settings, int binding, int key) {
@@ -142,21 +171,49 @@ void GameSettingsToggleSetting(GameSettings settings, int setting, int var2) {
 static char * RenderDistances[] = { "FAR", "NORMAL", "SHORT", "TINY" };
 
 String GameSettingsGetSetting(GameSettings settings, int setting) {
+	String string;
 	switch (setting) {
-		case 0: return StringConcat(StringCreate("Music: "), settings->music ? "ON" : "OFF");
-		case 1: return StringConcat(StringCreate("Sound: "), settings->sound ? "ON" : "OFF");
-		case 2: return StringConcat(StringCreate("Invert mouse: "), settings->invertMouse ? "ON" : "OFF");
-		case 3: return StringConcat(StringCreate("Show FPS: "), settings->showFrameRate ? "ON" : "OFF");
-		case 4: return StringConcat(StringCreate("Render distance: "), RenderDistances[settings->viewDistance]);
-		case 5: return StringConcat(StringCreate("View bobbing: "), settings->viewBobbing ? "ON" : "OFF");
-		case 6: return StringConcat(StringCreate("3d anaglyph: "), settings->anaglyph ? "ON" : "OFF");
-		case 7: return StringConcat(StringCreate("Limit framerate: "), settings->limitFramerate ? "ON" : "OFF");
-		default: return StringCreate("Error");
+		case 0:
+			string = StringCreate("Music: ");
+			StringConcat(&string, settings->music ? "ON" : "OFF");
+			break;
+		case 1:
+			string = StringCreate("Sound: ");
+			StringConcat(&string, settings->sound ? "ON" : "OFF");
+			break;
+		case 2:
+			string = StringCreate("Invert mouse: ");
+			StringConcat(&string, settings->invertMouse ? "ON" : "OFF");
+			break;
+		case 3:
+			string = StringCreate("Show FPS: ");
+			StringConcat(&string, settings->showFrameRate ? "ON" : "OFF");
+			break;
+		case 4:
+			string = StringCreate("Render distance: ");
+			StringConcat(&string, RenderDistances[settings->viewDistance]);
+			break;
+		case 5:
+			string = StringCreate("View bobbing: ");
+			StringConcat(&string, settings->viewBobbing ? "ON" : "OFF");
+			break;
+		case 6:
+			string = StringCreate("3d anaglyph: ");
+			StringConcat(&string, settings->anaglyph ? "ON" : "OFF");
+			break;
+		case 7:
+			string = StringCreate("Limit framerate: ");
+			StringConcat(&string, settings->limitFramerate ? "ON" : "OFF");
+			break;
+		default:
+			string = StringCreate("Error");
+			break;
 	}
+	return string;
 }
 
 void GameSettingsDestroy(GameSettings settings) {
-	StringDestroy(settings->file);
-	ListDestroy(settings->bindings);
-	MemoryFree(settings);
+	StringFree(settings->file);
+	ListFree(settings->bindings);
+	free(settings);
 }

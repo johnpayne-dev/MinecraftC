@@ -15,14 +15,14 @@ SaveLevelScreen SaveLevelScreenCreate(GUIScreen parent) {
 
 void SaveLevelScreenSetLevels(SaveLevelScreen screen, char * strings[5]) {
 	for (int i = 0; i < 5; i++) {
-		screen->buttons[i]->text = StringSet(screen->buttons[i]->text, strings[i]);
+		StringSet(&screen->buttons[i]->text, strings[i]);
 		screen->buttons[i]->visible = true;
 		screen->buttons[i]->active = screen->minecraft->session->hasPaid;
 	}
 }
 
 void SaveLevelScreenOnOpen(SaveLevelScreen screen) {
-	screen->buttons[5]->text = StringSet(screen->buttons[5]->text, "Save file...");
+	StringSet(&screen->buttons[5]->text, "Save file...");
 }
 
 void SaveLevelScreenOpenLevel(SaveLevelScreen screen, int level) {

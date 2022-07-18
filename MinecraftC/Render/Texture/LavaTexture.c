@@ -5,7 +5,7 @@
 LavaTexture LavaTextureCreate() {
 	LavaTexture texture = AnimatedTextureCreate(Blocks.table[BlockTypeLava]->textureID);
 	texture->type = AnimatedTextureTypeLava;
-	texture->typeData = MemoryAllocate(sizeof(struct LavaTextureData));
+	texture->typeData = malloc(sizeof(struct LavaTextureData));
 	*(LavaTextureData)texture->typeData = (struct LavaTextureData){ 0 };
 	return texture;
 }
@@ -59,5 +59,5 @@ void LavaTextureAnimate(LavaTexture texture) {
 
 void LavaTextureDestroy(LavaTexture texture) {
 	LavaTextureData this = texture->typeData;
-	MemoryFree(this);
+	free(this);
 }

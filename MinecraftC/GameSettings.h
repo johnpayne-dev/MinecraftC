@@ -25,7 +25,7 @@ typedef struct GameSettings {
 	KeyBinding toggleFogKey;
 	KeyBinding saveLocationKey;
 	KeyBinding loadLocationKey;
-	list(KeyBinding *) bindings;
+	List(KeyBinding *) bindings;
 	struct Minecraft * minecraft;
 	String file;
 	int settingsCount;

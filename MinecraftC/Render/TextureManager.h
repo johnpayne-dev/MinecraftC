@@ -4,11 +4,11 @@
 #include "Texture/AnimatedTexture.h"
 
 typedef struct TextureManager {
-	list(unsigned int) textures;
-	list(char *) textureNames;
+	List(unsigned int) textures;
+	List(char *) textureNames;
 	uint8_t * textureBuffer;
 	unsigned int idBuffer;
-	list(AnimatedTexture) animations;
+	List(AnimatedTexture) animations;
 	GameSettings settings;
 } * TextureManager;
 
