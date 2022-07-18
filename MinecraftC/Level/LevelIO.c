@@ -16,16 +16,6 @@ Level LevelIOLoad(LevelIO levelIO, SDL_RWops * input) {
 	return NULL;
 }
 
-bool LevelIOSaveOnline(LevelIO levelIO, Level level, char * host, char * userName, char * sessionID, char * levelName, int id) {
-	ProgressBarDisplaySetText(levelIO->progressBar, "Failed!");
-	return false;
-}
-
-Level LevelIOLoadOnline(LevelIO levelIO, char * url, char * user, int id) {
-	ProgressBarDisplaySetText(levelIO->progressBar, "Failed!");
-	return NULL;
-}
-
 void LevelIODestroy(LevelIO levelIO) {
 	MemoryFree(levelIO);
 }

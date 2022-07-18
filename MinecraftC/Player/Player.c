@@ -10,18 +10,9 @@ Player PlayerCreate(Level level) {
 	EntitySetPosition(entity, entity->x, entity->y, entity->z);
 	PlayerData player = MemoryAllocate(sizeof(struct PlayerData));
 	*player = (struct PlayerData) {
-		.rotationA = (RandomUniform() + 1.0) * 0.01,
 		.bodyRotation = 0.0,
 		.oldBodyRotation = 0.0,
-		.tickCount = 0,
-		.allowAlpha = true,
-		.bobbingStrength = 1.0,
-		.renderOffset = 0.0,
-		.timeOffset = RandomUniform() * 12398.0,
-		.rotation = 2.0 * M_PI * RandomUniform(),
-		.speed = 1.0,
 		.ai = PlayerAICreate(entity),
-		.rotationOffset = 180.0,
 		.inventory = InventoryCreate(),
 		.userType = 0,
 	};
@@ -38,13 +29,10 @@ void PlayerTick(Player player) {
 	this->oldTilt = this->tilt;
 	if (EntityIsInWater(player)) { player->fallDistance = 0.0; }
 	
-	this->oldAnimationStep = this->animationStep;
 	this->oldBodyRotation = this->bodyRotation;
 	player->xRotO = player->xRot;
 	player->yRotO = player->yRot;
-	this->tickCount++;
 	PlayerStepAI(player);
-	this->oldRun = this->run;
 	float dx = player->x - player->xo;
 	float dz = player->z - player->zo;
 	float len = sqrtf(dx * dx + dz * dz);
@@ -56,7 +44,6 @@ void PlayerTick(Player player) {
 		rot = atan2(dz, dx) * (180.0 / M_PI) - 90.0;
 	}
 	if (!player->onGround) { f2 = 0.0; }
-	this->run += (f2 - this->run) * 0.3;
 	
 	float a;
 	for (a = rot - this->bodyRotation; a < -180.0; a += 360.0);
@@ -76,8 +63,6 @@ void PlayerTick(Player player) {
 	while (this->bodyRotation - this->oldBodyRotation >= 180.0) { this->oldBodyRotation += 360.0; }
 	while (player->xRot - player->xRotO < -180.0) { player->xRotO -= 360.0; }
 	while (player->xRot - player->xRotO >= 180.0) { player->xRotO += 360.0; }
-
-	this->animationStep += f1;
 }
 
 void PlayerTravel(Player player, float x, float y) {
@@ -124,10 +109,9 @@ void PlayerResetPosition(Player entity) {
 
 void PlayerStepAI(Player player) {
 	PlayerData this = player->typeData;
-	InventoryTick(this->inventory);
 	this->oldBobbing = this->bobbing;
 	InputHandlerUpdateMovement(this->input);
-	PlayerAITick(this->ai, player->level, player);
+	PlayerAITick(this->ai, player);
 	float bob = sqrtf(player->xd * player->xd + player->zd * player->zd);
 	float tilt = atan(-player->yd * 0.2) * 15.0;
 	if (bob > 0.1) { bob = 0.1; }
@@ -145,11 +129,6 @@ void PlayerReleaseAllKeys(Player player) {
 void PlayerSetKey(Player player, int key, bool state) {
 	PlayerData this = player->typeData;
 	InputHandlerSetKeyState(this->input, key, state);
-}
-
-bool PlayerAddResource(Player player, BlockType resource) {
-	PlayerData this = player->typeData;
-	return InventoryAddResource(this->inventory, resource);
 }
 
 void PlayerDestroy(Player player) {

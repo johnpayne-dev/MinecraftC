@@ -14,7 +14,6 @@ LiquidBlock LiquidBlockCreate(BlockType blockType, LiquidType liquidType) {
 		.stillID = blockType + 1,
 	};
 	block->typeData = liquid;
-	if (liquidType == LiquidTypeLava) { BlockSetTickDelay(block, 16); }
 	return block;
 }
 
@@ -105,7 +104,7 @@ void LiquidBlockRenderInside(LiquidBlock block, int x, int y, int z, int side) {
 }
 
 AABB LiquidBlockGetSelectionAABB(LiquidBlock block, int x, int y, int z) {
-	return AABBNull;
+	return (AABB){ .null = true };
 }
 
 bool LiquidBlockIsOpaque(LiquidBlock block) {

@@ -20,12 +20,9 @@ Entity EntityCreate(Level level) {
 		.makeStepSound = true,
 		.fallDistance = 0.0,
 		.nextStep = 1,
-		.textureID = 0,
 		.ySlideOffset = 0.0,
 		.footSize = 0.0,
 		.noPhysics = false,
-		.pushThrough = 0.0,
-		.hovered = false,
 		.level = level,
 	};
 	EntitySetPosition(entity, 0.0, 0.0, 0.0);
@@ -84,12 +81,6 @@ void EntityTurn(Entity entity, float rx, float ry) {
 	entity->yRotO += entity->yRot - ory;
 }
 
-void EntityInterpolateTurn(Entity entity, float rx, float ry) {
-	entity->xRot -= rx * 0.15;
-	entity->yRot += ry * 0.15;
-	entity->xRot = entity->xRot < -90.0 ? -90.0 : (entity->xRot > 90.0 ? 90.0 : entity->xRot);
-}
-
 void EntityTick(Entity entity) {
 	if (entity->type == EntityTypeParticle) { ParticleTick(entity); return; }
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
@@ -106,14 +97,6 @@ void EntityTick(Entity entity) {
 
 bool EntityIsFree(Entity entity, float ax, float ay, float az) {
 	AABB aabb = AABBMove(entity->aabb, ax, ay, az);
-	list(AABB) cubes = LevelGetCubes(entity->level, aabb);
-	bool free = ListCount(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
-	ListDestroy(cubes);
-	return free;
-}
-
-bool EntityIsFreeScaled(Entity entity, float ax, float ay, float az, float s) {
-	AABB aabb = AABBMove(AABBGrow(entity->aabb, s, s, s), ax, ay, az);
 	list(AABB) cubes = LevelGetCubes(entity->level, aabb);
 	bool free = ListCount(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
 	ListDestroy(cubes);
@@ -275,10 +258,6 @@ void EntityMoveRelative(Entity entity, float x, float z, float speed) {
 	}
 }
 
-bool EntityIsLit(Entity entity) {
-	return LevelIsLit(entity->level, entity->x, entity->y, entity->z);
-}
-
 float EntityGetBrightness(Entity entity, float t) {
 	return LevelGetBrightness(entity->level, entity->x, entity->y, entity->z);
 }
@@ -291,18 +270,6 @@ void EntityPlaySound(Entity entity, const char * name, float volume, float pitch
 	LevelPlaySound(entity->level, name, entity, volume, pitch);
 }
 
-void EntityMoveTo(Entity entity, float x, float y, float z, float rx, float ry) {
-	entity->xo = entity->x;
-	entity->yo = entity->y;
-	entity->zo = entity->z;
-	entity->x = x;
-	entity->y = y;
-	entity->z = z;
-	entity->xRot = rx;
-	entity->yRot = ry;
-	EntitySetPosition(entity, x, y, z);
-}
-
 bool EntityIsPickable(Entity entity) {
 	if (entity->type == EntityTypePrimedTNT) { return PrimedTNTIsPickable(entity); }
 	return false;
@@ -310,10 +277,6 @@ bool EntityIsPickable(Entity entity) {
 
 void EntityRender(Entity entity, TextureManager textures, float t) {
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTRender(entity, textures, t); return; }
-}
-
-int EntityGetTexture(Entity entity) {
-	return entity->textureID;
 }
 
 void EntityDestroy(Entity entity) {

@@ -7,16 +7,14 @@ typedef struct Renderer {
 	bool displayActive;
 	float fogEnd;
 	HeldBlock heldBlock;
-	int levelTicks;
 	Entity entity;
 	RandomGenerator random;
-	float buffer[16];
 	float fogR, fogG, fogB;
 } * Renderer;
 
 Renderer RendererCreate(struct Minecraft * minecraft);
-Vector3D RendererGetPlayerVector(Renderer renderer, float t);
-void RendererApplyBobbing(Renderer renderer, float t);
+Vector3D RendererGetPlayerVector(Renderer renderer, float dt);
+void RendererApplyBobbing(Renderer renderer, float dt);
 void RendererSetLighting(Renderer renderer, bool lighting);
 void RendererEnableGUIMode(Renderer renderer);
 void RendererUpdateFog(Renderer renderer);

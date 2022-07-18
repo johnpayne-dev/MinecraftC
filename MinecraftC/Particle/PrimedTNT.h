@@ -11,7 +11,7 @@ typedef struct PrimedTNTData {
 } * PrimedTNTData;
 
 PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z);
-void PrimedTNTHurt(PrimedTNT tnt);
+void PrimedTNTOnHit(PrimedTNT tnt);
 bool PrimedTNTIsPickable(PrimedTNT tnt);
 void PrimedTNTTick(PrimedTNT tnt);
 void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float t);

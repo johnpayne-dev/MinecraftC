@@ -23,55 +23,55 @@
 struct Blocks Blocks = { 0 };
 
 void BlocksInitialize() {
-	BlockSetData(StoneBlockCreate(1), TileSounds.stone, 1.0, 1.0, 1.0);
-	BlockSetData(GrassBlockCreate(), TileSounds.grass, 0.9, 1.0, 0.6);
-	BlockSetData(BlockCreate(BlockTypeDirt, 2), TileSounds.grass, 0.8, 1.0, 0.5);
-	BlockSetData(BlockCreate(BlockTypeCobbleStone, 16), TileSounds.stone, 1.0, 1.0, 1.5);
-	BlockSetData(BlockCreate(BlockTypeWood, 4), TileSounds.wood, 1.0, 1.0, 1.5);
-	BlockSetData(SaplingBlockCreate(), TileSounds.none, 0.7, 1.0, 0.0);
-	BlockSetData(BlockCreate(BlockTypeBedrock, 17), TileSounds.stone, 1.0, 1.0, 999.0);
-	BlockSetData(LiquidBlockCreate(BlockTypeWater, LiquidTypeWater), TileSounds.none, 1.0, 1.0, 100.0);
-	BlockSetData(StillLiquidBlockCreate(BlockTypeStillWater, LiquidTypeWater), TileSounds.none, 1.0, 1.0, 100.0);
-	BlockSetData(LiquidBlockCreate(BlockTypeLava, LiquidTypeLava), TileSounds.none, 1.0, 1.0, 100.0);
-	BlockSetData(StillLiquidBlockCreate(BlockTypeStillLava, LiquidTypeLava), TileSounds.none, 1.0, 1.0, 100.0);
-	BlockSetData(SandBlockCreate(BlockTypeSand, 18), TileSounds.gravel, 0.8, 1.0, 0.5);
-	BlockSetData(SandBlockCreate(BlockTypeGravel, 19), TileSounds.gravel, 0.8, 1.0, 0.6);
-	BlockSetData(OreBlockCreate(BlockTypeGoldOre, 32), TileSounds.stone, 1.0, 1.0, 3.0);
-	BlockSetData(OreBlockCreate(BlockTypeIronOre, 33), TileSounds.stone, 1.0, 1.0, 3.0);
-	BlockSetData(OreBlockCreate(BlockTypeCoalOre, 34), TileSounds.stone, 1.0, 1.0, 3.0);
-	BlockSetData(WoodBlockCreate(), TileSounds.wood, 1.0, 1.0, 2.5);
-	BlockSetData(LeavesBlockCreate(), TileSounds.grass, 1.0, 0.4, 0.2);
-	BlockSetData(SpongeBlockCreate(), TileSounds.cloth, 1.0, 0.9, 0.6);
-	BlockSetData(GlassBlockCreate(), TileSounds.metal, 1.0, 1.0, 0.3);
-	BlockSetData(BlockCreate(BlockTypeRedWool, 64), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeOrangeWool, 65), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeYellowWool, 66), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeLimeWool, 67), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeGreenWool, 68), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeAquaGreenWool, 69), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeCyanWool, 70), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeBlueWool, 71), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypePurpleWool, 72), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeIndigoWool, 73), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeVioletWool, 74), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeMagentaWool, 75), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypePinkWool, 76), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeBlackWool, 77), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeGrayWool, 78), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(BlockCreate(BlockTypeWhiteWool, 79), TileSounds.cloth, 1.0, 1.0, 0.8);
-	BlockSetData(FlowerBlockCreate(BlockTypeDandelion, 13), TileSounds.none, 0.7, 1.0, 0.0);
-	BlockSetData(FlowerBlockCreate(BlockTypeRose, 12), TileSounds.none, 0.7, 1.0, 0.0);
-	BlockSetData(MushroomBlockCreate(BlockTypeBrownMushroom, 29), TileSounds.none, 0.7, 1.0, 0.0);
-	BlockSetData(MushroomBlockCreate(BlockTypeRedMushroom, 28), TileSounds.none, 0.8, 1.0, 0.0);
-	BlockSetData(MetalBlockCreate(BlockTypeGold, 40), TileSounds.metal, 0.7, 1.0, 3.0);
-	BlockSetData(MetalBlockCreate(BlockTypeIron, 39), TileSounds.metal, 0.7, 1.0, 5.0);
-	BlockSetData(SlabBlockCreate(BlockTypeDoubleSlab, true), TileSounds.stone, 1.0, 1.0, 2.0);
-	BlockSetData(SlabBlockCreate(BlockTypeSlab, false), TileSounds.stone, 1.0, 1.0, 2.0);
-	BlockSetData(BlockCreate(BlockTypeBrick, 7), TileSounds.stone, 1.0, 1.0, 2.0);
-	BlockSetData(TNTBlockCreate(), TileSounds.cloth, 1.0, 1.0, 0.0);
-	BlockSetData(BookshelfBlockCreate(), TileSounds.wood, 1.0, 1.0, 1.5);
-	BlockSetData(BlockCreate(BlockTypeMossyCobbleStone, 36), TileSounds.stone, 1.0, 1.0, 1.0);
-	BlockSetData(BlockCreate(BlockTypeObsidian, 37), TileSounds.stone, 1.0, 1.0, 10.0);
+	BlockSetData(StoneBlockCreate(1), TileSounds.stone, 1.0);
+	BlockSetData(GrassBlockCreate(), TileSounds.grass, 1.0);
+	BlockSetData(BlockCreate(BlockTypeDirt, 2), TileSounds.grass, 1.0);
+	BlockSetData(BlockCreate(BlockTypeCobbleStone, 16), TileSounds.stone, 1.0);
+	BlockSetData(BlockCreate(BlockTypeWood, 4), TileSounds.wood, 1.0);
+	BlockSetData(SaplingBlockCreate(), TileSounds.none, 1.0);
+	BlockSetData(BlockCreate(BlockTypeBedrock, 17), TileSounds.stone, 1.0);
+	BlockSetData(LiquidBlockCreate(BlockTypeWater, LiquidTypeWater), TileSounds.none, 1.0);
+	BlockSetData(StillLiquidBlockCreate(BlockTypeStillWater, LiquidTypeWater), TileSounds.none, 1.0);
+	BlockSetData(LiquidBlockCreate(BlockTypeLava, LiquidTypeLava), TileSounds.none, 1.0);
+	BlockSetData(StillLiquidBlockCreate(BlockTypeStillLava, LiquidTypeLava), TileSounds.none, 1.0);
+	BlockSetData(SandBlockCreate(BlockTypeSand, 18), TileSounds.gravel, 1.0);
+	BlockSetData(SandBlockCreate(BlockTypeGravel, 19), TileSounds.gravel, 1.0);
+	BlockSetData(OreBlockCreate(BlockTypeGoldOre, 32), TileSounds.stone, 1.0);
+	BlockSetData(OreBlockCreate(BlockTypeIronOre, 33), TileSounds.stone, 1.0);
+	BlockSetData(OreBlockCreate(BlockTypeCoalOre, 34), TileSounds.stone, 1.0);
+	BlockSetData(WoodBlockCreate(), TileSounds.wood, 1.0);
+	BlockSetData(LeavesBlockCreate(), TileSounds.grass, 0.4);
+	BlockSetData(SpongeBlockCreate(), TileSounds.cloth, 0.9);
+	BlockSetData(GlassBlockCreate(), TileSounds.metal, 1.0);
+	BlockSetData(BlockCreate(BlockTypeRedWool, 64), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeOrangeWool, 65), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeYellowWool, 66), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeLimeWool, 67), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeGreenWool, 68), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeAquaGreenWool, 69), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeCyanWool, 70), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeBlueWool, 71), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypePurpleWool, 72), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeIndigoWool, 73), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeVioletWool, 74), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeMagentaWool, 75), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypePinkWool, 76), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeBlackWool, 77), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeGrayWool, 78), TileSounds.cloth, 1.0);
+	BlockSetData(BlockCreate(BlockTypeWhiteWool, 79), TileSounds.cloth, 1.0);
+	BlockSetData(FlowerBlockCreate(BlockTypeDandelion, 13), TileSounds.none, 1.0);
+	BlockSetData(FlowerBlockCreate(BlockTypeRose, 12), TileSounds.none, 1.0);
+	BlockSetData(MushroomBlockCreate(BlockTypeBrownMushroom, 29), TileSounds.none, 1.0);
+	BlockSetData(MushroomBlockCreate(BlockTypeRedMushroom, 28), TileSounds.none, 1.0);
+	BlockSetData(MetalBlockCreate(BlockTypeGold, 40), TileSounds.metal, 1.0);
+	BlockSetData(MetalBlockCreate(BlockTypeIron, 39), TileSounds.metal, 1.0);
+	BlockSetData(SlabBlockCreate(BlockTypeDoubleSlab, true), TileSounds.stone, 1.0);
+	BlockSetData(SlabBlockCreate(BlockTypeSlab, false), TileSounds.stone, 1.0);
+	BlockSetData(BlockCreate(BlockTypeBrick, 7), TileSounds.stone, 1.0);
+	BlockSetData(TNTBlockCreate(), TileSounds.cloth, 1.0);
+	BlockSetData(BookshelfBlockCreate(), TileSounds.wood, 1.0);
+	BlockSetData(BlockCreate(BlockTypeMossyCobbleStone, 36), TileSounds.stone, 1.0);
+	BlockSetData(BlockCreate(BlockTypeObsidian, 37), TileSounds.stone, 1.0);
 }
 
 void BlocksDeinitialize() {
@@ -89,8 +89,6 @@ Block BlockCreate(BlockType type, int textureID) {
 	};
 	Blocks.table[type] = block;
 	BlockSetBounds(block, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-	Blocks.opaque[type] = BlockIsSolid(block);
-	Blocks.cube[type] = BlockIsCube(block);
 	Blocks.liquid[type] = false;
 	return block;
 }
@@ -108,10 +106,9 @@ bool BlockIsCube(Block block) {
 	return true;
 }
 
-Block BlockSetData(Block block, TileSound sound, float var, float particleGravity, float hardness) {
+Block BlockSetData(Block block, TileSound sound, float particleGravity) {
 	block->particleGravity = particleGravity;
 	block->sound = sound;
-	block->hardness = hardness * 20.0;
 	return block;
 }
 
@@ -126,10 +123,6 @@ void BlockSetBounds(Block block, float x0, float y0, float z0, float x1, float y
 	block->x1 = x1;
 	block->y1 = y1;
 	block->z1 = z1;
-}
-
-void BlockSetTickDelay(Block block, int tickDelay) {
-	Blocks.tickDelay[block->type] = tickDelay;
 }
 
 void BlockRenderFullBrightness(Block block) {
@@ -249,7 +242,7 @@ AABB BlockGetSelectionAABB(Block block, int x, int y, int z) {
 
 AABB BlockGetCollisionAABB(Block block, int x, int y, int z) {
 	if (IsFlowerBlock(block->type)) { return FlowerBlockGetCollisionAABB(block, x, y, z); }
-	if (IsLiquidBlock(block->type)) { return AABBNull; }
+	if (IsLiquidBlock(block->type)) { return (AABB){ .null = true }; }
 	return (AABB){ .x0 = x + block->x0, .y0 = y + block->y0, .z0 = z + block->z0, .x1 = x + block->x1, .y1 = y + block->y1, .z1 = z + block->z1 };
 }
 
@@ -290,20 +283,6 @@ void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, Par
 	}
 }
 
-void BlockSpawnBlockParticles(Block block, Level level, int x, int y, int z, int side, ParticleManager particles) {
-	float f = 0.1;
-	float vx = x + RandomUniform() * (block->x1 - block->x0 - f * 2.0) + f + block->x0;
-	float vy = y + RandomUniform() * (block->y1 - block->y0 - f * 2.0) + f + block->y0;
-	float vz = z + RandomUniform() * (block->z1 - block->z0 - f * 2.0) + f + block->z0;
-	if (side == 0) { vy = y + block->y0 - f; }
-	if (side == 1) { vy = y + block->y1 + f; }
-	if (side == 2) { vz = z + block->z0 - f; }
-	if (side == 3) { vz = z + block->z1 + f; }
-	if (side == 4) { vx = x + block->x0 - f; }
-	if (side == 5) { vx = x + block->x1 + f; }
-	ParticleManagerSpawnParticle(particles, ParticleScale(ParticleSetPower(TerrainParticleCreate(level, vx, vy, vz, 0.0, 0.0, 0.0, block), 0.2), 0.6));
-}
-
 LiquidType BlockGetLiquidType(Block block) {
 	if (IsLiquidBlock(block->type)) { return LiquidBlockGetLiquidType(block); }
 	return LiquidTypeNone;
@@ -332,10 +311,6 @@ void BlockOnAdded(Block block, Level level, int x, int y, int z) {
 
 void BlockOnRemoved(Block block, Level level, int x, int y, int z) {
 	if (block->type == BlockTypeSponge) { SpongeBlockOnRemoved(block, level, x, y, z); return; }
-}
-
-int BlockGetHardness(Block block) {
-	return block->hardness;
 }
 
 void BlockRenderPreview(Block block) {

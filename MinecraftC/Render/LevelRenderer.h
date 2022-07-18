@@ -12,15 +12,13 @@ typedef struct LevelRenderer {
 	int chunkCacheCount;
 	int xChunks, yChunks, zChunks;
 	int baseListID;
-	struct Minecraft * minecraft;
 	int * chunkDataCache;
 	int ticks;
 	float lastLoadX, lastLoadY, lastLoadZ;
-	float cracks;
 } * LevelRenderer;
 
 LevelRenderer LevelRendererCreate(struct Minecraft * minecraft, TextureManager textures);
 void LevelRendererRefresh(LevelRenderer renderer);
-int LevelRendererSortChunks(LevelRenderer renderer, Player player, int var);
+int LevelRendererSortChunks(LevelRenderer renderer, Player player, int pass);
 void LevelRendererQueueChunks(LevelRenderer renderer, int x0, int y0, int z0, int x1, int y1, int z1);
 void LevelRendererDestroy(LevelRenderer renderer);

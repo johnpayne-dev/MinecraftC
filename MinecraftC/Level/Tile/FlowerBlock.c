@@ -18,16 +18,14 @@ void FlowerBlockUpdate(FlowerBlock block, Level level, int x, int y, int z, Rand
 	if (block->type == BlockTypeRedMushroom || block->type == BlockTypeBrownMushroom) { MushroomBlockUpdate(block, level, x, y, z, random); return; }
 	if (block->type == BlockTypeSapling) { SaplingBlockUpdate(block, level, x, y, z, random); return; }
 	
-	if (!level->growTrees) {
-		BlockType tile = LevelGetTile(level, x, y - 1, z);
-		if (!LevelIsLit(level, x, y, z) || (tile != BlockTypeDirt && tile != BlockTypeGrass)) {
-			LevelSetTile(level, x, y, z, BlockTypeNone);
-		}
+	BlockType tile = LevelGetTile(level, x, y - 1, z);
+	if (!LevelIsLit(level, x, y, z) || (tile != BlockTypeDirt && tile != BlockTypeGrass)) {
+		LevelSetTile(level, x, y, z, BlockTypeNone);
 	}
 }
 
 AABB FlowerBlockGetCollisionAABB(FlowerBlock block, int x, int y, int z) {
-	return AABBNull;
+	return (AABB){ .null = true };
 }
 
 bool FlowerBlockIsOpaque(FlowerBlock block) {

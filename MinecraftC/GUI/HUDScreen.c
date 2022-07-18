@@ -20,7 +20,7 @@ HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height) {
 	return hud;
 }
 
-void HUDScreenRender(HUDScreen hud, float var1, bool var2, int mx, int my) {
+void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 	PlayerData player = hud->minecraft->player->typeData;
 	RendererEnableGUIMode(hud->minecraft->renderer);
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->minecraft->textureManager, "GUI/GUI.png"));
@@ -39,15 +39,6 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int mx, int my) {
 		if (tile != -1 && tile != 0) {
 			glPushMatrix();
 			glTranslatef(x, y, -50.0);
-			if (player->inventory->popTime[i] > 0) {
-				float f1 = (player->inventory->popTime[i] - var1) / 5.0;
-				float f2 = -tsin(f1 * f1 * M_PI) * 8.0;
-				float f3 = tsin(f1 * f1 * M_PI) + 1.0;
-				float f4 = tsin(f1 * M_PI) + 1.0;
-				glTranslatef(10.0, f2 + 10.0, 0.0);
-				glScalef(f3, f4, 1.0);
-				glTranslatef(-10.0, -10.0, 0.0);
-			}
 			glScalef(10.0, 10.0, 10.0);
 			glTranslatef(1.0, 0.5, 0.0);
 			glRotatef(-30.0, 1.0, 0.0, 0.0);
@@ -59,11 +50,6 @@ void HUDScreenRender(HUDScreen hud, float var1, bool var2, int mx, int my) {
 			BlockRenderFullBrightness(Blocks.table[tile]);
 			ShapeRendererEnd();
 			glPopMatrix();
-			if (player->inventory->count[i] > 1) {
-				String string = StringCreateFromInt(player->inventory->count[i]);
-				FontRendererRender(hud->minecraft->font, string, x + 19 - FontRendererGetWidth(hud->minecraft->font, string), y + 6, 0xffffffff);
-				StringDestroy(string);
-			}
 		}
 	}
 		

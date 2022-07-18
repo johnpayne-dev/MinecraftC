@@ -35,21 +35,6 @@ Particle ParticleCreate(Level level, float x, float y, float z, float xd, float 
 	return entity;
 }
 
-Particle ParticleSetPower(Particle particle, float power) {
-	ParticleData this = particle->typeData;
-	this->xd *= power;
-	this->zd *= power;
-	this->yd = (this->yd - 0.1) * power + 0.1;
-	return particle;
-}
-
-Particle ParticleScale(Particle particle, float scale) {
-	ParticleData this = particle->typeData;
-	EntitySetSize(particle, 0.2 * scale, 0.2 * scale);
-	this->size *= scale;
-	return particle;
-}
-
 void ParticleTick(Particle particle) {
 	ParticleData this = particle->typeData;
 	if (this->type == ParticleTypeSmoke) { SmokeParticleTick(particle); }

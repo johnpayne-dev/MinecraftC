@@ -13,7 +13,6 @@ LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures) 
 		.lastLoadX = -9999.0,
 		.lastLoadY = -9999.0,
 		.lastLoadZ = -9999.0,
-		.minecraft = minecraft,
 		.textures = textures,
 		.listID = glGenLists(2),
 		.baseListID = glGenLists(4096 << 6 << 1),

@@ -7,21 +7,9 @@
 typedef Entity Player;
 
 typedef struct PlayerData {
-	float rotation;
-	float timeOffset;
-	float speed;
-	float rotationA;
 	float bodyRotation;
 	float oldBodyRotation;
-	float run;
-	float oldRun;
-	float animationStep;
 	float oldAnimationStep;
-	int tickCount;
-	bool allowAlpha;
-	float rotationOffset;
-	float bobbingStrength;
-	float renderOffset;
 	float tilt;
 	float oldTilt;
 	PlayerAI ai;
@@ -39,5 +27,4 @@ void PlayerResetPosition(Player player);
 void PlayerStepAI(Player player);
 void PlayerReleaseAllKeys(Player player);
 void PlayerSetKey(Player player, int key, bool state);
-bool PlayerAddResource(Player player, BlockType resource);
 void PlayerDestroy(Player player);

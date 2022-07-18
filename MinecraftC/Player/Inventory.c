@@ -8,7 +8,6 @@ Inventory InventoryCreate() {
 	};
 	for (int i = 0; i < 9; i++) {
 		inventory->slots[i] = -1;
-		inventory->count[i] = 0;
 	}
 	return inventory;
 }
@@ -48,35 +47,6 @@ void InventoryReplaceSlotWithBlock(Inventory inventory, Block block) {
 		int slot = GetSlot(inventory, block->type);
 		if (slot >= 0) { inventory->slots[slot] = inventory->slots[inventory->selected]; }
 		inventory->slots[inventory->selected] = block->type;
-	}
-}
-
-bool InventoryAddResource(Inventory inventory, BlockType tile) {
-	int slot = GetSlot(inventory, tile);
-	if (slot < 0) { slot = GetSlot(inventory, -1); }
-	if (slot < 0) { return false; }
-	else if (inventory->count[slot] >= 99) { return false; }
-	else {
-		inventory->slots[slot] = tile;
-		inventory->count[slot]++;
-		inventory->popTime[slot] = 5;
-		return true;
-	}
-}
-
-void InventoryTick(Inventory inventory) {
-	for (int i = 0; i < 9; i++) {
-		if (inventory->popTime[i] > 0) { inventory->popTime[i]--; }
-	}
-}
-
-bool InventoryRemoveResource(Inventory inventory, BlockType blockType) {
-	int slot = GetSlot(inventory, blockType);
-	if (slot < 0) { return false; }
-	else {
-		inventory->count[slot]--;
-		if (inventory->count[slot] <= 0) { inventory->slots[slot] = -1; }
-		return true;
 	}
 }
 

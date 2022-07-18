@@ -20,7 +20,7 @@ void ChunkUpdate(Chunk chunk);
 float ChunkDistanceSquared(Chunk chunk, Player player);
 void ChunkSetAllDirty(Chunk chunk);
 void ChunkDispose(Chunk chunk);
-int ChunkAppendLists(Chunk chunk, int var1[], int var2, int var3);
+int ChunkAppendLists(Chunk chunk, int dataCache[], int count, int pass);
 void ChunkClip(Chunk chunk, Frustum frustum);
 void ChunkDestroy(Chunk chunk);
 

@@ -8,14 +8,11 @@
 Level LevelCreate() {
 	Level level = MemoryAllocate(sizeof(struct Level));
 	*level = (struct Level) {
-		.renderers = ListCreate(sizeof(LevelRenderer)),
 		.random = RandomGeneratorCreate(time(NULL)),
 		.tickList = ListCreate(sizeof(NextTickListEntry)),
 		.entities = ListCreate(sizeof(Entity)),
-		.networkMode = false,
 		.unprocessed = 0,
 		.tickCount = 0,
-		.growTrees = false,
 	};
 	level->randomValue = (int)RandomGeneratorInteger(level->random);
 	return level;
@@ -44,7 +41,7 @@ void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks) {
 	level->lightBlockers = MemoryAllocate(w * h * sizeof(int));
 	for (int i = 0; i < w * h; i++) { level->lightBlockers[i] = level->depth - 1; }
 	LevelCalculateLightDepths(level, 0, 0, w, h);
-	for (int i = 0; i < ListCount(level->renderers); i++) { LevelRendererRefresh(level->renderers[i]); }
+	if (level->renderer != NULL) { LevelRendererRefresh(level->renderer); }
 	level->tickList = ListClear(level->tickList);
 	LevelFindSpawn(level);
 	LevelInitializeTransient(level);
@@ -81,23 +78,14 @@ void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1) {
 			if (blocker != k) {
 				int min = blocker < k ? blocker : k;
 				int max = blocker > k ? blocker : k;
-				for (int l = 0; l < ListCount(level->renderers); l++) {
-					LevelRendererQueueChunks(level->renderers[l], i - 1, min - 1, j - 1, i + 1, max + 1, j + 1);
-				}
+				if (level->renderer != NULL) { LevelRendererQueueChunks(level->renderer, i - 1, min - 1, j - 1, i + 1, max + 1, j + 1); }
 			}
 		}
 	}
 }
 
-void LevelAddRenderer(Level level, LevelRenderer listener) {
-	level->renderers = ListPush(level->renderers, &listener);
-}
-
-void LevelFinalize(Level level) {
-}
-
-void LevelRemoveRenderer(Level level, LevelRenderer listener) {
-	level->renderers = ListRemoveAll(level->renderers, &listener);
+void LevelSetRenderer(Level level, LevelRenderer listener) {
+	level->renderer = listener;
 }
 
 bool LevelIsLightBlocker(Level level, int x, int y, int z) {
@@ -120,11 +108,11 @@ list(AABB) LevelGetCubes(Level level, AABB box) {
 					Block block = Blocks.table[LevelGetTile(level, i, j, k)];
 					if (block != NULL) {
 						aabb = BlockGetCollisionAABB(block, i, j, k);
-						if (!AABBIsNull(aabb) && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
+						if (!aabb.null && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
 					}
 				} else if (i < 0 || j < 0 || k < 0 || i >= level->width || k >= level->height) {
 					AABB aabb = BlockGetCollisionAABB(Blocks.table[BlockTypeBedrock], i, j, k);
-					if (!AABBIsNull(aabb) && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
+					if (!aabb.null && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
 				}
 			}
 		}
@@ -133,19 +121,16 @@ list(AABB) LevelGetCubes(Level level, AABB box) {
 }
 
 void LevelSwap(Level level, int x0, int y0, int z0, int x1, int y1, int z1) {
-	if (!level->networkMode) {
-		BlockType t1 = LevelGetTile(level, x0, y0, z0);
-		BlockType t2 = LevelGetTile(level, x1, y1, z1);
-		LevelSetTileNoNeighborChange(level, x0, y0, z0, t2);
-		LevelSetTileNoNeighborChange(level, x1, y1, z1, t1);
-		LevelUpdateNeighborsAt(level, x0, y0, z0, t2);
-		LevelUpdateNeighborsAt(level, x1, y1, z1, t1);
-	}
+	BlockType t1 = LevelGetTile(level, x0, y0, z0);
+	BlockType t2 = LevelGetTile(level, x1, y1, z1);
+	LevelSetTileNoNeighborChange(level, x0, y0, z0, t2);
+	LevelSetTileNoNeighborChange(level, x1, y1, z1, t1);
+	LevelUpdateNeighborsAt(level, x0, y0, z0, t2);
+	LevelUpdateNeighborsAt(level, x1, y1, z1, t1);
 }
 
 bool LevelSetTile(Level level, int x, int y, int z, BlockType tile) {
-	if (level->networkMode) { return false; }
-	else if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
+	if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
 		LevelUpdateNeighborsAt(level, x, y, z, tile);
 		return true;
 	}
@@ -153,7 +138,7 @@ bool LevelSetTile(Level level, int x, int y, int z, BlockType tile) {
 }
 
 bool LevelNetSetTile(Level level, int x, int y, int z, BlockType tile) {
-	if (LevelNetSetTileNoNeighborChange(level, x, y, z, tile)) {
+	if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
 		LevelUpdateNeighborsAt(level, x, y, z, tile);
 		return true;
 	}
@@ -161,10 +146,6 @@ bool LevelNetSetTile(Level level, int x, int y, int z, BlockType tile) {
 }
 
 bool LevelSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType tile) {
-	return level->networkMode ? false : LevelNetSetTileNoNeighborChange(level, x, y, z, tile);
-}
-
-bool LevelNetSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType tile) {
 	if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) { return false; }
 	int i = (y * level->height + z) * level->width + x;
 	if (tile == level->blocks[i]) { return false; }
@@ -175,9 +156,7 @@ bool LevelNetSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType
 	if (prev != BlockTypeNone) { BlockOnRemoved(Blocks.table[prev], level, x, y, z); }
 	if (tile != BlockTypeNone) { BlockOnAdded(Blocks.table[tile], level, x, y, z); }
 	LevelCalculateLightDepths(level, x, z, 1, 1);
-	for (int j = 0; j < ListCount(level->renderers); j++) {
-		LevelRendererQueueChunks(level->renderers[j], x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
-	}
+	if (level->renderer != NULL) { LevelRendererQueueChunks(level->renderer, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1); }
 	return true;
 }
 
@@ -322,7 +301,6 @@ bool LevelContainsLiquid(Level level, AABB box, LiquidType liquidID) {
 }
 
 void LevelAddToNextTick(Level level, int x, int y, int z, BlockType tile) {
-	if (level->networkMode) { return; }
 	NextTickListEntry tick = { .x = x, .y = y, .z = z, .Tile = tile };
 	if (tile != BlockTypeNone) { tick.Ticks = BlockGetTickDelay(Blocks.table[tile]); }
 	level->tickList = ListPush(level->tickList, &tick);
@@ -362,48 +340,9 @@ float LevelGetBrightness(Level level, int x, int y, int z) {
 	return LevelIsLit(level, x, y, z) ? 1.0 : 0.6;
 }
 
-float LevelGetCaveness(Level level, float px, float py, float pz, float degrees) {
-	int vx = (int)px, vy = (int)py, vz = (int)pz;
-	float n = 0.0, m = 0.0;
-	for (int x = vx - 6; x <= vx + 6; x++) {
-		for (int z = vz - 6; z <= vz + 6; z++) {
-			if (LevelIsInBounds(level, x, vy, z) && !LevelIsSolidTile(level, x, vy, z)) {
-				float ax = x + 0.5 - px;
-				float az = z + 0.5 - pz;
-				float a;
-				for (a = atan2(az, ax) - degrees * (M_PI / 180.0) + M_PI / 2.0; a < -M_PI; a += 2.0 * M_PI);
-				while (a >= M_PI) { a -= 2.0 * M_PI; }
-				if (a < 0.0) { a = -a; }
-				float l = 1.0 / sqrtf(ax * ax + 4.0 + az * az);
-				if (a > 1.0) { l = 0.0; }
-				if (l < 0.0) { l = 0.0; }
-				m += l;
-				if (LevelIsLit(level, x, vy, z)) { n += l; }
-			}
-		}
-	}
-	if (m == 0.0) { return 0.0; }
-	else { return n / m; }
-}
-
-uint8_t * LevelCopyBlocks(Level level) {
-	uint8_t * blocks = MemoryAllocate(level->width * level->depth * level->height);
-	memcpy(blocks, level->blocks, level->width * level->depth * level->height);
-	return blocks;
-}
-
-LiquidType LevelGetLiquidType(Level level, int x, int y, int z) {
-	BlockType tile = LevelGetTile(level, x, y, z);
-	return tile == BlockTypeNone ? LiquidTypeNone : BlockGetLiquidType(Blocks.table[tile]);
-}
-
 bool LevelIsWater(Level level, int x, int y, int z) {
 	BlockType tile = LevelGetTile(level, x, y, z);
 	return tile != BlockTypeNone && BlockGetLiquidType(Blocks.table[tile]) == LiquidTypeWater;
-}
-
-void LevelSetNetworkMode(Level level, bool network) {
-	level->networkMode = network;
 }
 
 MovingObjectPosition LevelClip(Level level, Vector3D v0, Vector3D v1) {
@@ -550,7 +489,6 @@ Entity LevelFindPlayer(Level level) {
 }
 
 void LevelDestroy(Level level) {
-	ListDestroy(level->renderers);
 	ListDestroy(level->entities);
 	RandomGeneratorDestroy(level->random);
 	ListDestroy(level->tickList);

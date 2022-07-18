@@ -136,7 +136,7 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 	return j;
 }
 
-Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth, int var) {
+Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth) {
 	ProgressBarDisplaySetTitle(generator->progressBar, "Generating level");
 	generator->width = width;
 	generator->depth = depth;
@@ -371,9 +371,6 @@ Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, in
 	Level level = LevelCreate();
 	level->waterLevel = generator->waterLevel;
 	LevelSetData(level, w, 64, d, generator->blocks);
-	level->createTime = TimeMilli();
-	level->creator = userName;
-	level->name = "A Nice World";
 	ii = w * d / 4000;
 	for (int i = 0; i < ii; i++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, i * 50 / (ii - 1) + 50);

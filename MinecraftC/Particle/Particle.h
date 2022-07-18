@@ -23,8 +23,6 @@ typedef struct ParticleData {
 typedef Entity Particle;
 
 Particle ParticleCreate(struct Level * level, float x, float y, float z, float xd, float yd, float zd);
-Particle ParticleSetPower(Particle particle, float power);
-Particle ParticleScale(Particle particle, float scale);
 void ParticleTick(Particle particle);
 void ParticleRender(Particle particle, float t, float x, float y, float z, float v6, float v7);
 int ParticleGetParticleTexture(Particle particle);

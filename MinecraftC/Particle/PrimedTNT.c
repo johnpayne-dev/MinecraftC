@@ -25,7 +25,7 @@ PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z) {
 	return entity;
 }
 
-void PrimedTNTHurt(PrimedTNT entity) {
+void PrimedTNTOnHit(PrimedTNT entity) {
 	if (!entity->removed) { EntityRemove(entity); }
 }
 

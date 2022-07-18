@@ -17,18 +17,18 @@ Renderer RendererCreate(Minecraft minecraft) {
 	return renderer;
 }
 
-Vector3D RendererGetPlayerVector(Renderer renderer, float t) {
+Vector3D RendererGetPlayerVector(Renderer renderer, float dt) {
 	Player entity = renderer->minecraft->player;
-	return (Vector3D){ entity->xo + (entity->x - entity->xo) * t, entity->yo + (entity->y - entity->yo) * t, entity->zo + (entity->z - entity->zo) * t };
+	return (Vector3D){ entity->xo + (entity->x - entity->xo) * dt, entity->yo + (entity->y - entity->yo) * dt, entity->zo + (entity->z - entity->zo) * dt };
 }
 
-void RendererApplyBobbing(Renderer renderer, float t) {
+void RendererApplyBobbing(Renderer renderer, float dt) {
 	Player entity = renderer->minecraft->player;
 	PlayerData player = entity->typeData;
 	float walk = entity->walkDistance - entity->oldWalkDistance;
-	walk = entity->walkDistance + walk * t;
-	float bob = player->oldBobbing + (player->bobbing - player->oldBobbing) * t;
-	float tilt = player->oldTilt + (player->tilt - player->oldTilt) * t;
+	walk = entity->walkDistance + walk * dt;
+	float bob = player->oldBobbing + (player->bobbing - player->oldBobbing) * dt;
+	float tilt = player->oldTilt + (player->tilt - player->oldTilt) * dt;
 	glTranslatef(tsin(walk * M_PI) * bob * 0.5, -fabs(tcos(walk * M_PI) * bob), 0.0);
 	glRotatef(tsin(walk * M_PI) * bob * 3.0, 0.0, 0.0, 1.0);
 	glRotatef(fabs(tcos(walk * M_PI + 0.2) * bob) * 5.0, 1.0, 0.0, 0.0);

@@ -1,8 +1,7 @@
 #pragma once
 #include "Utilities/String.h"
 
-typedef struct ChatLine
-{
+typedef struct ChatLine {
 	String message;
 	int time;
 } * ChatLine;

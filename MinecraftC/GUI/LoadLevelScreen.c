@@ -68,7 +68,6 @@ void LoadLevelScreenOnButtonClicked(LoadLevelScreen screen, Button button) {
 
 void LoadLevelScreenOpenLevel(LoadLevelScreen screen, int level) {
 	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevel(screen, level); return; }
-	MinecraftLoadOnlineLevel(screen->minecraft, screen->minecraft->session->userName, level);
 	MinecraftSetCurrentScreen(screen->minecraft, NULL);
 	MinecraftGrabMouse(screen->minecraft);
 }

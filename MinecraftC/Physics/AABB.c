@@ -65,24 +65,6 @@ bool AABBIntersectsInner(AABB c0, AABB c1) {
 	return c1.x1 >= c0.x0 && c1.x0 <= c0.x1 ? (c1.y1 >= c0.y0 && c1.y0 <= c0.y1 ? c1.z1 >= c0.z0 && c1.z0 <= c0.z1 : false) : false;
 }
 
-bool AABBContainsPoint(AABB c, Vector3D p) {
-	return p.x > c.x0 && p.x < c.x1 ? (p.y > c.y0 && p.y < c.y1 ? p.z > c.z0 && p.z < c.z1 : false) : false;
-}
-
-float AABBGetSize(AABB c) {
-	return (c.x1 - c.x0 + c.y1 - c.y0 + c.z1 - c.z0) / 3.0;
-}
-
-AABB AABBShrink(AABB c, float x, float y, float z) {
-	c.x0 -= x < 0.0 ? x : 0.0;
-	c.y0 -= y < 0.0 ? y : 0.0;
-	c.z0 -= z < 0.0 ? z : 0.0;
-	c.x1 -= x > 0.0 ? x : 0.0;
-	c.y1 -= y > 0.0 ? y : 0.0;
-	c.z1 -= z > 0.0 ? z : 0.0;
-	return c;
-}
-
 static bool XIntersects(AABB c, Vector3D v) {
 	return Vector3DIsNull(v) ? false : v.y >= c.y0 && v.y <= c.y1 && v.z >= c.z0 && v.z <= c.z1;
 }

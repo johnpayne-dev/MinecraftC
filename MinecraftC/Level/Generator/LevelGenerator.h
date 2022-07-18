@@ -13,5 +13,5 @@ typedef struct LevelGenerator {
 } * LevelGenerator;
 
 LevelGenerator LevelGeneratorCreate(ProgressBarDisplay progressBar);
-Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth, int var);
+Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth);
 void LevelGeneratorDestroy(LevelGenerator generator);

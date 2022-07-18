@@ -64,7 +64,6 @@ void LevelNameScreenOnButtonClicked(LevelNameScreen screen, Button button) {
 	LevelNameScreenData this = screen->typeData;
 	if (button->active) {
 		if (button->id == 0 && StringLength(this->name) > 0) {
-			LevelIOSaveOnline(screen->minecraft->levelIO, screen->minecraft->level, screen->minecraft->host, screen->minecraft->session->userName, screen->minecraft->session->sessionID, this->name, this->id);
 			MinecraftSetCurrentScreen(screen->minecraft, NULL);
 			MinecraftGrabMouse(screen->minecraft);
 		}
