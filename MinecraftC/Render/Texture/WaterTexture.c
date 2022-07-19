@@ -2,7 +2,7 @@
 #include "../../Level/Tile/Block.h"
 
 void WaterTextureCreate(WaterTexture * texture) {
-	AnimatedTextureCreate(texture, Blocks.table[BlockTypeWater]->textureID);
+	AnimatedTextureCreate(texture, Blocks.table[BlockTypeWater].textureID);
 	texture->type = AnimatedTextureTypeWater;
 	texture->water = (WaterTextureData){ 0 };
 }

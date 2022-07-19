@@ -3,5 +3,5 @@
 
 typedef FlowerBlock SaplingBlock;
 
-SaplingBlock SaplingBlockCreate(void);
-void SaplingBlockUpdate(SaplingBlock block, struct Level * level, int x, int y, int z, RandomGenerator * random);
+void SaplingBlockCreate(SaplingBlock * block, TileSound sound, float particleGravity);
+void SaplingBlockUpdate(SaplingBlock * block, struct Level * level, int x, int y, int z, RandomGenerator * random);

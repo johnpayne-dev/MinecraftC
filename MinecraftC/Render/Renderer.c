@@ -67,8 +67,8 @@ void RendererUpdateFog(Renderer * renderer) {
 	glFogfv(GL_FOG_COLOR, (float []){ renderer->fogR, renderer->fogG, renderer->fogB, 1.0 });
 	glNormal3f(0.0, -1.0, 0.0);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
-	Block block = Blocks.table[LevelGetTile(level, player->x, player->y + 0.12, player->z)];
-	if (block != NULL && BlockGetLiquidType(block) != LiquidTypeNone) {
+	Block * block = &Blocks.table[LevelGetTile(level, player->x, player->y + 0.12, player->z)];
+	if (block->type != BlockTypeNone && BlockGetLiquidType(block) != LiquidTypeNone) {
 		LiquidType liquid = BlockGetLiquidType(block);
 		glFogi(GL_FOG_MODE, GL_EXP);
 		if (liquid == LiquidTypeWater) {

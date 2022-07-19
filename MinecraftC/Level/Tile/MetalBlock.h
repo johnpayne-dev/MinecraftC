@@ -3,5 +3,5 @@
 
 typedef Block MetalBlock;
 
-MetalBlock MetalBlockCreate(BlockType type, int textureID);
-int MetalBlockGetTextureID(MetalBlock block, int face);
+void MetalBlockCreate(MetalBlock * block, BlockType type, int textureID, TileSound sound, float particleGravity);
+int MetalBlockGetTextureID(MetalBlock * block, int face);

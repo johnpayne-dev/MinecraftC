@@ -222,7 +222,7 @@ void EntityMove(Entity * entity, float ax, float ay, float az) {
 			BlockType blockType = LevelGetTile(entity->level, entity->x, entity->y - entity->heightOffset - 0.2, entity->z);
 			if (entity->walkDistance > entity->nextStep && blockType > 0) {
 				entity->nextStep++;
-				TileSound sound = Blocks.table[blockType]->sound;
+				TileSound sound = Blocks.table[blockType].sound;
 				if (sound.type != TileSoundTypeNone) {
 					EntityPlaySound(entity, "step.", TileSoundGetVolume(sound) * 0.75, TileSoundGetPitch(sound));
 				}
@@ -238,7 +238,7 @@ bool EntityIsInWater(Entity * entity) {
 
 bool EntityIsUnderWater(Entity * entity) {
 	BlockType blockType = LevelGetTile(entity->level, entity->x, entity->y, entity->z);
-	return blockType != 0 ? BlockGetLiquidType(Blocks.table[blockType]) == LiquidTypeWater : false;
+	return blockType != 0 ? BlockGetLiquidType(&Blocks.table[blockType]) == LiquidTypeWater : false;
 }
 
 bool EntityIsInLava(Entity * entity) {

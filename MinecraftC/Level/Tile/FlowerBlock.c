@@ -5,16 +5,14 @@
 #include "../../Render/ShapeRenderer.h"
 #include "../../Utilities/SinTable.h"
 
-FlowerBlock FlowerBlockCreate(BlockType type, int textureID) {
-	Block block = BlockCreate(type, textureID);
-	block->textureID = textureID;
+void FlowerBlockCreate(FlowerBlock * block, BlockType type, int textureID, TileSound sound, float particleGravity) {
+	BlockCreate(block, type, textureID, sound, particleGravity);
 	BlockSetPhysics(block, true);
 	float w = 0.2;
 	BlockSetBounds(block, 0.5 - w, 0.0, 0.5 - w, 0.5 + w, 3.0 * w, 0.5 + w);
-	return block;
 }
 
-void FlowerBlockUpdate(FlowerBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
+void FlowerBlockUpdate(FlowerBlock * block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	if (block->type == BlockTypeRedMushroom || block->type == BlockTypeBrownMushroom) { MushroomBlockUpdate(block, level, x, y, z, random); return; }
 	if (block->type == BlockTypeSapling) { SaplingBlockUpdate(block, level, x, y, z, random); return; }
 	
@@ -24,19 +22,19 @@ void FlowerBlockUpdate(FlowerBlock block, Level * level, int x, int y, int z, Ra
 	}
 }
 
-AABB FlowerBlockGetCollisionAABB(FlowerBlock block, int x, int y, int z) {
+AABB FlowerBlockGetCollisionAABB(FlowerBlock * block, int x, int y, int z) {
 	return (AABB){ .null = true };
 }
 
-bool FlowerBlockIsOpaque(FlowerBlock block) {
+bool FlowerBlockIsOpaque(FlowerBlock * block) {
 	return false;
 }
 
-bool FlowerBlockIsSolid(FlowerBlock block) {
+bool FlowerBlockIsSolid(FlowerBlock * block) {
 	return false;
 }
 
-static void Render(FlowerBlock block, float x, float y, float z) {
+static void Render(FlowerBlock * block, float x, float y, float z) {
 	int tex = BlockGetTextureID(block, 15);
 	int u0 = (tex % 16) << 4;
 	int v0 = (tex / 16) << 4;
@@ -63,25 +61,25 @@ static void Render(FlowerBlock block, float x, float y, float z) {
 	}
 }
 
-void FlowerBlockRenderPreview(FlowerBlock block) {
+void FlowerBlockRenderPreview(FlowerBlock * block) {
 	ShapeRendererNormal(0.0, 1.0, 0.0);
 	ShapeRendererBegin();
 	Render(block, 0.0, 0.4, -0.3);
 	ShapeRendererEnd();
 }
 
-bool FlowerBlockIsCube(FlowerBlock block) {
+bool FlowerBlockIsCube(FlowerBlock * block) {
 	return false;
 }
 
-bool FlowerBlockRender(FlowerBlock block, Level * level, int x, int y, int z) {
+bool FlowerBlockRender(FlowerBlock * block, Level * level, int x, int y, int z) {
 	float brightness = LevelGetBrightness(level, x, y, z);
 	ShapeRendererColorf(brightness, brightness, brightness);
 	Render(block, x, y, z);
 	return true;
 }
 
-void FlowerBlockRenderFullBrightness(FlowerBlock block) {
+void FlowerBlockRenderFullBrightness(FlowerBlock * block) {
 	ShapeRendererColorf(1.0, 1.0, 1.0);
 	Render(block, -2.0, 0.0, 0.0);
 }

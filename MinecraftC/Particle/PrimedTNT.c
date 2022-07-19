@@ -66,7 +66,7 @@ void PrimedTNTTick(PrimedTNT * entity) {
 				float oz = RandomGeneratorNormal(&random, 1.0) * radius / 4.0;
 				float l = ox * ox + oy * oy + oz * oz;
 				TerrainParticle * particle = malloc(sizeof(TerrainParticle));
-				TerrainParticleCreate(particle, entity->level, entity->x + ox, entity->y + oy, entity->z + oz, ox / l, oy / l, oz / l, Blocks.table[BlockTypeTNT]);
+				TerrainParticleCreate(particle, entity->level, entity->x + ox, entity->y + oy, entity->z + oz, ox / l, oy / l, oz / l, &Blocks.table[BlockTypeTNT]);
 				ParticleManagerSpawnParticle(entity->level->particleEngine, particle);
 			}
 		}
@@ -85,7 +85,7 @@ void PrimedTNTRender(PrimedTNT * tnt, TextureManager * textures, float dt) {
 	float vz = tnt->zo + (tnt->z - tnt->zo) * dt - 0.5;
 	glTranslatef(vx, vy, vz);
 	glPushMatrix();
-	BlockRenderPreview(Blocks.table[BlockTypeTNT]);
+	BlockRenderPreview(&Blocks.table[BlockTypeTNT]);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
 	glColor4f(1.0, 1.0, 1.0, ((this->life / 4 + 1) % 2) * 0.4);
@@ -94,7 +94,7 @@ void PrimedTNTRender(PrimedTNT * tnt, TextureManager * textures, float dt) {
 		
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	BlockRenderPreview(Blocks.table[BlockTypeTNT]);
+	BlockRenderPreview(&Blocks.table[BlockTypeTNT]);
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);

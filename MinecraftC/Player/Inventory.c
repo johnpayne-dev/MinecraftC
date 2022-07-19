@@ -25,7 +25,9 @@ void InventoryGrabTexture(Inventory * inventory, BlockType tile) {
 	int slot = GetSlot(inventory, tile);
 	if (slot >= 0) { inventory->selected = slot; }
 	else {
-		if (tile != BlockTypeNone && ListContains(SessionDataAllowedBlocks, Blocks.table[tile])) { InventoryReplaceSlotWithBlock(inventory, Blocks.table[tile]); }
+		if (tile != BlockTypeNone && ListContains(SessionDataAllowedBlocks, &(BlockType){ Blocks.table[tile].type })) {
+			InventoryReplaceSlotWithBlock(inventory, &Blocks.table[tile]);
+		}
 	}
 }
 
@@ -37,10 +39,10 @@ void InventorySwapPaint(Inventory * inventory, int slot) {
 }
 
 void InventoryReplaceSlot(Inventory * inventory, int sessionBlock) {
-	if (sessionBlock >= 0) { InventoryReplaceSlotWithBlock(inventory, SessionDataAllowedBlocks[sessionBlock]); }
+	if (sessionBlock >= 0) { InventoryReplaceSlotWithBlock(inventory, &Blocks.table[SessionDataAllowedBlocks[sessionBlock]]); }
 }
 
-void InventoryReplaceSlotWithBlock(Inventory * inventory, Block block) {
+void InventoryReplaceSlotWithBlock(Inventory * inventory, Block * block) {
 	if (block != NULL) {
 		int slot = GetSlot(inventory, block->type);
 		if (slot >= 0) { inventory->slots[slot] = inventory->slots[inventory->selected]; }

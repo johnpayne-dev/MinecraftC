@@ -2,7 +2,7 @@
 #include "../Level/Level.h"
 #include "../Render/ShapeRenderer.h"
 
-void TerrainParticleCreate(TerrainParticle * particle, Level * level, float x, float y, float z, float xd, float yd, float zd, Block block) {
+void TerrainParticleCreate(TerrainParticle * particle, Level * level, float x, float y, float z, float xd, float yd, float zd, Block * block) {
 	ParticleCreate(particle, level, x, y, z, xd, yd, zd);
 	ParticleData * this = &particle->particle;
 	this->texture = block->textureID;

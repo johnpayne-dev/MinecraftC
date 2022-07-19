@@ -46,7 +46,7 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 			glScalef(-1.0, -1.0, -1.0);
 			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&hud->minecraft->textureManager, "Terrain.png"));
 			ShapeRendererBegin();
-			BlockRenderFullBrightness(Blocks.table[tile]);
+			BlockRenderFullBrightness(&Blocks.table[tile]);
 			ShapeRendererEnd();
 			glPopMatrix();
 		}

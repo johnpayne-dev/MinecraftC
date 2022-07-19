@@ -3,7 +3,7 @@
 
 typedef struct HeldBlock {
 	struct Minecraft * minecraft;
-	Block block;
+	Block * block;
 	float position;
 	float lastPosition;
 	int offset;

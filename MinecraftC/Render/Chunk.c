@@ -40,7 +40,7 @@ void ChunkUpdate(Chunk * chunk) {
 				for (int z = z0; z < z1; z++) {
 					BlockType tile = LevelGetTile(chunk->level, x, y, z);
 					if (tile != BlockTypeNone) {
-						Block block = Blocks.table[tile];
+						Block * block = &Blocks.table[tile];
 						if (BlockGetRenderPass(block) != i) { b0 = true; }
 						else { b1 |= BlockRender(block, chunk->level, x, y, z); }
 					}

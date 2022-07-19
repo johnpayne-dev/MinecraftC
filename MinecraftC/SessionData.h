@@ -2,6 +2,6 @@
 #include "Utilities/String.h"
 #include "Level/Tile/Block.h"
 
-extern List(Block) SessionDataAllowedBlocks;
+extern List(BlockType) SessionDataAllowedBlocks;
 void SessionDataInitialize(void);
 void SessionDataFree(void);

@@ -3,7 +3,7 @@
 #include "../../Utilities/SinTable.h"
 
 void LavaTextureCreate(LavaTexture * texture) {
-	AnimatedTextureCreate(texture, Blocks.table[BlockTypeLava]->textureID);
+	AnimatedTextureCreate(texture, Blocks.table[BlockTypeLava].textureID);
 	texture->type = AnimatedTextureTypeLava;
 	texture->lava = (LavaTextureData){ 0 };
 }

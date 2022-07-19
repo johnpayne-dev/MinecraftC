@@ -104,13 +104,13 @@ static void OnMouseClicked(Minecraft * minecraft, int button) {
 				if (minecraft->selected.face == 4) { vx--; }
 				if (minecraft->selected.face == 5) { vx++; }
 			}
-			Block block = Blocks.table[LevelGetTile(minecraft->level, vx, vy, vz)];
+			Block * block = &Blocks.table[LevelGetTile(minecraft->level, vx, vy, vz)];
 			if (button == SDL_BUTTON_LEFT) {
-				if (block != NULL && (block->type != BlockTypeBedrock || player->userType >= 100)) {
+				if (block->type != BlockTypeNone && (block->type != BlockTypeBedrock || player->userType >= 100)) {
 					Level * level = minecraft->level;
-					Block block = Blocks.table[LevelGetTile(level, vx, vy, vz)];
+					Block * block = &Blocks.table[LevelGetTile(level, vx, vy, vz)];
 					bool setTile = LevelNetSetTile(level, vx, vy, vz, 0);
-					if (block != NULL && setTile) {
+					if (block->type != BlockTypeNone && setTile) {
 						if (block->sound.type != TileSoundTypeNone) {
 							LevelPlaySoundAt(level, "step.wtf", vx, vy, vz, (TileSoundGetVolume(block->sound) + 1.0) / 2.0, TileSoundGetPitch(block->sound) * 0.8);
 						}
@@ -122,12 +122,12 @@ static void OnMouseClicked(Minecraft * minecraft, int button) {
 				int selected = InventoryGetSelected(&player->inventory);
 				if (selected <= 0) { return; }
 				
-				Block block = Blocks.table[LevelGetTile(minecraft->level, vx, vy, vz)];
-				AABB aabb = Blocks.table[selected] == NULL ? (AABB){ .null = true } : BlockGetCollisionAABB(Blocks.table[selected], vx, vy, vz);
-				if ((block == NULL || block->type == BlockTypeWater || block->type == BlockTypeStillWater || block->type == BlockTypeLava || block->type == BlockTypeStillLava) && (aabb.null || !AABBIntersects(minecraft->player.aabb, aabb))) {
+				Block * block = &Blocks.table[LevelGetTile(minecraft->level, vx, vy, vz)];
+				AABB aabb = Blocks.table[selected].type == BlockTypeNone ? (AABB){ .null = true } : BlockGetCollisionAABB(&Blocks.table[selected], vx, vy, vz);
+				if ((block->type == BlockTypeNone || block->type == BlockTypeWater || block->type == BlockTypeStillWater || block->type == BlockTypeLava || block->type == BlockTypeStillLava) && (aabb.null || !AABBIntersects(minecraft->player.aabb, aabb))) {
 					LevelNetSetTile(minecraft->level, vx, vy, vz, selected);
 					minecraft->renderer.heldBlock.position = 0.0;
-					BlockOnPlaced(Blocks.table[selected], minecraft->level, vx, vy, vz);
+					BlockOnPlaced(&Blocks.table[selected], minecraft->level, vx, vy, vz);
 				}
 			}
 		}
@@ -241,8 +241,8 @@ static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
 		}
 		PlayerData * player = &minecraft->player.player;
 		int selected = InventoryGetSelected(&player->inventory);
-		Block block = NULL;
-		if (selected >= 0) { block = Blocks.table[selected]; }
+		Block * block = &Blocks.table[BlockTypeNone];
+		if (selected >= 0) { block = &Blocks.table[selected]; }
 		float s = (block == renderer->heldBlock.block ? 1.0 : 0.0) - renderer->heldBlock.position;
 		if (s < -0.4) { s = -0.4; }
 		if (s > 0.4) { s = 0.4; }
@@ -503,8 +503,8 @@ void MinecraftRun(Minecraft * minecraft) {
 				renderer->fogR = (renderer->fogR + (skyR - renderer->fogR) * a) * renderer->fogColorMultiplier;
 				renderer->fogG = (renderer->fogG + (skyG - renderer->fogG) * a) * renderer->fogColorMultiplier;
 				renderer->fogB = (renderer->fogB + (skyB - renderer->fogB) * a) * renderer->fogColorMultiplier;
-				Block block = Blocks.table[LevelGetTile(level, player->x, player->y + 0.12, player->z)];
-				if (block != NULL && BlockGetLiquidType(block) != LiquidTypeNone) {
+				Block * block = &Blocks.table[LevelGetTile(level, player->x, player->y + 0.12, player->z)];
+				if (block->type != BlockTypeNone && BlockGetLiquidType(block) != LiquidTypeNone) {
 					if (BlockGetLiquidType(block) == LiquidTypeWater) {
 						renderer->fogR = 0.02;
 						renderer->fogG = 0.02;
@@ -574,15 +574,15 @@ void MinecraftRun(Minecraft * minecraft) {
 							for (int z = pz - 1; z <= pz + 1; z++) {
 								int vx = x, vy = y, vz = z;
 								BlockType tile = LevelGetTile(level, x, y, z);
-								if (tile != BlockTypeNone && BlockIsSolid(Blocks.table[tile])) {
+								if (tile != BlockTypeNone && BlockIsSolid(&Blocks.table[tile])) {
 									glColor4f(0.2, 0.2, 0.2, 1.0);
 									glDepthFunc(GL_LESS);
 									ShapeRendererBegin();
-									for (int j = 0; j < 6; j++) { BlockRenderInside(Blocks.table[tile], vx, vy, vz, j); }
+									for (int j = 0; j < 6; j++) { BlockRenderInside(&Blocks.table[tile], vx, vy, vz, j); }
 									ShapeRendererEnd();
 									glCullFace(GL_FRONT);
 									ShapeRendererBegin();
-									for (int j = 0; j < 6; j++) { BlockRenderInside(Blocks.table[tile], vx, vy, vz, j); }
+									for (int j = 0; j < 6; j++) { BlockRenderInside(&Blocks.table[tile], vx, vy, vz, j); }
 									ShapeRendererEnd();
 									glCullFace(GL_BACK);
 									glDepthFunc(GL_LEQUAL);
@@ -693,7 +693,7 @@ void MinecraftRun(Minecraft * minecraft) {
 					glDepthMask(false);
 					BlockType tile = LevelGetTile(level, pos.x, pos.y, pos.z);
 					if (tile > BlockTypeNone) {
-						AABB aabb = AABBGrow(BlockGetSelectionAABB(Blocks.table[tile], pos.x, pos.y, pos.z), 0.002, 0.002, 0.002);
+						AABB aabb = AABBGrow(BlockGetSelectionAABB(&Blocks.table[tile], pos.x, pos.y, pos.z), 0.002, 0.002, 0.002);
 						glBegin(GL_LINE_STRIP);
 						glVertex3f(aabb.x0, aabb.y0, aabb.z0);
 						glVertex3f(aabb.x1, aabb.y0, aabb.z0);
@@ -898,7 +898,7 @@ void MinecraftSetLevel(Minecraft * minecraft, Level * level) {
 	PlayerData * player = &minecraft->player.player;
 	InputHandlerCreate(&player->input, &minecraft->settings);
 	for (int i = 0; i < 9; i++) {
-		if (player->inventory.slots[i] == -1) { player->inventory.slots[i] = SessionDataAllowedBlocks[i]->type; }
+		if (player->inventory.slots[i] == -1) { player->inventory.slots[i] = SessionDataAllowedBlocks[i]; }
 	}
 	
 	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->textureManager);

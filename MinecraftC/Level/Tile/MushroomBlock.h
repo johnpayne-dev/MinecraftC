@@ -3,5 +3,5 @@
 
 typedef FlowerBlock MushroomBlock;
 
-MushroomBlock MushroomBlockCreate(BlockType type, int textureID);
-void MushroomBlockUpdate(MushroomBlock block, struct Level * level, int x, int y, int z, RandomGenerator * random);
+void MushroomBlockCreate(MushroomBlock * block, BlockType type, int textureID, TileSound sound, float particleGravity);
+void MushroomBlockUpdate(MushroomBlock * block, struct Level * level, int x, int y, int z, RandomGenerator * random);

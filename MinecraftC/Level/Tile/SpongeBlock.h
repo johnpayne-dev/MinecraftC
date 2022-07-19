@@ -3,6 +3,6 @@
 
 typedef Block SpongeBlock;
 
-SpongeBlock SpongeBlockCreate(void);
-void SpongeBlockOnAdded(SpongeBlock block, struct Level * level, int x, int y, int z);
-void SpongeBlockOnRemoved(SpongeBlock block, struct Level * level, int x, int y, int z);
+void SpongeBlockCreate(SpongeBlock * block, TileSound sound, float particleGravity);
+void SpongeBlockOnAdded(SpongeBlock * block, struct Level * level, int x, int y, int z);
+void SpongeBlockOnRemoved(SpongeBlock * block, struct Level * level, int x, int y, int z);

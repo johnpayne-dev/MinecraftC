@@ -87,8 +87,8 @@ void LevelSetRenderer(Level * level, LevelRenderer * listener) {
 }
 
 bool LevelIsLightBlocker(Level * level, int x, int y, int z) {
-	Block block = Blocks.table[LevelGetTile(level, x, y, z)];
-	return block == NULL ? false : BlockIsOpaque(block);
+	Block * block = &Blocks.table[LevelGetTile(level, x, y, z)];
+	return block->type == BlockTypeNone ? false : BlockIsOpaque(block);
 }
 
 List(AABB) LevelGetCubes(Level * level, AABB box) {
@@ -103,13 +103,13 @@ List(AABB) LevelGetCubes(Level * level, AABB box) {
 			for (int k = z0; k < z1; k++) {
 				AABB aabb = { 0 };
 				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height) {
-					Block block = Blocks.table[LevelGetTile(level, i, j, k)];
-					if (block != NULL) {
+					Block * block = &Blocks.table[LevelGetTile(level, i, j, k)];
+					if (block->type != BlockTypeNone) {
 						aabb = BlockGetCollisionAABB(block, i, j, k);
 						if (!aabb.null && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
 					}
 				} else if (i < 0 || j < 0 || k < 0 || i >= level->width || k >= level->height) {
-					AABB aabb = BlockGetCollisionAABB(Blocks.table[BlockTypeBedrock], i, j, k);
+					AABB aabb = BlockGetCollisionAABB(&Blocks.table[BlockTypeBedrock], i, j, k);
 					if (!aabb.null && AABBIntersectsInner(box, aabb)) { list = ListPush(list, &aabb); }
 				}
 			}
@@ -151,8 +151,8 @@ bool LevelSetTileNoNeighborChange(Level * level, int x, int y, int z, BlockType 
 	if (tile == BlockTypeNone && (x == 0 || z == 0 || x == level->width - 1 || z == level->height - 1) && y >= LevelGetGroundLevel(level) && y < LevelGetWaterLevel(level)) { tile = BlockTypeWater; }
 	BlockType prev = level->blocks[i];
 	level->blocks[i] = tile;
-	if (prev != BlockTypeNone) { BlockOnRemoved(Blocks.table[prev], level, x, y, z); }
-	if (tile != BlockTypeNone) { BlockOnAdded(Blocks.table[tile], level, x, y, z); }
+	if (prev != BlockTypeNone) { BlockOnRemoved(&Blocks.table[prev], level, x, y, z); }
+	if (tile != BlockTypeNone) { BlockOnAdded(&Blocks.table[tile], level, x, y, z); }
 	LevelCalculateLightDepths(level, x, z, 1, 1);
 	if (level->renderer != NULL) { LevelRendererQueueChunks(level->renderer, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1); }
 	return true;
@@ -160,8 +160,8 @@ bool LevelSetTileNoNeighborChange(Level * level, int x, int y, int z, BlockType 
 
 static void UpdateTile(Level * level, int x, int y, int z, BlockType tile) {
 	if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) { return; }
-	Block block = Blocks.table[level->blocks[(y * level->height + z) * level->width + x]];
-	if (block != NULL) { BlockOnNeighborChanged(block, level, x, y, z, tile); }
+	Block * block = &Blocks.table[level->blocks[(y * level->height + z) * level->width + x]];
+	if (block->type != BlockTypeNone) { BlockOnNeighborChanged(block, level, x, y, z, tile); }
 }
 
 void LevelUpdateNeighborsAt(Level * level, int x, int y, int z, BlockType tile) {
@@ -190,8 +190,8 @@ BlockType LevelGetTile(Level * level, int x, int y, int z) {
 }
 
 bool LevelIsSolidTile(Level * level, int x, int y, int z) {
-	Block block = Blocks.table[LevelGetTile(level, x, y, z)];
-	return block == NULL ? false : BlockIsSolid(block);
+	Block * block = &Blocks.table[LevelGetTile(level, x, y, z)];
+	return block->type == BlockTypeNone ? false : BlockIsSolid(block);
 }
 
 void LevelTickEntities(Level * level) {
@@ -219,7 +219,7 @@ void LevelTick(Level * level) {
 			} else {
 				BlockType tile = level->blocks[(nextTick.y * level->height + nextTick.z) * level->width + nextTick.x];
 				if (LevelIsInBounds(level, nextTick.x, nextTick.y, nextTick.z) && tile == nextTick.Tile && tile != BlockTypeNone) {
-					BlockUpdate(Blocks.table[tile], level, nextTick.x, nextTick.y, nextTick.z, &level->random);
+					BlockUpdate(&Blocks.table[tile], level, nextTick.x, nextTick.y, nextTick.z, &level->random);
 				}
 			}
 		}
@@ -236,7 +236,7 @@ void LevelTick(Level * level) {
 		int z = y >> a & (level->height - 1);
 		y = y >> (a + b) & (level->depth - 1);
 		BlockType tile = level->blocks[(y * level->height + z) * level->width + x];
-		if (Blocks.physics[tile]) { BlockUpdate(Blocks.table[tile], level, x, y, z, &level->random); }
+		if (Blocks.physics[tile]) { BlockUpdate(&Blocks.table[tile], level, x, y, z, &level->random); }
 	}
 }
 
@@ -267,8 +267,8 @@ bool LevelContainsAnyLiquid(Level * level, AABB box) {
 	for (int i = x0; i < x1; i++) {
 		for (int j = y0; j < y1; j++) {
 			for (int k = z0; k < z1; k++) {
-				Block block = Blocks.table[LevelGetTile(level, i, j, k)];
-				if (block != NULL && BlockGetLiquidType(block) != LiquidTypeNone) { return true; }
+				Block * block = &Blocks.table[LevelGetTile(level, i, j, k)];
+				if (block->type != BlockTypeNone && BlockGetLiquidType(block) != LiquidTypeNone) { return true; }
 			}
 		}
 	}
@@ -290,8 +290,8 @@ bool LevelContainsLiquid(Level * level, AABB box, LiquidType liquidID) {
 	for (int i = x0; i < x1; i++) {
 		for (int j = y0; j < y1; j++) {
 			for (int k = z0; k < z1; k++) {
-				Block block = Blocks.table[LevelGetTile(level, i, j, k)];
-				if (block != NULL && BlockGetLiquidType(block) == liquidID) { return true; }
+				Block * block = &Blocks.table[LevelGetTile(level, i, j, k)];
+				if (block->type != BlockTypeNone && BlockGetLiquidType(block) == liquidID) { return true; }
 			}
 		}
 	}
@@ -300,13 +300,13 @@ bool LevelContainsLiquid(Level * level, AABB box, LiquidType liquidID) {
 
 void LevelAddToNextTick(Level * level, int x, int y, int z, BlockType tile) {
 	NextTickListEntry tick = { .x = x, .y = y, .z = z, .Tile = tile };
-	if (tile != BlockTypeNone) { tick.Ticks = BlockGetTickDelay(Blocks.table[tile]); }
+	if (tile != BlockTypeNone) { tick.Ticks = BlockGetTickDelay(&Blocks.table[tile]); }
 	level->tickList = ListPush(level->tickList, &tick);
 }
 
 static bool IsSolid(Level * level, float x, float y, float z) {
 	BlockType tile = LevelGetTile(level, x, y, z);
-	return tile != BlockTypeNone && BlockIsSolid(Blocks.table[tile]);
+	return tile != BlockTypeNone && BlockIsSolid(&Blocks.table[tile]);
 }
 
 bool LevelIsSolidSearch(Level * level, float x, float y, float z, float r) {
@@ -323,7 +323,7 @@ bool LevelIsSolidSearch(Level * level, float x, float y, float z, float r) {
 
 int LevelGetHighestTile(Level * level, int x, int z) {
 	int y;
-	for (y = level->depth; (LevelGetTile(level, x, y - 1, z) == 0 || BlockGetLiquidType(Blocks.table[LevelGetTile(level, x, y - 1, z)]) != LiquidTypeNone) && y > 0; y--);
+	for (y = level->depth; (LevelGetTile(level, x, y - 1, z) == 0 || BlockGetLiquidType(&Blocks.table[LevelGetTile(level, x, y - 1, z)]) != LiquidTypeNone) && y > 0; y--);
 	return y;
 }
 
@@ -340,7 +340,7 @@ float LevelGetBrightness(Level * level, int x, int y, int z) {
 
 bool LevelIsWater(Level * level, int x, int y, int z) {
 	BlockType tile = LevelGetTile(level, x, y, z);
-	return tile != BlockTypeNone && BlockGetLiquidType(Blocks.table[tile]) == LiquidTypeWater;
+	return tile != BlockTypeNone && BlockGetLiquidType(&Blocks.table[tile]) == LiquidTypeWater;
 }
 
 MovingObjectPosition LevelClip(Level * level, Vector3D v0, Vector3D v1) {
@@ -390,7 +390,7 @@ MovingObjectPosition LevelClip(Level * level, Vector3D v0, Vector3D v1) {
 		if (c == 1) { i0y--; v00.y++; }
 		if (c == 3) { i0z--; v00.z++; }
 		BlockType tile = LevelGetTile(level, i0x, i0y, i0z);
-		Block block = Blocks.table[tile];
+		Block * block = &Blocks.table[tile];
 		if (tile != BlockTypeNone && BlockGetLiquidType(block) == LiquidTypeNone) {
 			MovingObjectPosition pos = BlockClip(block, i0x, i0y, i0z, v0, v1);
 			if (!pos.null) { return pos; }
@@ -473,9 +473,9 @@ void LevelExplode(Level * level, float x, float y, float z, float radius) {
 				float vy = j + 0.5 - y;
 				float vz = k + 0.5 - z;
 				BlockType tile = LevelGetTile(level, i, j, k);
-				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height && vx * vx + vy * vy + vz * vz < radius * radius && tile > 0 && BlockCanExplode(Blocks.table[tile])) {
+				if (i >= 0 && j >= 0 && k >= 0 && i < level->width && j < level->depth && k < level->height && vx * vx + vy * vy + vz * vz < radius * radius && tile > 0 && BlockCanExplode(&Blocks.table[tile])) {
 					LevelSetTile(level, i, j, k, BlockTypeNone);
-					BlockExplode(Blocks.table[tile], level, i, j, k);
+					BlockExplode(&Blocks.table[tile], level, i, j, k);
 				}
 			}
 		}

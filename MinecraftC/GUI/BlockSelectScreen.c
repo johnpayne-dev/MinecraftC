@@ -34,7 +34,7 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
 	
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&screen->minecraft->textureManager, "Terrain.png"));
 	for (int i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
-		Block block = SessionDataAllowedBlocks[i];
+		BlockType tile = SessionDataAllowedBlocks[i];
 		glPushMatrix();
 		int x = screen->width / 2 + i % 9 * 24 + -108;
 		int y = screen->height / 2 + i / 9 * 24 + -60;
@@ -47,7 +47,7 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
 		glTranslatef(-1.5, 0.5, 0.5);
 		glScalef(-1.0, -1.0, -1.0);
 		ShapeRendererBegin();
-		BlockRenderFullBrightness(block);
+		BlockRenderFullBrightness(&Blocks.table[tile]);
 		ShapeRendererEnd();
 		glPopMatrix();
 	}
