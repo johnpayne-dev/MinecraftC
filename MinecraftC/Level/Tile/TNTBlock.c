@@ -14,12 +14,15 @@ int TNTBlockGetDropCount(TNTBlock block) {
 	return 0;
 }
 
-void TNTBlockExplode(TNTBlock block, Level level, int x, int y, int z) {
-	PrimedTNT tnt = PrimedTNTCreate(level, x + 0.5, y + 0.5, z + 0.5);
-	((PrimedTNTData)tnt->typeData)->life = RandomIntegerRange(5, 14);
+void TNTBlockExplode(TNTBlock block, Level * level, int x, int y, int z) {
+	PrimedTNT * tnt = malloc(sizeof(PrimedTNT));
+	PrimedTNTCreate(tnt, level, x + 0.5, y + 0.5, z + 0.5);
+	tnt->tnt.life = RandomIntegerRange(5, 14);
 	LevelAddEntity(level, tnt);
 }
 
-void TNTBlockSpawnBreakParticles(TNTBlock block, Level level, int x, int y, int z, ParticleManager particles) {
-	LevelAddEntity(level, PrimedTNTCreate(level, x + 0.5, y + 0.5, z + 0.5f));
+void TNTBlockSpawnBreakParticles(TNTBlock block, Level * level, int x, int y, int z, ParticleManager * particles) {
+	PrimedTNT * tnt = malloc(sizeof(PrimedTNT));
+	PrimedTNTCreate(tnt, level, x + 0.5, y + 0.5, z + 0.5f);
+	LevelAddEntity(level, tnt);
 }

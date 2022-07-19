@@ -2,16 +2,14 @@
 #include "../../Level/Tile/Block.h"
 #include "../../Utilities/SinTable.h"
 
-LavaTexture LavaTextureCreate() {
-	LavaTexture texture = AnimatedTextureCreate(Blocks.table[BlockTypeLava]->textureID);
+void LavaTextureCreate(LavaTexture * texture) {
+	AnimatedTextureCreate(texture, Blocks.table[BlockTypeLava]->textureID);
 	texture->type = AnimatedTextureTypeLava;
-	texture->typeData = malloc(sizeof(struct LavaTextureData));
-	*(LavaTextureData)texture->typeData = (struct LavaTextureData){ 0 };
-	return texture;
+	texture->lava = (LavaTextureData){ 0 };
 }
 
-void LavaTextureAnimate(LavaTexture texture) {
-	LavaTextureData this = texture->typeData;
+void LavaTextureAnimate(LavaTexture * texture) {
+	LavaTextureData * this = &texture->lava;
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			int sy = tsin(y * M_PI / 8.0) * 1.2;
@@ -55,9 +53,4 @@ void LavaTextureAnimate(LavaTexture texture) {
 		texture->data[(i << 2) + 2] = c;
 		texture->data[(i << 2) + 3] = -1;
 	}
-}
-
-void LavaTextureDestroy(LavaTexture texture) {
-	LavaTextureData this = texture->typeData;
-	free(this);
 }

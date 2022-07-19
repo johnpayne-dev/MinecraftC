@@ -14,13 +14,12 @@
 #include "Particle/WaterDropParticle.h"
 #include "Particle/PrimedTNT.h"
 
-Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fullScreen) {
-	Minecraft minecraft = malloc(sizeof(struct Minecraft));
-	*minecraft = (struct Minecraft){ 0 };
-	minecraft->timer = TimerCreate(20.0);
-	minecraft->progressBar = ProgressBarDisplayCreate(minecraft);
-	minecraft->renderer = RendererCreate(minecraft);
-	minecraft->levelIO = LevelIOCreate(minecraft->progressBar);
+void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScreen) {
+	*minecraft = (Minecraft){ 0 };
+	TimerCreate(&minecraft->timer, 20.0);
+	ProgressBarDisplayCreate(&minecraft->progressBar, minecraft);
+	RendererCreate(&minecraft->renderer, minecraft);
+	LevelIOCreate(&minecraft->levelIO, &minecraft->progressBar);
 	minecraft->ticks = 0;
 	minecraft->selected = (MovingObjectPosition){ .null = true };
 	minecraft->running = false;
@@ -31,18 +30,16 @@ Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fu
 	minecraft->height = height;
 	minecraft->fullScreen = fullScreen;
 	minecraft->debug = StringCreate("");
-	minecraft->session = NULL;
-	return minecraft;
 }
 
-void MinecraftSetCurrentScreen(Minecraft minecraft, GUIScreen screen) {
+void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen screen) {
 	if (minecraft->currentScreen != NULL && minecraft->currentScreen->type == GUIScreenTypeError) { return; }
 	
 	if (minecraft->currentScreen != NULL) { GUIScreenOnClose(minecraft->currentScreen); }
 	minecraft->currentScreen = screen;
 	if (screen != NULL) {
 		if (minecraft->hasMouse) {
-			PlayerReleaseAllKeys(minecraft->player);
+			PlayerReleaseAllKeys(&minecraft->player);
 			minecraft->hasMouse = false;
 			if (minecraft->levelLoaded) { SDL_ShowCursor(true); }
 			else { SDL_SetWindowGrab(minecraft->window, false); }
@@ -54,7 +51,7 @@ void MinecraftSetCurrentScreen(Minecraft minecraft, GUIScreen screen) {
 	} else { MinecraftGrabMouse(minecraft); }
 }
 
-void MinecraftShutdown(Minecraft minecraft) {
+void MinecraftShutdown(Minecraft * minecraft) {
 	/*try {
 		if(this.soundPlayer != null) {
 		     SoundPlayer var1 = this.soundPlayer;
@@ -69,26 +66,26 @@ void MinecraftShutdown(Minecraft minecraft) {
 		  ;
 	       }*/
 	if (!minecraft->levelLoaded) {
-		LevelIOSave(minecraft->levelIO, minecraft->level, SDL_RWFromFile("level.dat", "rb"));
+		LevelIOSave(&minecraft->levelIO, minecraft->level, SDL_RWFromFile("level.dat", "rb"));
 	}
 	
 	SDL_GL_DeleteContext(minecraft->context);
 	SDL_DestroyWindow(minecraft->window);
 }
 
-static void CheckGLError(Minecraft minecraft, char * msg) {
+static void CheckGLError(Minecraft * minecraft, char * msg) {
 	int error = glGetError();
 	if (error != 0) {
 		LogError("GL: %i\n", error);
 	}
 }
 
-static void OnMouseClicked(Minecraft minecraft, int button) {
-	PlayerData player = minecraft->player->typeData;
+static void OnMouseClicked(Minecraft * minecraft, int button) {
+	PlayerData * player = &minecraft->player.player;
 	
 	if (button == SDL_BUTTON_LEFT) {
-		minecraft->renderer->heldBlock.offset = -1;
-		minecraft->renderer->heldBlock.moving = true;
+		minecraft->renderer.heldBlock.offset = -1;
+		minecraft->renderer.heldBlock.moving = true;
 	}
 	
 	if (!minecraft->selected.null) {
@@ -110,26 +107,26 @@ static void OnMouseClicked(Minecraft minecraft, int button) {
 			Block block = Blocks.table[LevelGetTile(minecraft->level, vx, vy, vz)];
 			if (button == SDL_BUTTON_LEFT) {
 				if (block != NULL && (block->type != BlockTypeBedrock || player->userType >= 100)) {
-					Level level = minecraft->level;
+					Level * level = minecraft->level;
 					Block block = Blocks.table[LevelGetTile(level, vx, vy, vz)];
 					bool setTile = LevelNetSetTile(level, vx, vy, vz, 0);
 					if (block != NULL && setTile) {
 						if (block->sound.type != TileSoundTypeNone) {
 							LevelPlaySoundAt(level, "step.wtf", vx, vy, vz, (TileSoundGetVolume(block->sound) + 1.0) / 2.0, TileSoundGetPitch(block->sound) * 0.8);
 						}
-						BlockSpawnBreakParticles(block, level, vx, vy, vz, minecraft->particleManager);
+						BlockSpawnBreakParticles(block, level, vx, vy, vz, &minecraft->particleManager);
 					}
 					return;
 				}
 			} else {
-				int selected = InventoryGetSelected(player->inventory);
+				int selected = InventoryGetSelected(&player->inventory);
 				if (selected <= 0) { return; }
 				
 				Block block = Blocks.table[LevelGetTile(minecraft->level, vx, vy, vz)];
 				AABB aabb = Blocks.table[selected] == NULL ? (AABB){ .null = true } : BlockGetCollisionAABB(Blocks.table[selected], vx, vy, vz);
-				if ((block == NULL || block->type == BlockTypeWater || block->type == BlockTypeStillWater || block->type == BlockTypeLava || block->type == BlockTypeStillLava) && (aabb.null || !AABBIntersects(minecraft->player->aabb, aabb))) {
+				if ((block == NULL || block->type == BlockTypeWater || block->type == BlockTypeStillWater || block->type == BlockTypeLava || block->type == BlockTypeStillLava) && (aabb.null || !AABBIntersects(minecraft->player.aabb, aabb))) {
 					LevelNetSetTile(minecraft->level, vx, vy, vz, selected);
-					minecraft->renderer->heldBlock.position = 0.0;
+					minecraft->renderer.heldBlock.position = 0.0;
 					BlockOnPlaced(Blocks.table[selected], minecraft->level, vx, vy, vz);
 				}
 			}
@@ -137,7 +134,7 @@ static void OnMouseClicked(Minecraft minecraft, int button) {
 	}
 }
 
-static void Tick(Minecraft minecraft, List(SDL_Event) events) {
+static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
 	/*if (this.soundPlayer != null)
 	{
 		SoundPlayer var1 = this.soundPlayer;
@@ -147,21 +144,21 @@ static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 	
 	HUDScreen hud = minecraft->hud;
 	hud->ticks++;
-	for (int i = 0; i < ListLength(hud->chat); i++) { hud->chat[i]->time++; }
+	for (int i = 0; i < ListLength(hud->chat); i++) { hud->chat[i].time++; }
 	
-	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Terrain.png"));
-	for (int i = 0; i < ListLength(minecraft->textureManager->animations); i++) {
-		AnimatedTexture texture = minecraft->textureManager->animations[i];
-		texture->anaglyph = minecraft->settings->anaglyph;
+	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Terrain.png"));
+	for (int i = 0; i < ListLength(minecraft->textureManager.animations); i++) {
+		AnimatedTexture * texture = minecraft->textureManager.animations[i];
+		texture->anaglyph = minecraft->settings.anaglyph;
 		AnimatedTextureAnimate(texture);
-		memcpy(minecraft->textureManager->textureBuffer, texture->data, 1024);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, texture->textureID % 16 << 4, texture->textureID / 16 << 4, 16, 16, GL_RGBA, GL_UNSIGNED_BYTE, minecraft->textureManager->textureBuffer);
+		memcpy(minecraft->textureManager.textureBuffer, texture->data, 1024);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, texture->textureID % 16 << 4, texture->textureID / 16 << 4, 16, 16, GL_RGBA, GL_UNSIGNED_BYTE, minecraft->textureManager.textureBuffer);
 	}
 	
-	PlayerData player = minecraft->player->typeData;
+	PlayerData * player = &minecraft->player.player;
 	if (minecraft->currentScreen == NULL || minecraft->currentScreen->grabsMouse) {
 		for (int i = 0; i < ListLength(events); i++) {
-			if (events[i].type == SDL_MOUSEWHEEL) { InventorySwapPaint(player->inventory, events[i].wheel.y); }
+			if (events[i].type == SDL_MOUSEWHEEL) { InventorySwapPaint(&player->inventory, events[i].wheel.y); }
 			if (minecraft->currentScreen == NULL) {
 				if (!minecraft->hasMouse && events[i].type == SDL_MOUSEBUTTONDOWN) { MinecraftGrabMouse(minecraft); }
 				else if (events[i].type == SDL_MOUSEBUTTONDOWN) {
@@ -181,26 +178,26 @@ static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 						if (tile == BlockTypeGrass) { tile = BlockTypeDirt; }
 						if (tile == BlockTypeDoubleSlab) { tile = BlockTypeSlab; }
 						if (tile == BlockTypeBedrock) { tile = BlockTypeStone; }
-						InventoryGrabTexture(player->inventory, tile);
+						InventoryGrabTexture(&player->inventory, tile);
 					}
 				}
 			} else { GUIScreenMouseEvent(minecraft->currentScreen, events[i]); }
 		}
 		
 		for (int i = 0; i < ListLength(events); i++) {
-			if (events[i].type == SDL_KEYDOWN || events[i].type == SDL_KEYUP) { PlayerSetKey(minecraft->player, events[i].key.keysym.scancode, events[i].type == SDL_KEYDOWN); }
+			if (events[i].type == SDL_KEYDOWN || events[i].type == SDL_KEYUP) { PlayerSetKey(&minecraft->player, events[i].key.keysym.scancode, events[i].type == SDL_KEYDOWN); }
 			if (events[i].type == SDL_KEYDOWN) {
 				if (minecraft->currentScreen != NULL) { GUIScreenKeyboardEvent(minecraft->currentScreen, events[i]); }
 				else {
 					if (events[i].key.keysym.scancode == SDL_SCANCODE_ESCAPE) { MinecraftPause(minecraft); events[i] = (SDL_Event){ 0 }; }
-					if (events[i].key.keysym.scancode == minecraft->settings->loadLocationKey.key) { EntityResetPosition(minecraft->player); }
-					if (events[i].key.keysym.scancode == minecraft->settings->saveLocationKey.key) {
-						LevelSetSpawnPosition(minecraft->level, minecraft->player->x, minecraft->player->y, minecraft->player->z, minecraft->player->yRot);
-						EntityResetPosition(minecraft->player);
+					if (events[i].key.keysym.scancode == minecraft->settings.loadLocationKey.key) { EntityResetPosition(&minecraft->player); }
+					if (events[i].key.keysym.scancode == minecraft->settings.saveLocationKey.key) {
+						LevelSetSpawnPosition(minecraft->level, minecraft->player.x, minecraft->player.y, minecraft->player.z, minecraft->player.yRot);
+						EntityResetPosition(&minecraft->player);
 					}
 					if (events[i].key.keysym.scancode == SDL_SCANCODE_F5) { minecraft->raining = !minecraft->raining; }
-					if (events[i].key.keysym.scancode == minecraft->settings->buildKey.key) { MinecraftSetCurrentScreen(minecraft, BlockSelectScreenCreate()); }
-					if (events[i].key.keysym.scancode == minecraft->settings->chatKey.key)
+					if (events[i].key.keysym.scancode == minecraft->settings.buildKey.key) { MinecraftSetCurrentScreen(minecraft, BlockSelectScreenCreate()); }
+					if (events[i].key.keysym.scancode == minecraft->settings.chatKey.key)
 					{
 						//PlayerReleaseAllKeys(minecraft->Player);
 						//MinecraftSetCurrentScreen(minecraft, ChatInputScreenCreate());
@@ -208,18 +205,18 @@ static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 					}
 				}
 				for (int j = 0; j < 9; j++) {
-					if (events[i].key.keysym.scancode == SDL_SCANCODE_1 + j) { player->inventory->selected = j; }
+					if (events[i].key.keysym.scancode == SDL_SCANCODE_1 + j) { player->inventory.selected = j; }
 				}
-				if (events[i].key.keysym.scancode == minecraft->settings->toggleFogKey.key) { GameSettingsToggleSetting(minecraft->settings, 4, 1); }
+				if (events[i].key.keysym.scancode == minecraft->settings.toggleFogKey.key) { GameSettingsToggleSetting(&minecraft->settings, 4); }
 			}
 		}
 		
 		if (minecraft->currentScreen == NULL) {
-			if ((SDL_GetMouseState(&(int){ 0 }, &(int){ 0 }) & SDL_BUTTON(SDL_BUTTON_LEFT)) > 0 && (minecraft->ticks - minecraft->lastClick) >= minecraft->timer->ticksPerSecond / 4.0 && minecraft->hasMouse) {
+			if ((SDL_GetMouseState(&(int){ 0 }, &(int){ 0 }) & SDL_BUTTON(SDL_BUTTON_LEFT)) > 0 && (minecraft->ticks - minecraft->lastClick) >= minecraft->timer.ticksPerSecond / 4.0 && minecraft->hasMouse) {
 				OnMouseClicked(minecraft, SDL_BUTTON_LEFT);
 				minecraft->lastClick = minecraft->ticks;
 			}
-			if ((SDL_GetMouseState(&(int){ 0 }, &(int){ 0 }) & SDL_BUTTON(SDL_BUTTON_RIGHT)) > 0 && (minecraft->ticks - minecraft->lastClick) >= minecraft->timer->ticksPerSecond / 4.0 && minecraft->hasMouse) {
+			if ((SDL_GetMouseState(&(int){ 0 }, &(int){ 0 }) & SDL_BUTTON(SDL_BUTTON_RIGHT)) > 0 && (minecraft->ticks - minecraft->lastClick) >= minecraft->timer.ticksPerSecond / 4.0 && minecraft->hasMouse) {
 				OnMouseClicked(minecraft, SDL_BUTTON_RIGHT);
 				minecraft->lastClick = minecraft->ticks;
 			}
@@ -233,7 +230,7 @@ static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 	}
 	
 	if (minecraft->level != NULL) {
-		Renderer renderer = minecraft->renderer;
+		Renderer * renderer = &minecraft->renderer;
 		renderer->heldBlock.lastPosition = renderer->heldBlock.position;
 		if (renderer->heldBlock.moving) {
 			renderer->heldBlock.offset++;
@@ -242,8 +239,8 @@ static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 				renderer->heldBlock.moving = false;
 			}
 		}
-		PlayerData player = minecraft->player->typeData;
-		int selected = InventoryGetSelected(player->inventory);
+		PlayerData * player = &minecraft->player.player;
+		int selected = InventoryGetSelected(&player->inventory);
 		Block block = NULL;
 		if (selected >= 0) { block = Blocks.table[selected]; }
 		float s = (block == renderer->heldBlock.block ? 1.0 : 0.0) - renderer->heldBlock.position;
@@ -253,30 +250,32 @@ static void Tick(Minecraft minecraft, List(SDL_Event) events) {
 		if (renderer->heldBlock.position < 0.1) { renderer->heldBlock.block = block; }
 		
 		if (minecraft->raining) {
-			Level level = minecraft->level;
-			int vx = minecraft->player->x;
-			int vy = minecraft->player->y;
-			int vz = minecraft->player->z;
+			Level * level = minecraft->level;
+			int vx = minecraft->player.x;
+			int vy = minecraft->player.y;
+			int vz = minecraft->player.z;
 			for (int i = 0; i < 50; i++) {
-				int rx = vx + (int)RandomGeneratorIntegerRange(renderer->random, 0, 8) - 4;
-				int rz = vz + (int)RandomGeneratorIntegerRange(renderer->random, 0, 8) - 4;
+				int rx = vx + (int)RandomGeneratorIntegerRange(&renderer->random, 0, 8) - 4;
+				int rz = vz + (int)RandomGeneratorIntegerRange(&renderer->random, 0, 8) - 4;
 				int ry = LevelGetHighestTile(level, rx, rz);
 				if (ry <= vy + 4 && ry >= vy - 4) {
-					float xo = RandomGeneratorUniform(renderer->random);
-					float zo = RandomGeneratorUniform(renderer->random);
-					ParticleManagerSpawnParticle(minecraft->particleManager, WaterDropParticleCreate(level, rx + xo, ry + 0.1, rz + zo));
+					float xo = RandomGeneratorUniform(&renderer->random);
+					float zo = RandomGeneratorUniform(&renderer->random);
+					WaterDropParticle * particle = malloc(sizeof(WaterDropParticle));
+					WaterDropParticleCreate(particle, level, rx + xo, ry + 0.1, rz + zo);
+					ParticleManagerSpawnParticle(&minecraft->particleManager, particle);
 				}
 			}
 		}
 		
-		minecraft->levelRenderer->ticks++;
+		minecraft->levelRenderer.ticks++;
 		LevelTickEntities(minecraft->level);
 		LevelTick(minecraft->level);
-		ParticleManagerTick(minecraft->particleManager);
+		ParticleManagerTick(&minecraft->particleManager);
 	}
 }
 
-void MinecraftRun(Minecraft minecraft) {
+void MinecraftRun(Minecraft * minecraft) {
 	minecraft->running = true;
 	
 	SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE;
@@ -310,24 +309,27 @@ void MinecraftRun(Minecraft minecraft) {
 	ShapeRendererInitialize();
 	SessionDataInitialize();
 	minecraft->workingDirectory = SDL_GetPrefPath("NotMojang", "MinecraftC");
-	minecraft->settings = GameSettingsCreate(minecraft);
-	SDL_GL_SetSwapInterval(minecraft->settings->limitFramerate ? 1 : 0);
-	minecraft->textureManager = TextureManagerCreate(minecraft->settings);
-	TextureManagerRegisterAnimation(minecraft->textureManager, LavaTextureCreate());
-	TextureManagerRegisterAnimation(minecraft->textureManager, WaterTextureCreate());
-	minecraft->font = FontRendererCreate(minecraft->settings, "Default.png", minecraft->textureManager);
-	minecraft->levelRenderer = LevelRendererCreate(minecraft, minecraft->textureManager);
+	GameSettingsCreate(&minecraft->settings, minecraft);
+	SDL_GL_SetSwapInterval(minecraft->settings.limitFramerate ? 1 : 0);
+	TextureManagerCreate(&minecraft->textureManager, &minecraft->settings);
+	AnimatedTexture * lavaTexture = malloc(sizeof(AnimatedTexture));
+	LavaTextureCreate(lavaTexture);
+	TextureManagerRegisterAnimation(&minecraft->textureManager, lavaTexture);
+	AnimatedTexture * waterTexture = malloc(sizeof(AnimatedTexture));
+	WaterTextureCreate(waterTexture);
+	TextureManagerRegisterAnimation(&minecraft->textureManager, waterTexture);
+	minecraft->font = FontRendererCreate(&minecraft->settings, "Default.png", &minecraft->textureManager);
+	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->textureManager);
 	glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
 	
 	if (!minecraft->levelLoaded) {
-		Level level = LevelIOLoad(minecraft->levelIO, SDL_RWFromFile("level.dat", "rb"));
+		Level * level = LevelIOLoad(&minecraft->levelIO, SDL_RWFromFile("level.dat", "rb"));
 		if (level != NULL) { MinecraftSetLevel(minecraft, level); }
 	}
 	
 	if (minecraft->level == NULL) { MinecraftGenerateLevel(minecraft, 1); }
 	minecraft->levelLoaded = true;
 	
-	minecraft->particleManager = ParticleMangerCreate(minecraft->level, minecraft->textureManager);
 	if (minecraft->levelLoaded) {
 		/*try {
 		    var1.cursor = new Cursor(16, 16, 0, 0, 1, var9, (IntBuffer)null);
@@ -362,7 +364,7 @@ void MinecraftRun(Minecraft minecraft) {
 	uint64_t start = TimeMilli();
 	List(SDL_Event) events = ListCreate(sizeof(SDL_Event));
 	while (minecraft->running) {
-		if (minecraft->timer->elapsedTicks > 0) { events = ListClear(events); };
+		if (minecraft->timer.elapsedTicks > 0) { events = ListClear(events); };
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) { minecraft->running = false; }
@@ -383,7 +385,7 @@ void MinecraftRun(Minecraft minecraft) {
 			events = ListPush(events, &copy);
 		}
 		
-		Timer timer = minecraft->timer;
+		Timer * timer = &minecraft->timer;
 		uint64_t time = TimeMilli();
 		uint64_t d = time - timer->lastSystemClock;
 		uint64_t t2 = TimeNano() / 1000000;
@@ -420,7 +422,7 @@ void MinecraftRun(Minecraft minecraft) {
 		glEnable(GL_TEXTURE_2D);
 		
 		float delta = timer->delta;
-		Renderer renderer = minecraft->renderer;
+		Renderer * renderer = &minecraft->renderer;
 		if (renderer->displayActive && (SDL_GetWindowFlags(minecraft->window) & SDL_WINDOW_INPUT_FOCUS) == 0) {
 			MinecraftPause(minecraft);
 		}
@@ -439,7 +441,7 @@ void MinecraftRun(Minecraft minecraft) {
 				SDL_WarpMouseGlobal(x, y);
 			} else { SDL_GetRelativeMouseState(&dx, &dy); }
 			
-			EntityTurn(minecraft->player, dy * (minecraft->settings->invertMouse ? -1.0 : 1.0), dx);
+			EntityTurn(&minecraft->player, dy * (minecraft->settings.invertMouse ? -1.0 : 1.0), dx);
 		}
 		
 		int w = minecraft->width * 240 / minecraft->height;
@@ -449,7 +451,7 @@ void MinecraftRun(Minecraft minecraft) {
 		mx = mx * w / minecraft->width;
 		my = my * h / minecraft->height - 1;
 		if (minecraft->level != NULL) {
-			Player player = minecraft->player;
+			Player * player = &minecraft->player;
 			float rotx = player->xRotO + (player->xRot - player->xRotO) * delta;
 			float roty = player->yRotO + (player->yRot - player->yRotO) * delta;
 			Vector3D v = RendererGetPlayerVector(renderer, delta);
@@ -465,7 +467,7 @@ void MinecraftRun(Minecraft minecraft) {
 			renderer->entity = NULL;
 			float a = 0.0;
 			for (int i = 0; i < ListLength(minecraft->level->entities); i++) {
-				Entity entity = minecraft->level->entities[i];
+				Entity * entity = minecraft->level->entities[i];
 				float dist = sqrtf((entity->x - minecraft->level->player->x) * (entity->x - minecraft->level->player->x) + (entity->y - minecraft->level->player->y) * (entity->y - minecraft->level->player->y) + (entity->z - minecraft->level->player->z) * (entity->z - minecraft->level->player->z));
 				if (EntityIsPickable(entity) && dist < reach) {
 					float r = 0.1;
@@ -483,14 +485,14 @@ void MinecraftRun(Minecraft minecraft) {
 			}
 		
 			for (int i = 0; i < 2; i++) {
-				if (minecraft->settings->anaglyph) {
+				if (minecraft->settings.anaglyph) {
 					if (i == 0) { glColorMask(false, true, true, false); }
 					else { glColorMask(true, false, false, false); }
 				}
 				
-				Level level = minecraft->level;
+				Level * level = minecraft->level;
 				glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
-				float a = 1.0 / (4 - minecraft->settings->viewDistance);
+				float a = 1.0 / (4 - minecraft->settings.viewDistance);
 				a = 1.0 - pow(a, 0.25);
 				float skyR = ((level->skyColor >> 24) & 0xff) / 255.0;
 				float skyG = ((level->skyColor >> 16) & 0xff) / 255.0;
@@ -514,7 +516,7 @@ void MinecraftRun(Minecraft minecraft) {
 						renderer->fogB = 0.1;
 					}
 				}
-				if (minecraft->settings->anaglyph) {
+				if (minecraft->settings.anaglyph) {
 					float ar = (renderer->fogR * 30.0 + renderer->fogG * 59.0 + renderer->fogB * 11.0) / 100.0;
 					float ag = (renderer->fogR * 30.0 + renderer->fogG * 70.0) / 100.0;
 					float ab = (renderer->fogR * 30.0 + renderer->fogB * 70.0) / 100.0;
@@ -527,16 +529,16 @@ void MinecraftRun(Minecraft minecraft) {
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				renderer->fogColorMultiplier = 1.0;
 				glEnable(GL_CULL_FACE);
-				renderer->fogEnd = (512 >> (minecraft->settings->viewDistance << 1));
+				renderer->fogEnd = (512 >> (minecraft->settings.viewDistance << 1));
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				if (minecraft->settings->anaglyph) { glTranslatef(-((i << 1) - 1) * 0.07, 0.0, 0.0); }
+				if (minecraft->settings.anaglyph) { glTranslatef(-((i << 1) - 1) * 0.07, 0.0, 0.0); }
 				
 				gluPerspective(70.0, (float)minecraft->width / (float)minecraft->height, 0.05, renderer->fogEnd);
 				glMatrixMode(GL_MODELVIEW);
 				glLoadIdentity();
-				if (minecraft->settings->anaglyph) { glTranslatef(((i << 1) - 1) * 0.1, 0.0, 0.0); }
-				if (minecraft->settings->viewBobbing) { RendererApplyBobbing(renderer, delta); }
+				if (minecraft->settings.anaglyph) { glTranslatef(((i << 1) - 1) * 0.1, 0.0, 0.0); }
+				if (minecraft->settings.viewBobbing) { RendererApplyBobbing(renderer, delta); }
 				
 				glTranslatef(0.0, 0.0, -0.1);
 				float rotx = player->xRotO + (player->xRot - player->xRotO) * delta;
@@ -549,14 +551,14 @@ void MinecraftRun(Minecraft minecraft) {
 				glTranslatef(-posx, -posy, -posz);
 				
 				Frustum frustum = FrustumUpdate();
-				LevelRenderer lrenderer = minecraft->levelRenderer;
+				LevelRenderer * lrenderer = &minecraft->levelRenderer;
 				for (int j = 0; j < lrenderer->chunkCacheCount; j++) { ChunkClip(lrenderer->chunkCache[j], frustum); }
-				qsort(lrenderer->chunks, ListLength(lrenderer->chunks), sizeof(Chunk), ChunkVisibleDistanceComparator);
+				qsort(lrenderer->chunks, ListLength(lrenderer->chunks), sizeof(Chunk *), ChunkVisibleDistanceComparator);
 				
 				int limit = ListLength(lrenderer->chunks);
 				if (limit > 10) { limit = 10; }
 				for (int j = 0; j < limit; j++) {
-					Chunk chunk = lrenderer->chunks[0];
+					Chunk * chunk = lrenderer->chunks[0];
 					lrenderer->chunks = ListRemove(lrenderer->chunks, 0);
 					ChunkUpdate(chunk);
 					chunk->loaded = false;
@@ -591,8 +593,8 @@ void MinecraftRun(Minecraft minecraft) {
 				}
 				
 				RendererSetLighting(renderer, true);
-				LevelRenderEntities(minecraft->level, minecraft->textureManager, delta);
-				ParticleManager particles = minecraft->particleManager;
+				LevelRenderEntities(minecraft->level, &minecraft->textureManager, delta);
+				ParticleManager * particles = &minecraft->particleManager;
 				RendererSetLighting(renderer, false);
 				RendererUpdateFog(renderer);
 				float dt = delta;
@@ -604,8 +606,8 @@ void MinecraftRun(Minecraft minecraft) {
 				for (int j = 0; j < 2; j++) {
 					if (ListLength(particles->particles[j]) != 0) {
 						int tex = 0;
-						if (j == 0) { tex = TextureManagerLoad(minecraft->textureManager, "Particles.png"); }
-						if (j == 1) { tex = TextureManagerLoad(minecraft->textureManager, "Terrain.png"); }
+						if (j == 0) { tex = TextureManagerLoad(&minecraft->textureManager, "Particles.png"); }
+						if (j == 1) { tex = TextureManagerLoad(&minecraft->textureManager, "Terrain.png"); }
 						glBindTexture(GL_TEXTURE_2D, tex);
 						ShapeRendererBegin();
 						for (int k = 0; k < ListLength(particles->particles[j]); k++) {
@@ -615,16 +617,16 @@ void MinecraftRun(Minecraft minecraft) {
 					}
 				}
 				
-				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Rock.png"));
+				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Rock.png"));
 				glEnable(GL_TEXTURE_2D);
 				glCallList(lrenderer->listID);
 				RendererUpdateFog(renderer);
-				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Clouds.png"));
+				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Clouds.png"));
 				glColor4f(1.0, 1.0, 1.0, 1.0);
 				float cloudR = ((level->cloudColor >> 24) & 0xff) / 255.0;
 				float cloudG = ((level->cloudColor >> 16) & 0xff) / 255.0;
 				float cloudB = ((level->cloudColor >> 8) & 0xff) / 255.0;
-				if (minecraft->settings->anaglyph) {
+				if (minecraft->settings.anaglyph) {
 					float ar = (cloudR * 30.0 + cloudG * 59.0 + cloudB * 11.0) / 100.0;
 					float ag = (cloudR * 30.0 + cloudG * 70.0) / 100.0;
 					float ab = (cloudR * 30.0 + cloudB * 70.0) / 100.0;
@@ -652,7 +654,7 @@ void MinecraftRun(Minecraft minecraft) {
 				
 				glDisable(GL_TEXTURE_2D);
 				ShapeRendererBegin();
-				if (minecraft->settings->anaglyph) {
+				if (minecraft->settings.anaglyph) {
 					float ar = (skyR * 30.0 + skyG * 59.0 + skyB * 11.0) / 100.0;
 					float ag = (skyR * 30.0 + skyG * 70.0) / 100.0;
 					float ab = (skyR * 30.0 + skyB * 70.0) / 100.0;
@@ -727,20 +729,20 @@ void MinecraftRun(Minecraft minecraft) {
 				RendererUpdateFog(renderer);
 				glEnable(GL_TEXTURE_2D);
 				glEnable(GL_BLEND);
-				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Water.png"));
+				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Water.png"));
 				glCallList(lrenderer->listID + 1);
 				glDisable(GL_BLEND);
 				glEnable(GL_BLEND);
 				glColorMask(false, false, false, false);
 				int count = LevelRendererSortChunks(lrenderer, player, 1);
 				glColorMask(true, true, true, true);
-				if (minecraft->settings->anaglyph) {
+				if (minecraft->settings.anaglyph) {
 					if (i == 0) { glColorMask(false, true, true, false); }
 					else { glColorMask(true, false, false, false); }
 				}
 				glDisable(GL_CULL_FACE);
 				if (count > 0) {
-					glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Terrain.png"));
+					glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Terrain.png"));
 					glCallLists(count, GL_INT, lrenderer->chunkDataCache);
 				}
 				glEnable(GL_CULL_FACE);
@@ -755,7 +757,7 @@ void MinecraftRun(Minecraft minecraft) {
 					glNormal3f(0.0, 1.0, 0.0);
 					glEnable(GL_BLEND);
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Rain.png"));
+					glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Rain.png"));
 					for (int x = px - 5; x <= px + 5; x++) {
 						for (int z = pz - 5; z <= pz + 5; z++) {
 							int y = LevelGetHighestTile(level, x, z);
@@ -786,8 +788,8 @@ void MinecraftRun(Minecraft minecraft) {
 				
 				glClear(GL_DEPTH_BUFFER_BIT);
 				glLoadIdentity();
-				if (minecraft->settings->anaglyph) { glTranslatef(((i << 1) - 1) * 0.1, 0.0, 0.0); }
-				if (minecraft->settings->viewBobbing) { RendererApplyBobbing(renderer, delta); }
+				if (minecraft->settings.anaglyph) { glTranslatef(((i << 1) - 1) * 0.1, 0.0, 0.0); }
+				if (minecraft->settings.viewBobbing) { RendererApplyBobbing(renderer, delta); }
 				
 				HeldBlock held = renderer->heldBlock;
 				float heldPos = held.lastPosition + (held.position - held.lastPosition) * delta;
@@ -814,14 +816,14 @@ void MinecraftRun(Minecraft minecraft) {
 				if (held.block != NULL) {
 					glScalef(0.4, 0.4, 0.4);
 					glTranslatef(-0.5, -0.5, -0.5);
-					glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(minecraft->textureManager, "Terrain.png"));
+					glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Terrain.png"));
 					BlockRenderPreview(held.block);
 				}
 				glDisable(GL_NORMALIZE);
 				glPopMatrix();
 				RendererSetLighting(renderer, false);
 				
-				if (!minecraft->settings->anaglyph) { break; }
+				if (!minecraft->settings.anaglyph) { break; }
 				
 				if (i == 1) { glColorMask(true, true, true, true); }
 			}
@@ -860,7 +862,7 @@ void MinecraftRun(Minecraft minecraft) {
 	MinecraftShutdown(minecraft);
 }
 
-void MinecraftGrabMouse(Minecraft minecraft) {
+void MinecraftGrabMouse(Minecraft * minecraft) {
 	if (!minecraft->hasMouse) {
 		minecraft->hasMouse = true;
 		if (minecraft->levelLoaded) {
@@ -872,71 +874,52 @@ void MinecraftGrabMouse(Minecraft minecraft) {
 	}
 }
 
-void MinecraftPause(Minecraft minecraft) {
+void MinecraftPause(Minecraft * minecraft) {
 	if (minecraft->currentScreen == NULL) {
 		MinecraftSetCurrentScreen(minecraft, PauseScreenCreate());
 	}
 }
 
-bool MinecraftIsOnline(Minecraft minecraft) {
-	return false;
-}
-
-void MinecraftGenerateLevel(Minecraft minecraft, int size) {
+void MinecraftGenerateLevel(Minecraft * minecraft, int size) {
 	char * user = "anonymous";
-	LevelGenerator generator = LevelGeneratorCreate(minecraft->progressBar);
-	Level level = LevelGeneratorGenerate(generator, user, 128 << size, 128 << size);
+	LevelGenerator generator = LevelGeneratorCreate(&minecraft->progressBar);
+	Level * level = LevelGeneratorGenerate(generator, user, 128 << size, 128 << size);
 	MinecraftSetLevel(minecraft, level);
 	LevelGeneratorDestroy(generator);
 }
 
-void MinecraftSetLevel(Minecraft minecraft, Level level) {
+void MinecraftSetLevel(Minecraft * minecraft, Level * level) {
 	if (minecraft->level != NULL) { LevelDestroy(minecraft->level); }
 	minecraft->level = level;
-	if (level != NULL) {
-		if (minecraft->player != NULL) { EntityDestroy(minecraft->player); }
-		minecraft->player = LevelFindPlayer(level);
-	}
+	PlayerCreate(&minecraft->player, level);
+	EntityResetPosition(&minecraft->player);
+	if (level != NULL) { level->player = &minecraft->player; }
 	
-	if (minecraft->player == NULL) {
-		minecraft->player = PlayerCreate(level);
-		EntityResetPosition(minecraft->player);
-		if (level != NULL) { level->player = minecraft->player; }
-	}
-	
-	PlayerData player = minecraft->player->typeData;
-	player->input = InputHandlerCreate(minecraft->settings);
+	PlayerData * player = &minecraft->player.player;
+	InputHandlerCreate(&player->input, &minecraft->settings);
 	for (int i = 0; i < 9; i++) {
-		if (player->inventory->slots[i] == -1) { player->inventory->slots[i] = SessionDataAllowedBlocks[i]->type; }
+		if (player->inventory.slots[i] == -1) { player->inventory.slots[i] = SessionDataAllowedBlocks[i]->type; }
 	}
 	
-	if (minecraft->levelRenderer != NULL) {
-		LevelRendererDestroy(minecraft->levelRenderer);
-		minecraft->levelRenderer = LevelRendererCreate(minecraft, minecraft->textureManager);
-		minecraft->levelRenderer->level = level;
-		if (level != NULL) {
-			LevelSetRenderer(level, minecraft->levelRenderer);
-			LevelRendererRefresh(minecraft->levelRenderer);
-		}
+	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->textureManager);
+	minecraft->levelRenderer.level = level;
+	if (level != NULL) {
+		LevelSetRenderer(level, &minecraft->levelRenderer);
+		LevelRendererRefresh(&minecraft->levelRenderer);
 	}
 	
-	if (minecraft->particleManager != NULL) {
-		if (level != NULL) { level->particleEngine = minecraft->particleManager; }
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < ListLength(minecraft->particleManager->particles[i]); j++) { ParticleDestroy(minecraft->particleManager->particles[i][j]); }
-			minecraft->particleManager->particles[i] = ListClear(minecraft->particleManager->particles[i]);
-		}
+	ParticleMangerCreate(&minecraft->particleManager, minecraft->level, &minecraft->textureManager);
+	if (level != NULL) { level->particleEngine = &minecraft->particleManager; }
+	for (int i = 0; i < 2; i++) {
+		minecraft->particleManager.particles[i] = ListClear(minecraft->particleManager.particles[i]);
 	}
 }
 
-void MinecraftDestroy(Minecraft minecraft) {
-	TimerDestroy(minecraft->timer);
-	ProgressBarDisplayDestroy(minecraft->progressBar);
-	RendererDestroy(minecraft->renderer);
-	LevelIODestroy(minecraft->levelIO);
+void MinecraftDestroy(Minecraft * minecraft) {
 	StringFree(minecraft->debug);
-	free(minecraft);
 }
+
+static Minecraft minecraft;
 
 int main(int argc, char * argv[]) {
 #ifdef _WIN32
@@ -946,7 +929,7 @@ int main(int argc, char * argv[]) {
 	SinTableInitialize();
 	RandomSetSeed((unsigned int)time(NULL));
 	
-	Minecraft minecraft = MinecraftCreate(NULL, 860, 480, false);
-	MinecraftRun(minecraft);
+	MinecraftCreate(&minecraft, 860, 480, false);
+	MinecraftRun(&minecraft);
 	return 0;
 }

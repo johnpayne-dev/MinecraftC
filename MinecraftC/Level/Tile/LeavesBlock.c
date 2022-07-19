@@ -5,7 +5,7 @@ LeavesBlock LeavesBlockCreate() {
 	return BlockCreate(BlockTypeLeaves, 22);
 }
 
-bool LeavesBlockCanRenderSide(LeavesBlock block, Level level, int x, int y, int z, int side) {
+bool LeavesBlockCanRenderSide(LeavesBlock block, Level * level, int x, int y, int z, int side) {
 	return !LevelIsSolidTile(level, x, y, z);
 }
 

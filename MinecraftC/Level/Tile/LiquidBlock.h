@@ -12,7 +12,7 @@ typedef struct LiquidBlockData {
 LiquidBlock LiquidBlockCreate(BlockType blockType, LiquidType liquidType);
 bool LiquidBlockIsCube(LiquidBlock block);
 void LiquidBlockOnPlaced(LiquidBlock block, struct Level * level, int x, int y, int z);
-void LiquidBlockUpdate(LiquidBlock block, struct Level * level, int x, int y, int z, RandomGenerator random);
+void LiquidBlockUpdate(LiquidBlock block, struct Level * level, int x, int y, int z, RandomGenerator * random);
 float LiquidBlockGetBrightness(LiquidBlock block, struct Level * level, int x, int y, int z);
 bool LiquidBlockCanRenderSide(LiquidBlock block, struct Level * level, int x, int y, int z, int side);
 void LiquidBlockRenderInside(LiquidBlock block, int x, int y, int z, int side);

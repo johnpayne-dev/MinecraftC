@@ -4,25 +4,25 @@
 #include "../Render/Frustum.h"
 
 typedef struct Chunk {
-	Level level;
+	Level * level;
 	int baseListID;
 	int x, y, z;
 	int width, depth, height;
 	bool visible;
 	bool dirty[2];
 	bool loaded;
-} * Chunk;
+} Chunk;
 
 extern int ChunkUpdates;
 
-Chunk ChunkCreate(Level level, int x, int y, int z, int chunkSize, int baseListID);
-void ChunkUpdate(Chunk chunk);
-float ChunkDistanceSquared(Chunk chunk, Player player);
-void ChunkSetAllDirty(Chunk chunk);
-void ChunkDispose(Chunk chunk);
-int ChunkAppendLists(Chunk chunk, int dataCache[], int count, int pass);
-void ChunkClip(Chunk chunk, Frustum frustum);
-void ChunkDestroy(Chunk chunk);
+void ChunkCreate(Chunk * chunk, Level * level, int x, int y, int z, int chunkSize, int baseListID);
+void ChunkUpdate(Chunk * chunk);
+float ChunkDistanceSquared(Chunk * chunk, Player * player);
+void ChunkSetAllDirty(Chunk * chunk);
+void ChunkDispose(Chunk * chunk);
+int ChunkAppendLists(Chunk * chunk, int dataCache[], int count, int pass);
+void ChunkClip(Chunk * chunk, Frustum frustum);
+void ChunkDestroy(Chunk * chunk);
 
 int ChunkDistanceComparator(const void * a, const void * b);
 int ChunkVisibleDistanceComparator(const void * a, const void * b);

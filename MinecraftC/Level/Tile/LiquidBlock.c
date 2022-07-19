@@ -21,11 +21,11 @@ bool LiquidBlockIsCube(LiquidBlock block) {
 	return false;
 }
 
-void LiquidBlockOnPlaced(LiquidBlock block, Level level, int x, int y, int z) {
+void LiquidBlockOnPlaced(LiquidBlock block, Level * level, int x, int y, int z) {
 	LevelAddToNextTick(level, x, y, z, ((LiquidBlockData)block->typeData)->movingID);
 }
 
-static bool CanFlow(LiquidBlock block, Level level, int x, int y, int z) {
+static bool CanFlow(LiquidBlock block, Level * level, int x, int y, int z) {
 	if (((LiquidBlockData)block->typeData)->type == LiquidTypeWater) {
 		for (int i = x - 2; i <= x + 2; i++) {
 			for (int j = y - 2; j <= y + 2; j++) {
@@ -38,7 +38,7 @@ static bool CanFlow(LiquidBlock block, Level level, int x, int y, int z) {
 	return true;
 }
 
-static bool Flow(LiquidBlock block, Level level, int x, int y, int z) {
+static bool Flow(LiquidBlock block, Level * level, int x, int y, int z) {
 	LiquidBlockData liquid = block->typeData;
 	if (LevelGetTile(level, x, y, z) == BlockTypeNone) {
 		if (!CanFlow(block, level, x, y, z)) { return false; }
@@ -47,7 +47,7 @@ static bool Flow(LiquidBlock block, Level level, int x, int y, int z) {
 	return false;
 }
 
-void LiquidBlockUpdate(LiquidBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+void LiquidBlockUpdate(LiquidBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	if (block->type == BlockTypeStillWater || block->type == BlockTypeStillLava) { StillLiquidBlockUpdate(block, level, x, y, z, random); return; }
 		
 	LiquidBlockData liquid = block->typeData;
@@ -67,11 +67,11 @@ void LiquidBlockUpdate(LiquidBlock block, Level level, int x, int y, int z, Rand
 	else { LevelAddToNextTick(level, x, y, z, liquid->movingID); }
 }
 
-float LiquidBlockGetBrightness(LiquidBlock block, Level level, int x, int y, int z) {
+float LiquidBlockGetBrightness(LiquidBlock block, Level * level, int x, int y, int z) {
 	return ((LiquidBlockData)block->typeData)->type == LiquidTypeLava ? 100.0 : LevelGetBrightness(level, x, y, z);
 }
 
-bool LiquidBlockCanRenderSide(LiquidBlock block, Level level, int x, int y, int z, int side) {
+bool LiquidBlockCanRenderSide(LiquidBlock block, Level * level, int x, int y, int z, int side) {
 	LiquidBlockData liquid = block->typeData;
 	if (x >= 0 && y >= 0 && z >= 0 && x < level->width && z < level->height) {
 		BlockType tile = LevelGetTile(level, x, y, z);
@@ -119,7 +119,7 @@ LiquidType LiquidBlockGetLiquidType(LiquidBlock block) {
 	return ((LiquidBlockData)block->typeData)->type;
 }
 
-void LiquidBlockOnNeighborChanged(LiquidBlock block, Level level, int x, int y, int z, BlockType tile) {
+void LiquidBlockOnNeighborChanged(LiquidBlock block, Level * level, int x, int y, int z, BlockType tile) {
 	if (block->type == BlockTypeStillWater || block->type == BlockTypeStillLava) { StillLiquidBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
 	
 	LiquidBlockData this = block->typeData;

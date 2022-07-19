@@ -6,10 +6,9 @@ typedef struct ProgressBarDisplay {
 	char * text;
 	char * title;
 	int64_t start;
-} * ProgressBarDisplay;
+} ProgressBarDisplay;
 
-ProgressBarDisplay ProgressBarDisplayCreate(struct Minecraft * minecraft);
-void ProgressBarDisplaySetTitle(ProgressBarDisplay display, char * title);
-void ProgressBarDisplaySetText(ProgressBarDisplay display, char * text);
-void ProgressBarDisplaySetProgress(ProgressBarDisplay display, int progress);
-void ProgressBarDisplayDestroy(ProgressBarDisplay display);
+void ProgressBarDisplayCreate(ProgressBarDisplay * display, struct Minecraft * minecraft);
+void ProgressBarDisplaySetTitle(ProgressBarDisplay * display, char * title);
+void ProgressBarDisplaySetText(ProgressBarDisplay * display, char * text);
+void ProgressBarDisplaySetProgress(ProgressBarDisplay * display, int progress);

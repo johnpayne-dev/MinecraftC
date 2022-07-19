@@ -4,7 +4,7 @@
 typedef Block FlowerBlock;
 
 FlowerBlock FlowerBlockCreate(BlockType type, int textureID);
-void FlowerBlockUpdate(FlowerBlock block, struct Level * level, int x, int y, int z, RandomGenerator random);
+void FlowerBlockUpdate(FlowerBlock block, struct Level * level, int x, int y, int z, RandomGenerator * random);
 AABB FlowerBlockGetCollisionAABB(FlowerBlock block, int x, int y, int z);
 bool FlowerBlockIsOpaque(FlowerBlock block);
 bool FlowerBlockIsSolid(FlowerBlock block);

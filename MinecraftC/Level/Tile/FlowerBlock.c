@@ -14,7 +14,7 @@ FlowerBlock FlowerBlockCreate(BlockType type, int textureID) {
 	return block;
 }
 
-void FlowerBlockUpdate(FlowerBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+void FlowerBlockUpdate(FlowerBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	if (block->type == BlockTypeRedMushroom || block->type == BlockTypeBrownMushroom) { MushroomBlockUpdate(block, level, x, y, z, random); return; }
 	if (block->type == BlockTypeSapling) { SaplingBlockUpdate(block, level, x, y, z, random); return; }
 	
@@ -74,7 +74,7 @@ bool FlowerBlockIsCube(FlowerBlock block) {
 	return false;
 }
 
-bool FlowerBlockRender(FlowerBlock block, Level level, int x, int y, int z) {
+bool FlowerBlockRender(FlowerBlock block, Level * level, int x, int y, int z) {
 	float brightness = LevelGetBrightness(level, x, y, z);
 	ShapeRendererColorf(brightness, brightness, brightness);
 	Render(block, x, y, z);

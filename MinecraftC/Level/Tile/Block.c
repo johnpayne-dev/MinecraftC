@@ -142,12 +142,12 @@ void BlockRenderFullBrightness(Block block) {
 	BlockRenderInside(block, -2, 0, 0, 5);
 }
 
-float BlockGetBrightness(Block block, Level level, int x, int y, int z) {
+float BlockGetBrightness(Block block, Level * level, int x, int y, int z) {
 	if (IsLiquidBlock(block->type)) { return LiquidBlockGetBrightness(block, level, x, y, z); }
 	return LevelGetBrightness(level, x, y, z);
 }
 
-bool BlockCanRenderSide(Block block, Level level, int x, int y, int z, int side) {
+bool BlockCanRenderSide(Block block, Level * level, int x, int y, int z, int side) {
 	if (block->type == BlockTypeGlass) { return GlassBlockCanRenderSide(block, level, x, y, z, side); }
 	if (block->type == BlockTypeLeaves) { return LeavesBlockCanRenderSide(block, level, x, y, z, side); }
 	if (IsLiquidBlock(block->type)) { return LiquidBlockCanRenderSide(block, level, x, y, z, side); }
@@ -166,7 +166,10 @@ int BlockGetTextureID(Block block, int face) {
 }
 
 void BlockRenderInside(Block block, int x, int y, int z, int side) {
-	if (IsLiquidBlock(block->type)) { return LiquidBlockRenderInside(block, x, y, z, side); }
+	if (IsLiquidBlock(block->type)) {
+		LiquidBlockRenderInside(block, x, y, z, side);
+		return;
+	}
 	BlockRenderSideWithTexture(block, x, y, z, side, BlockGetTextureID(block, side));
 }
 
@@ -263,13 +266,13 @@ bool BlockIsSolid(Block block) {
 	return true;
 }
 
-void BlockUpdate(Block block, Level level, int x, int y, int z, RandomGenerator random) {
+void BlockUpdate(Block block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	if (IsFlowerBlock(block->type)) { FlowerBlockUpdate(block, level, x, y, z, random); return; }
 	if (block->type == BlockTypeGrass) { GrassBlockUpdate(block, level, x, y, z, random); return; }
 	if (IsLiquidBlock(block->type)) { LiquidBlockUpdate(block, level, x, y, z, random); return; }
 }
 
-void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, ParticleManager particles) {
+void BlockSpawnBreakParticles(Block block, Level * level, int x, int y, int z, ParticleManager * particles) {
 	if (block->type == BlockTypeTNT) { TNTBlockSpawnBreakParticles(block, level, x, y, z, particles); }
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -277,7 +280,9 @@ void BlockSpawnBreakParticles(Block block, Level level, int x, int y, int z, Par
 				float xd = x + (i + 0.5) / 4.0;
 				float yd = y + (j + 0.5) / 4.0;
 				float zd = z + (k + 0.5) / 4.0;
-				ParticleManagerSpawnParticle(particles, TerrainParticleCreate(level, xd, yd, zd, xd - x - 0.5, yd - y - 0.5, zd - z - 0.5, block));
+				TerrainParticle * particle = malloc(sizeof(TerrainParticle));
+				TerrainParticleCreate(particle, level, xd, yd, zd, xd - x - 0.5, yd - y - 0.5, zd - z - 0.5, block);
+				ParticleManagerSpawnParticle(particles, particle);
 			}
 		}
 	}
@@ -288,13 +293,13 @@ LiquidType BlockGetLiquidType(Block block) {
 	return LiquidTypeNone;
 }
 
-void BlockOnNeighborChanged(Block block, Level level, int x, int y, int z, BlockType tile) {
+void BlockOnNeighborChanged(Block block, Level * level, int x, int y, int z, BlockType tile) {
 	if (IsLiquidBlock(block->type)) { LiquidBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
 	if (IsSandBlock(block->type)) { SandBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
 	if (IsSlabBlock(block->type)) { SlabBlockOnNeighborChanged(block, level, x, y, z, tile); return; }
 }
 
-void BlockOnPlaced(Block block, Level level, int x, int y, int z) {
+void BlockOnPlaced(Block block, Level * level, int x, int y, int z) {
 	if (IsLiquidBlock(block->type)) { LiquidBlockOnPlaced(block, level, x, y, z); return; }
 	if (IsSandBlock(block->type)) { SandBlockOnPlaced(block, level, x, y, z); return; }
 }
@@ -304,12 +309,12 @@ int BlockGetTickDelay(Block block) {
 	return 0;
 }
 
-void BlockOnAdded(Block block, Level level, int x, int y, int z) {
+void BlockOnAdded(Block block, Level * level, int x, int y, int z) {
 	if (IsSlabBlock(block->type)) { SlabBlockOnAdded(block, level, x, y, z); return; }
 	if (block->type == BlockTypeSponge) { SpongeBlockOnAdded(block, level, x, y, z); return; }
 }
 
-void BlockOnRemoved(Block block, Level level, int x, int y, int z) {
+void BlockOnRemoved(Block block, Level * level, int x, int y, int z) {
 	if (block->type == BlockTypeSponge) { SpongeBlockOnRemoved(block, level, x, y, z); return; }
 }
 
@@ -343,11 +348,11 @@ MovingObjectPosition BlockClip(Block block, int x, int y, int z, Vector3D v1, Ve
 	return pos;
 }
 
-void BlockExplode(Block block, Level level, int x, int y, int z) {
+void BlockExplode(Block block, Level * level, int x, int y, int z) {
 	if (block->type == BlockTypeTNT) { TNTBlockExplode(block, level, x, y, z); return; }
 }
 
-bool BlockRender(Block block, Level level, int x, int y, int z) {
+bool BlockRender(Block block, Level * level, int x, int y, int z) {
 	if (IsFlowerBlock(block->type)) { return FlowerBlockRender(block, level, x, y, z); }
 	
 	bool rendered = false;

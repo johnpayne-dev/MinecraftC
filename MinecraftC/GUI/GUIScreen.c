@@ -37,7 +37,7 @@ void GUIScreenRender(GUIScreen screen, int mx, int my) {
 	for (int i = 0; i < ListLength(screen->buttons); i++) {
 		Button button = screen->buttons[i];
 		if (button->visible) {
-			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(screen->minecraft->textureManager, "GUI/GUI.png"));
+			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&screen->minecraft->textureManager, "GUI/GUI.png"));
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 			bool hovered = mx >= button->x && my >= button->y && mx < button->x + button->width && my < button->y + button->height;
 			int state = 1;
@@ -91,7 +91,7 @@ void GUIScreenOnButtonClicked(GUIScreen screen, Button button) {
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnButtonClicked(screen, button); return; }
 }
 
-void GUIScreenOpen(GUIScreen screen, Minecraft minecraft, int width, int height) {
+void GUIScreenOpen(GUIScreen screen, Minecraft * minecraft, int width, int height) {
 	screen->minecraft = minecraft;
 	screen->font = minecraft->font;
 	screen->width = width;

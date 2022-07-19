@@ -1,25 +1,24 @@
 #include "PlayerAI.h"
 #include "Player.h"
+#include "../Entity.h"
 #include <stdlib.h>
 
-PlayerAI PlayerAICreate(Player parent) {
-	PlayerAI ai = malloc(sizeof(struct PlayerAI));
-	*ai = (struct PlayerAI) {
-		.random = RandomGeneratorCreate(TimeNano()),
+void PlayerAICreate(PlayerAI * ai, Player * parent) {
+	*ai = (PlayerAI) {
 		.jumping = false,
 		.parent = parent,
 	};
-	return ai;
+	RandomGeneratorCreate(&ai->random, TimeNano());
 }
 
-void PlayerAIUpdate(PlayerAI ai) {
-	PlayerData player = ai->parent->typeData;
-	ai->jumping = player->input->jumping;
-	ai->x = player->input->x;
-	ai->y = player->input->y;
+void PlayerAIUpdate(PlayerAI * ai) {
+	PlayerData * player = &ai->parent->player;
+	ai->jumping = player->input.jumping;
+	ai->x = player->input.x;
+	ai->y = player->input.y;
 }
 
-void PlayerAITick(PlayerAI ai, Entity mob) {
+void PlayerAITick(PlayerAI * ai, Entity * mob) {
 	ai->mob = mob;
 	PlayerAIUpdate(ai);
 	
@@ -36,12 +35,6 @@ void PlayerAITick(PlayerAI ai, Entity mob) {
 	PlayerTravel(mob, ai->x, ai->y);
 }
 
-void PlayerAIJumpFromGround(PlayerAI ai) {
+void PlayerAIJumpFromGround(PlayerAI * ai) {
 	ai->mob->yd = 0.42;
 }
-
-void PlayerAIDestroy(PlayerAI ai) {
-	RandomGeneratorDestroy(ai->random);
-	free(ai);
-}
-

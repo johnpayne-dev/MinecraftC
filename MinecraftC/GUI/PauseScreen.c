@@ -27,12 +27,10 @@ void PauseScreenOnOpen(PauseScreen screen) {
 }
 
 void PauseScreenOnButtonClicked(PauseScreen screen, Button button) {
-	if (button->id == 0) { MinecraftSetCurrentScreen(screen->minecraft, OptionsScreenCreate(screen, screen->minecraft->settings)); }
+	if (button->id == 0) { MinecraftSetCurrentScreen(screen->minecraft, OptionsScreenCreate(screen, &screen->minecraft->settings)); }
 	if (button->id == 1) { MinecraftSetCurrentScreen(screen->minecraft, GenerateLevelScreenCreate(screen)); }
-	if (screen->minecraft->session != NULL) {
-		if (button->id == 2) { MinecraftSetCurrentScreen(screen->minecraft, SaveLevelScreenCreate(screen)); }
-		if (button->id == 3) { MinecraftSetCurrentScreen(screen->minecraft, LoadLevelScreenCreate(screen)); }
-	}
+	if (button->id == 2) { MinecraftSetCurrentScreen(screen->minecraft, SaveLevelScreenCreate(screen)); }
+	if (button->id == 3) { MinecraftSetCurrentScreen(screen->minecraft, LoadLevelScreenCreate(screen)); }
 	if (button->id == 4) {
 		MinecraftGrabMouse(screen->minecraft);
 		MinecraftSetCurrentScreen(screen->minecraft, NULL);

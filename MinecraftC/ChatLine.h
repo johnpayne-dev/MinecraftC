@@ -4,7 +4,7 @@
 typedef struct ChatLine {
 	String message;
 	int time;
-} * ChatLine;
+} ChatLine;
 
-ChatLine ChatLineCreate(char * message);
-void ChatLineDestroy(ChatLine line);
+void ChatLineCreate(ChatLine * line, char * message);
+void ChatLineDestroy(ChatLine * line);

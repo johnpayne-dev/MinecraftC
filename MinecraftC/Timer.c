@@ -2,9 +2,8 @@
 #include "Utilities/Time.h"
 #include <stdlib.h>
 
-Timer TimerCreate(float ticksPerSecond) {
-	Timer timer = malloc(sizeof(struct Timer));
-	*timer = (struct Timer) {
+void TimerCreate(Timer * timer, float ticksPerSecond) {
+	*timer = (Timer) {
 		.speed = 1.0,
 		.elapsedDelta = 0.0,
 		.adjustment = 1.0,
@@ -12,9 +11,4 @@ Timer TimerCreate(float ticksPerSecond) {
 		.lastSystemClock = TimeMilli(),
 		.lastHRClock = TimeNano() / 1e6,
 	};
-	return timer;
-}
-
-void TimerDestroy(Timer timer) {
-	free(timer);
 }

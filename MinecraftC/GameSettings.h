@@ -2,9 +2,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include "KeyBinding.h"
 #include "Utilities/List.h"
 #include "Utilities/String.h"
+
+typedef struct KeyBinding {
+	char * name;
+	int key;
+} KeyBinding;
 
 typedef struct GameSettings {
 	bool music;
@@ -29,11 +33,11 @@ typedef struct GameSettings {
 	struct Minecraft * minecraft;
 	String file;
 	int settingsCount;
-} * GameSettings;
+} GameSettings;
 
-GameSettings GameSettingsCreate(struct Minecraft * minecraft);
-String GameSettingsGetBinding(GameSettings settings, int binding);
-void GameSettingsSetBinding(GameSettings settings, int binding, int key);
-void GameSettingsToggleSetting(GameSettings settings, int setting, int var2);
-String GameSettingsGetSetting(GameSettings settings, int setting);
-void GameSettingsDestroy(GameSettings settings);
+void GameSettingsCreate(GameSettings * settings, struct Minecraft * minecraft);
+String GameSettingsGetBinding(GameSettings * settings, int binding);
+void GameSettingsSetBinding(GameSettings * settings, int binding, int key);
+void GameSettingsToggleSetting(GameSettings * settings, int setting);
+String GameSettingsGetSetting(GameSettings * settings, int setting);
+void GameSettingsDestroy(GameSettings * settings);

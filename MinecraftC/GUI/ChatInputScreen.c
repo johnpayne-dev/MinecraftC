@@ -64,7 +64,7 @@ void ChatInputScreenOnMouseClicked(ChatInputScreen screen, int x, int y, int but
 	if (button == SDL_BUTTON_LEFT && screen->minecraft->hud->hoveredPlayer != NULL) {
 		if (StringLength(this->message) > 0 && this->message[StringLength(this->message) - 1] != ' ') { StringConcat(&this->message, " "); }
 		StringConcat(&this->message, (char *)screen->minecraft->hud->hoveredPlayer);
-		int len = 64 - (StringLength(screen->minecraft->session->userName) + 2);
+		int len = 64;
 		if (StringLength(this->message) > len) { this->message = StringSub(this->message, 0, len); }
 	}
 }

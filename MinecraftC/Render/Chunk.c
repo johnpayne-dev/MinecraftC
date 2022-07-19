@@ -5,9 +5,8 @@
 
 int ChunkUpdates = 0;
 
-Chunk ChunkCreate(Level level, int x, int y, int z, int chunkSize, int baseListID) {
-	Chunk chunk = malloc(sizeof(struct Chunk));
-	*chunk = (struct Chunk) {
+void ChunkCreate(Chunk * chunk, Level * level, int x, int y, int z, int chunkSize, int baseListID) {
+	*chunk = (Chunk) {
 		.visible = false,
 		.level = level,
 		.x = x,
@@ -19,10 +18,9 @@ Chunk ChunkCreate(Level level, int x, int y, int z, int chunkSize, int baseListI
 		.baseListID = baseListID,
 	};
 	ChunkSetAllDirty(chunk);
-	return chunk;
 }
 
-void ChunkUpdate(Chunk chunk) {
+void ChunkUpdate(Chunk * chunk) {
 	ChunkUpdates++;
 	int x0 = chunk->x, y0 = chunk->y, z0 = chunk->z;
 	int x1 = chunk->x + chunk->width;
@@ -56,22 +54,22 @@ void ChunkUpdate(Chunk chunk) {
 	}
 }
 
-float ChunkDistanceSquared(Chunk chunk, Player player) {
+float ChunkDistanceSquared(Chunk * chunk, Player * player) {
 	return (player->x - chunk->x) * (player->x - chunk->x) + (player->y - chunk->y) * (player->y - chunk->y) + (player->z - chunk->z) * (player->z - chunk->z);
 }
 
-void ChunkSetAllDirty(Chunk chunk) {
+void ChunkSetAllDirty(Chunk * chunk) {
 	for (int i = 0; i < 2; i++) {
 		chunk->dirty[i] = true;
 	}
 }
 
-void ChunkDispose(Chunk chunk) {
+void ChunkDispose(Chunk * chunk) {
 	ChunkSetAllDirty(chunk);
 	ChunkDestroy(chunk);
 }
 
-int ChunkAppendLists(Chunk chunk, int dataCache[], int count, int pass) {
+int ChunkAppendLists(Chunk * chunk, int dataCache[], int count, int pass) {
 	if (!chunk->visible) { return count; }
 	else {
 		if (!chunk->dirty[pass]) { dataCache[count++] = chunk->baseListID + pass; }
@@ -79,33 +77,33 @@ int ChunkAppendLists(Chunk chunk, int dataCache[], int count, int pass) {
 	}
 }
 
-void ChunkClip(Chunk chunk, Frustum frustum) {
+void ChunkClip(Chunk * chunk, Frustum frustum) {
 	chunk->visible = FrustumContainsBox(frustum, chunk->x, chunk->y, chunk->z, chunk->x + chunk->width, chunk->y + chunk->height, chunk->z + chunk->depth);
 }
 
-void ChunkDestroy(Chunk chunk) {
+void ChunkDestroy(Chunk * chunk) {
 	free(chunk);
 }
 
 int ChunkDistanceComparator(const void * a, const void * b) {
-	float ax = (*(Chunk *)a)->x, ay = (*(Chunk *)a)->y, az = (*(Chunk *)a)->z;
-	float apx = (*(Chunk *)a)->level->player->x, apy = (*(Chunk *)a)->level->player->y, apz = (*(Chunk *)a)->level->player->z;
-	float bx = (*(Chunk *)b)->x, by = (*(Chunk *)b)->y, bz = (*(Chunk *)b)->z;
-	float bpx = (*(Chunk *)b)->level->player->x, bpy = (*(Chunk *)b)->level->player->y, bpz = (*(Chunk *)b)->level->player->z;
-	float distA = (ax - apx) * (ax - apx) + (ay - apy) * (ay - apy) + (az - apz) * (az - apz);
-	float distB = (bx - bpx) * (bx - bpx) + (by - bpy) * (by - bpy) + (bz - bpz) * (bz - bpz);
+	Chunk * ca = *(Chunk **)a;
+	Chunk * cb = *(Chunk **)b;
+	float apx = ca->level->player->x, apy = ca->level->player->y, apz = ca->level->player->z;
+	float bpx = cb->level->player->x, bpy = cb->level->player->y, bpz = cb->level->player->z;
+	float distA = (ca->x - apx) * (ca->x - apx) + (ca->y - apy) * (ca->y - apy) + (ca->z - apz) * (ca->z - apz);
+	float distB = (cb->x - bpx) * (cb->x - bpx) + (cb->y - bpy) * (cb->y - bpy) + (cb->z - bpz) * (cb->z - bpz);
 	return distA == distB ? 0 : (distA > distB ? 1 : -1);
 }
 
 int ChunkVisibleDistanceComparator(const void * a, const void * b) {
-	if ((*(Chunk *)a)->visible || !(*(Chunk *)b)->visible) {
-		if ((*(Chunk *)b)->visible) {
-			float ax = (*(Chunk *)a)->x, ay = (*(Chunk *)a)->y, az = (*(Chunk *)a)->z;
-			float apx = (*(Chunk *)a)->level->player->x, apy = (*(Chunk *)a)->level->player->y, apz = (*(Chunk *)a)->level->player->z;
-			float bx = (*(Chunk *)b)->x, by = (*(Chunk *)b)->y, bz = (*(Chunk *)b)->z;
-			float bpx = (*(Chunk *)b)->level->player->x, bpy = (*(Chunk *)b)->level->player->y, bpz = (*(Chunk *)b)->level->player->z;
-			float distA = (ax - apx) * (ax - apx) + (ay - apy) * (ay - apy) + (az - apz) * (az - apz);
-			float distB = (bx - bpx) * (bx - bpx) + (by - bpy) * (by - bpy) + (bz - bpz) * (bz - bpz);
+	Chunk * ca = *(Chunk **)a;
+	Chunk * cb = *(Chunk **)b;
+	if (ca->visible || !cb->visible) {
+		if (cb->visible) {
+			float apx = ca->level->player->x, apy = ca->level->player->y, apz = ca->level->player->z;
+			float bpx = cb->level->player->x, bpy = cb->level->player->y, bpz = cb->level->player->z;
+			float distA = (ca->x - apx) * (ca->x - apx) + (ca->y - apy) * (ca->y - apy) + (ca->z - apz) * (ca->z - apz);
+			float distB = (cb->x - bpx) * (cb->x - bpx) + (cb->y - bpy) * (cb->y - bpy) + (cb->z - bpz) * (cb->z - bpz);
 			return distA == distB ? 0 : (distA > distB ? 1 : -1);
 		} else { return -1; }
 	} else { return 1; }

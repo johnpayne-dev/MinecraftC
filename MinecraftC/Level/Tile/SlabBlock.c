@@ -18,12 +18,12 @@ bool SlabBlockIsSolid(SlabBlock block) {
 	return block->type == BlockTypeDoubleSlab;
 }
 
-void SlabBlockOnNeighborChanged(SlabBlock block, Level level, int x, int y, int z, int side) {
+void SlabBlockOnNeighborChanged(SlabBlock block, Level * level, int x, int y, int z, int side) {
 	if (block->type == BlockTypeSlab) {
 	}
 }
 
-void SlabBlockOnAdded(SlabBlock block, Level level, int x, int y, int z) {
+void SlabBlockOnAdded(SlabBlock block, Level * level, int x, int y, int z) {
 	if (LevelGetTile(level, x, y - 1, z) == BlockTypeSlab) {
 		LevelSetTile(level, x, y, z, BlockTypeNone);
 		LevelSetTile(level, x, y - 1, z, BlockTypeDoubleSlab);
@@ -38,7 +38,7 @@ bool SlabBlockIsCube(SlabBlock block) {
 	return block->type == BlockTypeDoubleSlab;
 }
 
-bool SlabBlockCanRenderSide(SlabBlock block, struct Level * level, int x, int y, int z, int side) {
+bool SlabBlockCanRenderSide(SlabBlock block, Level * level, int x, int y, int z, int side) {
 	return side == 1 ? true : (LevelIsSolidTile(level, x, y, z) ? false : (side == 0 ? true : LevelGetTile(level, x, y, z) != block->type));
 }
 

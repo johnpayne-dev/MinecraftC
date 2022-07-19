@@ -1,16 +1,14 @@
 #include "WaterTexture.h"
 #include "../../Level/Tile/Block.h"
 
-WaterTexture WaterTextureCreate() {
-	WaterTexture texture = AnimatedTextureCreate(Blocks.table[BlockTypeWater]->textureID);
+void WaterTextureCreate(WaterTexture * texture) {
+	AnimatedTextureCreate(texture, Blocks.table[BlockTypeWater]->textureID);
 	texture->type = AnimatedTextureTypeWater;
-	texture->typeData = malloc(sizeof(struct WaterTextureData));
-	*(WaterTextureData)texture->typeData = (struct WaterTextureData){ 0 };
-	return texture;
+	texture->water = (WaterTextureData){ 0 };
 }
 
-void WaterTextureAnimate(WaterTexture texture) {
-	WaterTextureData this = texture->typeData;
+void WaterTextureAnimate(WaterTexture * texture) {
+	WaterTextureData * this = &texture->water;
 	this->updates++;
 	
 	for (int x = 0; x < 16; x++) {
@@ -57,9 +55,4 @@ void WaterTextureAnimate(WaterTexture texture) {
 		texture->data[(i << 2) + 2] = c;
 		texture->data[(i << 2) + 3] = d;
 	}
-}
-
-void WaterTextureDestroy(WaterTexture texture) {
-	WaterTextureData this = texture->typeData;
-	free(this);
 }

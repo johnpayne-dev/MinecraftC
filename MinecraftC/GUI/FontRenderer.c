@@ -7,7 +7,7 @@
 
 #include "../../Resources/Default.h"
 
-FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManager textures) {
+FontRenderer FontRendererCreate(GameSettings * settings, char * name, TextureManager * textures) {
 	FontRenderer font = malloc(sizeof(struct FontRenderer));
 	font->settings = settings;
 	font->textureName = name;
@@ -75,7 +75,7 @@ static void Render(FontRenderer font, char * str, int x, int y, uint32_t color, 
 			ShapeRendererVertexUV(x + w + s, y + s, 0.0, (u + s) / 128.0, (v + s) / 128.0);
 			ShapeRendererVertexUV(x + w + s, y, 0.0, (u + s) / 128.0, v / 128.0);
 			ShapeRendererVertexUV(x + w, y, 0.0, u / 128.0 , v / 128.0);
-			w += font->widthMap[str[i]];
+			w += font->widthMap[(int)str[i]];
 		}
 		ShapeRendererEnd();
 	}
@@ -98,7 +98,7 @@ int FontRendererGetWidth(FontRenderer font, char * str) {
 		for (int i = 0; i < strlen(str); i++)
 		{
 			if (str[i] == 38) { i++; }
-			else { width += font->widthMap[str[i]]; }
+			else { width += font->widthMap[(int)str[i]]; }
 		}
 		return width;
 	}

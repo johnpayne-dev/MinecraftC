@@ -1,9 +1,9 @@
 #include "WaterDropParticle.h"
 #include "../Level/Level.h"
 
-WaterDropParticle WaterDropParticleCreate(Level level, float x, float y, float z) {
-	Particle particle = ParticleCreate(level, x, y, z, 0.0, 0.0, 0.0);
-	ParticleData this = particle->typeData;
+void WaterDropParticleCreate(WaterDropParticle * particle, Level * level, float x, float y, float z) {
+	ParticleCreate(particle, level, x, y, z, 0.0, 0.0, 0.0);
+	ParticleData * this = &particle->particle;
 	this->type = ParticleTypeWaterDrop;
 	this->xd *= 0.3;
 	this->zd *= 0.3;
@@ -14,11 +14,10 @@ WaterDropParticle WaterDropParticleCreate(Level level, float x, float y, float z
 	this->texture = 16;
 	EntitySetSize(particle, 0.01, 0.01);
 	this->lifeTime = 8.0 / (RandomUniform() * 0.8 + 0.2);
-	return particle;
 }
 
-void WaterDropParticleTick(WaterDropParticle particle) {
-	ParticleData this = particle->typeData;
+void WaterDropParticleTick(WaterDropParticle * particle) {
+	ParticleData * this = &particle->particle;
 	particle->xo = particle->x;
 	particle->yo = particle->y;
 	particle->zo = particle->z;

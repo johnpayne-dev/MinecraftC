@@ -5,20 +5,18 @@
 #include "../Utilities/SinTable.h"
 #include "../Particle/PrimedTNT.h"
 
-Level LevelCreate() {
-	Level level = malloc(sizeof(struct Level));
-	*level = (struct Level) {
-		.random = RandomGeneratorCreate(time(NULL)),
+void LevelCreate(Level * level) {
+	*level = (Level) {
 		.tickList = ListCreate(sizeof(NextTickListEntry)),
 		.entities = ListCreate(sizeof(Entity)),
 		.unprocessed = 0,
 		.tickCount = 0,
 	};
-	level->randomValue = (int)RandomGeneratorInteger(level->random);
-	return level;
+	RandomGeneratorCreate(&level->random, time(NULL));
+	level->randomValue = (int)RandomGeneratorInteger(&level->random);
 }
 
-void LevelInitializeTransient(Level level) {
+void LevelInitializeTransient(Level * level) {
 	if (level->blocks == NULL) { LogFatal("The level is corrupt!\n"); }
 	//level->Renderers = ListCreate(sizeof(LevelRenderer));
 	//level->LightBlockers = MemoryAllocate(level->Width * level->Height * sizeof(int));
@@ -32,7 +30,7 @@ void LevelInitializeTransient(Level level) {
 	LevelFindSpawn(level);
 }
 
-void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks) {
+void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
 	level->width = w;
 	level->depth = d;
 	level->height = h;
@@ -47,7 +45,7 @@ void LevelSetData(Level level, int w, int d, int h, uint8_t * blocks) {
 	LevelInitializeTransient(level);
 }
 
-void LevelFindSpawn(Level level) {
+void LevelFindSpawn(Level * level) {
 	int i = 0;
 	int x, y, z;
 	do {
@@ -68,7 +66,7 @@ void LevelFindSpawn(Level level) {
 	return;
 }
 
-void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1) {
+void LevelCalculateLightDepths(Level * level, int x0, int y0, int x1, int y1) {
 	for (int i = x0; i < x0 + x1; i++) {
 		for (int j = y0; j < y0 + y1; j++) {
 			int blocker = level->lightBlockers[i + j * level->width];
@@ -84,16 +82,16 @@ void LevelCalculateLightDepths(Level level, int x0, int y0, int x1, int y1) {
 	}
 }
 
-void LevelSetRenderer(Level level, LevelRenderer listener) {
+void LevelSetRenderer(Level * level, LevelRenderer * listener) {
 	level->renderer = listener;
 }
 
-bool LevelIsLightBlocker(Level level, int x, int y, int z) {
+bool LevelIsLightBlocker(Level * level, int x, int y, int z) {
 	Block block = Blocks.table[LevelGetTile(level, x, y, z)];
 	return block == NULL ? false : BlockIsOpaque(block);
 }
 
-List(AABB) LevelGetCubes(Level level, AABB box) {
+List(AABB) LevelGetCubes(Level * level, AABB box) {
 	List(AABB) list = ListCreate(sizeof(AABB));
 	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
 	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
@@ -120,7 +118,7 @@ List(AABB) LevelGetCubes(Level level, AABB box) {
 	return list;
 }
 
-void LevelSwap(Level level, int x0, int y0, int z0, int x1, int y1, int z1) {
+void LevelSwap(Level * level, int x0, int y0, int z0, int x1, int y1, int z1) {
 	BlockType t1 = LevelGetTile(level, x0, y0, z0);
 	BlockType t2 = LevelGetTile(level, x1, y1, z1);
 	LevelSetTileNoNeighborChange(level, x0, y0, z0, t2);
@@ -129,7 +127,7 @@ void LevelSwap(Level level, int x0, int y0, int z0, int x1, int y1, int z1) {
 	LevelUpdateNeighborsAt(level, x1, y1, z1, t1);
 }
 
-bool LevelSetTile(Level level, int x, int y, int z, BlockType tile) {
+bool LevelSetTile(Level * level, int x, int y, int z, BlockType tile) {
 	if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
 		LevelUpdateNeighborsAt(level, x, y, z, tile);
 		return true;
@@ -137,7 +135,7 @@ bool LevelSetTile(Level level, int x, int y, int z, BlockType tile) {
 	else { return false; }
 }
 
-bool LevelNetSetTile(Level level, int x, int y, int z, BlockType tile) {
+bool LevelNetSetTile(Level * level, int x, int y, int z, BlockType tile) {
 	if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
 		LevelUpdateNeighborsAt(level, x, y, z, tile);
 		return true;
@@ -145,7 +143,7 @@ bool LevelNetSetTile(Level level, int x, int y, int z, BlockType tile) {
 	else { return false; }
 }
 
-bool LevelSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType tile) {
+bool LevelSetTileNoNeighborChange(Level * level, int x, int y, int z, BlockType tile) {
 	if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) { return false; }
 	int i = (y * level->height + z) * level->width + x;
 	if (tile == level->blocks[i]) { return false; }
@@ -160,13 +158,13 @@ bool LevelSetTileNoNeighborChange(Level level, int x, int y, int z, BlockType ti
 	return true;
 }
 
-static void UpdateTile(Level level, int x, int y, int z, BlockType tile) {
+static void UpdateTile(Level * level, int x, int y, int z, BlockType tile) {
 	if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) { return; }
 	Block block = Blocks.table[level->blocks[(y * level->height + z) * level->width + x]];
 	if (block != NULL) { BlockOnNeighborChanged(block, level, x, y, z, tile); }
 }
 
-void LevelUpdateNeighborsAt(Level level, int x, int y, int z, BlockType tile) {
+void LevelUpdateNeighborsAt(Level * level, int x, int y, int z, BlockType tile) {
 	UpdateTile(level, x - 1, y, z, tile);
 	UpdateTile(level, x + 1, y, z, tile);
 	UpdateTile(level, x, y - 1, z, tile);
@@ -175,7 +173,7 @@ void LevelUpdateNeighborsAt(Level level, int x, int y, int z, BlockType tile) {
 	UpdateTile(level, x, y, z + 1, tile);
 }
 
-bool LevelSetTileNoUpdate(Level level, int x, int y, int z, BlockType tile) {
+bool LevelSetTileNoUpdate(Level * level, int x, int y, int z, BlockType tile) {
 	if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) { return false; }
 	int i = (y * level->height + z) * level->width + x;
 	if (tile == level->blocks[i]) { return false; }
@@ -183,27 +181,27 @@ bool LevelSetTileNoUpdate(Level level, int x, int y, int z, BlockType tile) {
 	return true;
 }
 
-bool LevelIsLit(Level level, int x, int y, int z) {
+bool LevelIsLit(Level * level, int x, int y, int z) {
 	return !(x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) ? y >= level->lightBlockers[x + z * level->width] : true;
 }
 
-BlockType LevelGetTile(Level level, int x, int y, int z) {
+BlockType LevelGetTile(Level * level, int x, int y, int z) {
 	return !(x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height) ? level->blocks[(y * level->height + z) * level->width + x] & 0xFF : 0;
 }
 
-bool LevelIsSolidTile(Level level, int x, int y, int z) {
+bool LevelIsSolidTile(Level * level, int x, int y, int z) {
 	Block block = Blocks.table[LevelGetTile(level, x, y, z)];
 	return block == NULL ? false : BlockIsSolid(block);
 }
 
-void LevelTickEntities(Level level) {
+void LevelTickEntities(Level * level) {
 	for (int i = 0; i < ListLength(level->entities); i++) {
 		EntityTick(level->entities[i]);
 		if (level->entities[i]->removed) { level->entities = ListRemove(level->entities, i--); }
 	}
 }
 
-void LevelTick(Level level) {
+void LevelTick(Level * level) {
 	level->tickCount++;
 	
 	int a = 1;
@@ -221,7 +219,7 @@ void LevelTick(Level level) {
 			} else {
 				BlockType tile = level->blocks[(nextTick.y * level->height + nextTick.z) * level->width + nextTick.x];
 				if (LevelIsInBounds(level, nextTick.x, nextTick.y, nextTick.z) && tile == nextTick.Tile && tile != BlockTypeNone) {
-					BlockUpdate(Blocks.table[tile], level, nextTick.x, nextTick.y, nextTick.z, level->random);
+					BlockUpdate(Blocks.table[tile], level, nextTick.x, nextTick.y, nextTick.z, &level->random);
 				}
 			}
 		}
@@ -238,23 +236,23 @@ void LevelTick(Level level) {
 		int z = y >> a & (level->height - 1);
 		y = y >> (a + b) & (level->depth - 1);
 		BlockType tile = level->blocks[(y * level->height + z) * level->width + x];
-		if (Blocks.physics[tile]) { BlockUpdate(Blocks.table[tile], level, x, y, z, level->random); }
+		if (Blocks.physics[tile]) { BlockUpdate(Blocks.table[tile], level, x, y, z, &level->random); }
 	}
 }
 
-bool LevelIsInBounds(Level level, int x, int y, int z) {
+bool LevelIsInBounds(Level * level, int x, int y, int z) {
 	return !(x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth || z >= level->height);
 }
 
-float LevelGetGroundLevel(Level level) {
+float LevelGetGroundLevel(Level * level) {
 	return LevelGetWaterLevel(level) - 2.0;
 }
 
-float LevelGetWaterLevel(Level level) {
+float LevelGetWaterLevel(Level * level) {
 	return level->waterLevel;
 }
 
-bool LevelContainsAnyLiquid(Level level, AABB box) {
+bool LevelContainsAnyLiquid(Level * level, AABB box) {
 	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
 	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
 	if (box.x0 < 0.0) { x0--; }
@@ -277,7 +275,7 @@ bool LevelContainsAnyLiquid(Level level, AABB box) {
 	return false;
 }
 
-bool LevelContainsLiquid(Level level, AABB box, LiquidType liquidID) {
+bool LevelContainsLiquid(Level * level, AABB box, LiquidType liquidID) {
 	int x0 = box.x0, y0 = box.y0, z0 = box.z0;
 	int x1 = box.x1 + 1, y1 = box.y1 + 1, z1 = box.z1 + 1;
 	if (box.x0 < 0.0) { x0--; }
@@ -300,18 +298,18 @@ bool LevelContainsLiquid(Level level, AABB box, LiquidType liquidID) {
 	return false;
 }
 
-void LevelAddToNextTick(Level level, int x, int y, int z, BlockType tile) {
+void LevelAddToNextTick(Level * level, int x, int y, int z, BlockType tile) {
 	NextTickListEntry tick = { .x = x, .y = y, .z = z, .Tile = tile };
 	if (tile != BlockTypeNone) { tick.Ticks = BlockGetTickDelay(Blocks.table[tile]); }
 	level->tickList = ListPush(level->tickList, &tick);
 }
 
-static bool IsSolid(Level level, float x, float y, float z) {
+static bool IsSolid(Level * level, float x, float y, float z) {
 	BlockType tile = LevelGetTile(level, x, y, z);
 	return tile != BlockTypeNone && BlockIsSolid(Blocks.table[tile]);
 }
 
-bool LevelIsSolidSearch(Level level, float x, float y, float z, float r) {
+bool LevelIsSolidSearch(Level * level, float x, float y, float z, float r) {
 	if (IsSolid(level, x - r, y - r, z - r)) { return true; }
 	if (IsSolid(level, x + r, y - r, z - r)) { return true; }
 	if (IsSolid(level, x - r, y + r, z - r)) { return true; }
@@ -323,29 +321,29 @@ bool LevelIsSolidSearch(Level level, float x, float y, float z, float r) {
 	return false;
 }
 
-int LevelGetHighestTile(Level level, int x, int z) {
+int LevelGetHighestTile(Level * level, int x, int z) {
 	int y;
 	for (y = level->depth; (LevelGetTile(level, x, y - 1, z) == 0 || BlockGetLiquidType(Blocks.table[LevelGetTile(level, x, y - 1, z)]) != LiquidTypeNone) && y > 0; y--);
 	return y;
 }
 
-void LevelSetSpawnPosition(Level level, int x, int y, int z, float rotation) {
+void LevelSetSpawnPosition(Level * level, int x, int y, int z, float rotation) {
 	level->xSpawn = x;
 	level->ySpawn = y;
 	level->zSpawn = z;
 	level->spawnRotation = rotation;
 }
 
-float LevelGetBrightness(Level level, int x, int y, int z) {
+float LevelGetBrightness(Level * level, int x, int y, int z) {
 	return LevelIsLit(level, x, y, z) ? 1.0 : 0.6;
 }
 
-bool LevelIsWater(Level level, int x, int y, int z) {
+bool LevelIsWater(Level * level, int x, int y, int z) {
 	BlockType tile = LevelGetTile(level, x, y, z);
 	return tile != BlockTypeNone && BlockGetLiquidType(Blocks.table[tile]) == LiquidTypeWater;
 }
 
-MovingObjectPosition LevelClip(Level level, Vector3D v0, Vector3D v1) {
+MovingObjectPosition LevelClip(Level * level, Vector3D v0, Vector3D v1) {
 	if (v0.x == NAN || v0.y == NAN || v0.z == NAN) { return (MovingObjectPosition){ .null = true }; }
 	if (v1.x == NAN || v1.y == NAN || v1.z == NAN) { return (MovingObjectPosition){ .null = true }; }
 	int i0x = v0.x, i0y = v0.y, i0z = v0.z;
@@ -401,14 +399,14 @@ MovingObjectPosition LevelClip(Level level, Vector3D v0, Vector3D v1) {
 	return (MovingObjectPosition){ .null = true };
 }
 
-void LevelPlaySound(Level level, const char * sound, Entity entity, float volume, float pitch) {
+void LevelPlaySound(Level * level, const char * sound, Entity * entity, float volume, float pitch) {
 }
 
-void LevelPlaySoundAt(Level level, const char * sound, float x, float y, float z, float volume, float pitch) {
+void LevelPlaySoundAt(Level * level, const char * sound, float x, float y, float z, float volume, float pitch) {
 }
 
-bool LevelMaybeGrowTree(Level level, int x, int y, int z) {
-	int r = (int)RandomGeneratorIntegerRange(level->random, 0, 2) + 4;
+bool LevelMaybeGrowTree(Level * level, int x, int y, int z) {
+	int r = (int)RandomGeneratorIntegerRange(&level->random, 0, 2) + 4;
 	bool grow = true;
 	int i, j, k;
 	for (j = y; j <= y + 1 + r; ++j) {
@@ -436,7 +434,7 @@ bool LevelMaybeGrowTree(Level level, int x, int y, int z) {
 				int var12 = m - x;
 				for (j = z - k; j <= z + k; ++j) {
 					int var11 = j - z;
-					if (abs(var12) != k || abs(var11) != k || (RandomGeneratorIntegerRange(level->random, 0, 1) != 0 && i != 0)) { LevelSetTile(level, m, l, j, BlockTypeLeaves); }
+					if (abs(var12) != k || abs(var11) != k || (RandomGeneratorIntegerRange(&level->random, 0, 1) != 0 && i != 0)) { LevelSetTile(level, m, l, j, BlockTypeLeaves); }
 				}
 			}
 		}
@@ -446,22 +444,22 @@ bool LevelMaybeGrowTree(Level level, int x, int y, int z) {
 	} else { return false; }
 }
 
-Entity LevelGetPlayer(Level level) {
+Entity * LevelGetPlayer(Level * level) {
 	return level->player;
 }
 
-void LevelAddEntity(Level level, Entity entity) {
+void LevelAddEntity(Level * level, Entity * entity) {
 	EntitySetLevel(entity, level);
 	level->entities = ListPush(level->entities, &entity);
 }
 
-void LevelRenderEntities(Level level, TextureManager textures, float dt) {
+void LevelRenderEntities(Level * level, TextureManager * textures, float dt) {
 	for (int i = 0; i < ListLength(level->entities); i++) {
 		EntityRender(level->entities[i], textures, dt);
 	}
 }
 
-void LevelExplode(Level level, Entity entity, float x, float y, float z, float radius) {
+void LevelExplode(Level * level, float x, float y, float z, float radius) {
 	int x0 = x - radius - 1.0;
 	int y0 = y - radius - 1.0;
 	int z0 = z - radius - 1.0;
@@ -484,15 +482,13 @@ void LevelExplode(Level level, Entity entity, float x, float y, float z, float r
 	}
 }
 
-Entity LevelFindPlayer(Level level) {
+Entity * LevelFindPlayer(Level * level) {
 	return level->player;
 }
 
-void LevelDestroy(Level level) {
+void LevelDestroy(Level * level) {
 	ListFree(level->entities);
-	RandomGeneratorDestroy(level->random);
 	ListFree(level->tickList);
 	if (level->lightBlockers != NULL) { free(level->lightBlockers); }
 	if (level->blocks != NULL) { free(level->blocks); }
-	free(level);
 }

@@ -1,7 +1,7 @@
 #include "OctaveNoise.h"
 #include <stdlib.h>
 
-OctaveNoise OctaveNoiseCreate(RandomGenerator random, int octaveCount) {
+OctaveNoise OctaveNoiseCreate(RandomGenerator * random, int octaveCount) {
 	Noise noise = NoiseCreate();
 	noise->type = NoiseTypeOctave;
 	noise->typeData = malloc(sizeof(struct OctaveNoiseData));

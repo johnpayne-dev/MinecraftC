@@ -36,8 +36,8 @@ List(void) ListInsert(List(void) list, void * element, int32_t index) {
 		info = realloc(info, sizeof(struct ListInfo) + info->capacity * info->elementSize);
 		list = info + 1;
 	}
-	memmove(list + (index + 1) * info->elementSize, list + index * info->elementSize, (info->length - 1 - index) * info->elementSize);
-	memcpy(list + index * info->elementSize, element, info->elementSize);
+	memmove((uint8_t *)list + (index + 1) * info->elementSize, (uint8_t *)list + index * info->elementSize, (info->length - 1 - index) * info->elementSize);
+	memcpy((uint8_t *)list + index * info->elementSize, element, info->elementSize);
 	return list;
 }
 
@@ -65,7 +65,7 @@ List(void) ListPop(List(void) list) {
 
 List(void) ListRemoveAll(List(void) list, void * value) {
 	for (uint32_t i = 0; i < ListLength(list); i++) {
-		if (memcmp(list + i * ListElementSize(list), value, ListElementSize(list)) == 0) {
+		if (memcmp((uint8_t *)list + i * ListElementSize(list), value, ListElementSize(list)) == 0) {
 			list = ListRemove(list, i);
 			i--;
 		}
@@ -75,17 +75,17 @@ List(void) ListRemoveAll(List(void) list, void * value) {
 
 void ListSet(List(void) list, int32_t index, void * element) {
 	struct ListInfo * info = (struct ListInfo *)list - 1;
-	memcpy(list + index * info->elementSize, element, info->elementSize);
+	memcpy((uint8_t *)list + index * info->elementSize, element, info->elementSize);
 }
 
 void * ListGet(List(void) list, int32_t index) {
 	struct ListInfo * info = (struct ListInfo *)list - 1;
-	return list + index * info->elementSize;
+	return (uint8_t *)list + index * info->elementSize;
 }
 
 int32_t ListIndexOf(List(void) list, void * value) {
 	for (uint32_t i = 0; i < ListLength(list); i++) {
-		if (memcmp(list + i * ListElementSize(list), value, ListElementSize(list)) == 0) { return i; }
+		if (memcmp((uint8_t *)list + i * ListElementSize(list), value, ListElementSize(list)) == 0) { return i; }
 	}
 	return -1;
 }

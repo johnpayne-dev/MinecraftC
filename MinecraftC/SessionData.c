@@ -48,20 +48,6 @@ void SessionDataInitialize() {
 	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.table[BlockTypeObsidian]);
 }
 
-void SessionDataDeinitialize() {
+void SessionDataFree() {
 	ListFree(SessionDataAllowedBlocks);
-}
-
-SessionData SessionDataCreate(char * userName, char * sessionID) {
-	SessionData session = malloc(sizeof(struct SessionData));
-	*session = (struct SessionData) {
-		.userName = StringCreate(userName),
-		.sessionID = sessionID,
-	};
-	return session;
-}
-
-void SessionDataDestroy(SessionData session) {
-	StringFree(session->userName);
-	free(session);
 }

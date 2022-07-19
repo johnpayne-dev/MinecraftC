@@ -14,19 +14,17 @@
 #include "../../Resources/Water.h"
 #include <stdlib.h>
 
-TextureManager TextureManagerCreate(GameSettings settings) {
-	TextureManager manager = malloc(sizeof(struct TextureManager));
-	*manager = (struct TextureManager) {
+void TextureManagerCreate(TextureManager * manager, GameSettings * settings) {
+	*manager = (TextureManager) {
 		.settings = settings,
-		.animations = ListCreate(sizeof(AnimatedTexture)),
+		.animations = ListCreate(sizeof(AnimatedTexture *)),
 		.textureBuffer = malloc(512 * 512),
 		.textures = ListCreate(sizeof(unsigned int)),
 		.textureNames = ListCreate(sizeof(char *)),
 	};
-	return manager;
 }
 
-int TextureManagerLoad(TextureManager manager, char * resource) {
+int TextureManagerLoad(TextureManager * manager, char * resource) {
 	bool loaded = false;
 	int index = -1;
 	for (int i = 0; i < ListLength(manager->textureNames); i++) {
@@ -68,22 +66,21 @@ int TextureManagerLoad(TextureManager manager, char * resource) {
 	return manager->idBuffer;
 }
 
-void TextureManagerReload(TextureManager manager) {
+void TextureManagerReload(TextureManager * manager) {
 	for (int i = 0; i < ListLength(manager->textures); i++) { glDeleteTextures(1, &manager->textures[i]); }
 	manager->textures = ListClear(manager->textures);
 	manager->textureNames = ListClear(manager->textureNames);
 }
 
-void TextureManagerRegisterAnimation(TextureManager manager, AnimatedTexture texture) {
+void TextureManagerRegisterAnimation(TextureManager * manager, AnimatedTexture * texture) {
 	manager->animations = ListPush(manager->animations, &texture);
 	AnimatedTextureAnimate(texture);
 }
 
-void TextureManagerDestroy(TextureManager manager) {
+void TextureManagerDestroy(TextureManager * manager) {
 	ListFree(manager->textures);
 	ListFree(manager->textureNames);
 	ListFree(manager->animations);
 	free(manager->textureBuffer);
-	free(manager);
 }
 

@@ -2,24 +2,23 @@
 #include "../Level/Level.h"
 #include "../Render/ShapeRenderer.h"
 
-TerrainParticle TerrainParticleCreate(Level level, float x, float y, float z, float xd, float yd, float zd, Block block) {
-	Particle particle = ParticleCreate(level, x, y, z, xd, yd, zd);
-	ParticleData this = particle->typeData;
+void TerrainParticleCreate(TerrainParticle * particle, Level * level, float x, float y, float z, float xd, float yd, float zd, Block block) {
+	ParticleCreate(particle, level, x, y, z, xd, yd, zd);
+	ParticleData * this = &particle->particle;
 	this->texture = block->textureID;
 	this->gravity = block->particleGravity;
 	this->r = 0.6;
 	this->g = 0.6;
 	this->b = 0.6;
 	this->type = ParticleTypeTerrain;
-	return particle;
 }
 
-int TerrainParticleGetTexture(TerrainParticle particle) {
+int TerrainParticleGetTexture(TerrainParticle * particle) {
 	return 1;
 }
 
-void TerrainParticleRender(TerrainParticle particle, float dt, float x, float y, float z, float v6, float v7) {
-	ParticleData this = particle->typeData;
+void TerrainParticleRender(TerrainParticle * particle, float dt, float x, float y, float z, float v6, float v7) {
+	ParticleData * this = &particle->particle;
 	float u0 = ((this->texture % 16) + this->u / 4.0) / 16.0;
 	float v0 = ((this->texture / 16) + this->v / 4.0) / 16.0;
 	float u1 = u0 + 0.015609375;

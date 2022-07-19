@@ -8,6 +8,6 @@ typedef struct PerlinNoiseData {
 	int hash[512];
 } * PerlinNoiseData;
 
-PerlinNoise PerlinNoiseCreate(RandomGenerator random);
+PerlinNoise PerlinNoiseCreate(RandomGenerator * random);
 float PerlinNoiseCompute(PerlinNoise noise, float x, float y);
 void PerlinNoiseDestroy(PerlinNoise noise);

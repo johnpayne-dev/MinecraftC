@@ -11,7 +11,6 @@ typedef struct Timer {
 	uint64_t lastSystemClock;
 	uint64_t lastHRClock;
 	float adjustment;
-} * Timer;
+} Timer;
 
-Timer TimerCreate(float ticksPerSecond);
-void TimerDestroy(Timer timer);
+void TimerCreate(Timer * timer, float ticksPerSecond);

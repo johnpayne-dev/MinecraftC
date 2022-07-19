@@ -1,31 +1,30 @@
 #include "Player.h"
 #include "PlayerAI.h"
 #include "../Utilities/OpenGL.h"
+#include "../Level/Level.h"
 
-Player PlayerCreate(Level level) {
-	Entity entity = EntityCreate(level);
+void PlayerCreate(Player * entity, Level * level) {
+	EntityCreate(entity, level);
 	entity->type = EntityTypePlayer;
 	entity->footSize = 0.5;
 	entity->heightOffset = 1.62;
 	EntitySetPosition(entity, entity->x, entity->y, entity->z);
-	PlayerData player = malloc(sizeof(struct PlayerData));
-	*player = (struct PlayerData) {
+	PlayerData * player = &entity->player;
+	*player = (PlayerData) {
 		.bodyRotation = 0.0,
 		.oldBodyRotation = 0.0,
-		.ai = PlayerAICreate(entity),
-		.inventory = InventoryCreate(),
 		.userType = 0,
 	};
-	entity->typeData = player;
+	InventoryCreate(&player->inventory);
+	PlayerAICreate(&player->ai, entity);
 	if (level != NULL) {
 		level->player = entity;
 		LevelAddEntity(level, entity);
 	}
-	return entity;
 }
 
-void PlayerTick(Player player) {
-	PlayerData this = player->typeData;
+void PlayerTick(Player * player) {
+	PlayerData * this = &player->player;
 	this->oldTilt = this->tilt;
 	if (EntityIsInWater(player)) { player->fallDistance = 0.0; }
 	
@@ -37,13 +36,11 @@ void PlayerTick(Player player) {
 	float dz = player->z - player->zo;
 	float len = sqrtf(dx * dx + dz * dz);
 	float rot = this->bodyRotation;
-	float f1 = 0.0, f2 = 0.0;
+	float f1 = 0.0;
 	if (len > 0.05) {
-		f2 = 1.0;
 		f1 = len * 3.0;
 		rot = atan2(dz, dx) * (180.0 / M_PI) - 90.0;
 	}
-	if (!player->onGround) { f2 = 0.0; }
 	
 	float a;
 	for (a = rot - this->bodyRotation; a < -180.0; a += 360.0);
@@ -65,7 +62,7 @@ void PlayerTick(Player player) {
 	while (player->xRot - player->xRotO >= 180.0) { player->xRotO += 360.0; }
 }
 
-void PlayerTravel(Player player, float x, float y) {
+void PlayerTravel(Player * player, float x, float y) {
 	if (EntityIsInWater(player)) {
 		float z = player->y;
 		EntityMoveRelative(player, x, y, 0.02);
@@ -98,7 +95,7 @@ void PlayerTravel(Player player, float x, float y) {
 	}
 }
 
-void PlayerResetPosition(Player entity) {
+void PlayerResetPosition(Player * entity) {
 	entity->heightOffset = 1.62;
 	EntitySetSize(entity, 0.6, 1.8);
 	entity->type = EntityTypeNone;
@@ -107,11 +104,11 @@ void PlayerResetPosition(Player entity) {
 	if (entity->level != NULL) { entity->level->player = entity; }
 }
 
-void PlayerStepAI(Player player) {
-	PlayerData this = player->typeData;
+void PlayerStepAI(Player * player) {
+	PlayerData * this = &player->player;
 	this->oldBobbing = this->bobbing;
-	InputHandlerUpdateMovement(this->input);
-	PlayerAITick(this->ai, player);
+	InputHandlerUpdateMovement(&this->input);
+	PlayerAITick(&this->ai, player);
 	float bob = sqrtf(player->xd * player->xd + player->zd * player->zd);
 	float tilt = atan(-player->yd * 0.2) * 15.0;
 	if (bob > 0.1) { bob = 0.1; }
@@ -121,18 +118,12 @@ void PlayerStepAI(Player player) {
 	this->tilt += (tilt - this->tilt) * 0.8;
 }
 
-void PlayerReleaseAllKeys(Player player) {
-	PlayerData this = player->typeData;
-	InputHandlerResetKeys(this->input);
+void PlayerReleaseAllKeys(Player * player) {
+	PlayerData * this = &player->player;
+	InputHandlerResetKeys(&this->input);
 }
 
-void PlayerSetKey(Player player, int key, bool state) {
-	PlayerData this = player->typeData;
-	InputHandlerSetKeyState(this->input, key, state);
-}
-
-void PlayerDestroy(Player player) {
-	PlayerData this = player->typeData;
-	InventoryDestroy(this->inventory);
-	free(this);
+void PlayerSetKey(Player * player, int key, bool state) {
+	PlayerData * this = &player->player;
+	InputHandlerSetKeyState(&this->input, key, state);
 }

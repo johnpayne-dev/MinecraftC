@@ -11,7 +11,7 @@ int GrassBlockGetTextureID(GrassBlock block, int side) {
 	return side == 1 ? 0 : (side == 0 ? 2 : 3);
 }
 
-void GrassBlockUpdate(GrassBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+void GrassBlockUpdate(GrassBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	if (RandomGeneratorIntegerRange(random, 0, 3) == 0) {
 		if (!LevelIsLit(level, x, y, z)) {
 			LevelSetTile(level, x, y, z, BlockTypeDirt);

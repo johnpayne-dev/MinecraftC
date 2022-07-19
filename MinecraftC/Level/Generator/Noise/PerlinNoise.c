@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-PerlinNoise PerlinNoiseCreate(RandomGenerator random) {
+PerlinNoise PerlinNoiseCreate(RandomGenerator * random) {
 	Noise noise = NoiseCreate();
 	noise->type = NoiseTypePerlin;
 	noise->typeData = malloc(sizeof(struct PerlinNoiseData));

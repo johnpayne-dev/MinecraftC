@@ -4,8 +4,7 @@
 #include "Utilities/SinTable.h"
 #include "Particle/PrimedTNT.h"
 
-Entity EntityCreate(Level level) {
-	Entity entity = malloc(sizeof(struct Entity));
+void EntityCreate(Entity * entity, Level * level) {
 	*entity = (struct Entity) {
 		.onGround = false,
 		.horizontalCollision = false,
@@ -26,11 +25,13 @@ Entity EntityCreate(Level level) {
 		.level = level,
 	};
 	EntitySetPosition(entity, 0.0, 0.0, 0.0);
-	return entity;
 }
 
-void EntityResetPosition(Entity entity) {
-	if (entity->type == EntityTypePlayer) { return PlayerResetPosition(entity); }
+void EntityResetPosition(Entity * entity) {
+	if (entity->type == EntityTypePlayer) {
+		PlayerResetPosition(entity);
+		return;
+	}
 	if (entity->level != NULL) {
 		float spawnX = entity->level->xSpawn + 0.5;
 		float spawnY = entity->level->ySpawn;
@@ -53,16 +54,16 @@ void EntityResetPosition(Entity entity) {
 	}
 }
 
-void EntityRemove(Entity entity) {
+void EntityRemove(Entity * entity) {
 	entity->removed = true;
 }
 
-void EntitySetSize(Entity entity, float w, float h) {
+void EntitySetSize(Entity * entity, float w, float h) {
 	entity->aabbWidth = w;
 	entity->aabbHeight = h;
 }
 
-void EntitySetPosition(Entity entity, float x, float y, float z) {
+void EntitySetPosition(Entity * entity, float x, float y, float z) {
 	entity->x = x;
 	entity->y = y;
 	entity->z = z;
@@ -71,7 +72,7 @@ void EntitySetPosition(Entity entity, float x, float y, float z) {
 	entity->aabb = (AABB){ .x0 = x - w, .y0 = y - h, .z0 = z - w, .x1 = x + w, .y1 = y + h, .z1 = z + w };
 }
 
-void EntityTurn(Entity entity, float rx, float ry) {
+void EntityTurn(Entity * entity, float rx, float ry) {
 	float orx = entity->xRot;
 	float ory = entity->yRot;
 	entity->xRot -= rx * 0.15;
@@ -81,7 +82,7 @@ void EntityTurn(Entity entity, float rx, float ry) {
 	entity->yRotO += entity->yRot - ory;
 }
 
-void EntityTick(Entity entity) {
+void EntityTick(Entity * entity) {
 	if (entity->type == EntityTypeParticle) { ParticleTick(entity); return; }
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
 	
@@ -95,7 +96,7 @@ void EntityTick(Entity entity) {
 	if (entity->type == EntityTypePlayer) { PlayerTick(entity); return; }
 }
 
-bool EntityIsFree(Entity entity, float ax, float ay, float az) {
+bool EntityIsFree(Entity * entity, float ax, float ay, float az) {
 	AABB aabb = AABBMove(entity->aabb, ax, ay, az);
 	List(AABB) cubes = LevelGetCubes(entity->level, aabb);
 	bool free = ListLength(cubes) > 0 ? false : !LevelContainsAnyLiquid(entity->level, aabb);
@@ -103,7 +104,7 @@ bool EntityIsFree(Entity entity, float ax, float ay, float az) {
 	return free;
 }
 
-void EntityMove(Entity entity, float ax, float ay, float az) {
+void EntityMove(Entity * entity, float ax, float ay, float az) {
 	if (entity->noPhysics) {
 		entity->aabb = AABBMove(entity->aabb, ax, ay, az);
 		entity->x = (entity->aabb.x0 + entity->aabb.x1) / 2.0;
@@ -231,20 +232,20 @@ void EntityMove(Entity entity, float ax, float ay, float az) {
 	}
 }
 
-bool EntityIsInWater(Entity entity) {
+bool EntityIsInWater(Entity * entity) {
 	return LevelContainsLiquid(entity->level, AABBGrow(entity->aabb, 0.0, -0.4, 0.0), LiquidTypeWater);
 }
 
-bool EntityIsUnderWater(Entity entity) {
+bool EntityIsUnderWater(Entity * entity) {
 	BlockType blockType = LevelGetTile(entity->level, entity->x, entity->y, entity->z);
 	return blockType != 0 ? BlockGetLiquidType(Blocks.table[blockType]) == LiquidTypeWater : false;
 }
 
-bool EntityIsInLava(Entity entity) {
+bool EntityIsInLava(Entity * entity) {
 	return LevelContainsLiquid(entity->level, AABBGrow(entity->aabb, 0.0, -0.4, 0.0), LiquidTypeLava);
 }
 
-void EntityMoveRelative(Entity entity, float x, float z, float speed) {
+void EntityMoveRelative(Entity * entity, float x, float z, float speed) {
 	float len = sqrtf(x * x + z * z);
 	if (len >= 0.01) {
 		if (len < 1.0) { len = 1.0; }
@@ -258,29 +259,23 @@ void EntityMoveRelative(Entity entity, float x, float z, float speed) {
 	}
 }
 
-float EntityGetBrightness(Entity entity, float t) {
+float EntityGetBrightness(Entity * entity, float t) {
 	return LevelGetBrightness(entity->level, entity->x, entity->y, entity->z);
 }
 
-void EntitySetLevel(Entity entity, Level level) {
+void EntitySetLevel(Entity * entity, Level * level) {
 	entity->level = level;
 }
 
-void EntityPlaySound(Entity entity, const char * name, float volume, float pitch) {
+void EntityPlaySound(Entity * entity, const char * name, float volume, float pitch) {
 	LevelPlaySound(entity->level, name, entity, volume, pitch);
 }
 
-bool EntityIsPickable(Entity entity) {
+bool EntityIsPickable(Entity * entity) {
 	if (entity->type == EntityTypePrimedTNT) { return PrimedTNTIsPickable(entity); }
 	return false;
 }
 
-void EntityRender(Entity entity, TextureManager textures, float t) {
+void EntityRender(Entity * entity, TextureManager * textures, float t) {
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTRender(entity, textures, t); return; }
-}
-
-void EntityDestroy(Entity entity) {
-	if (entity->type == EntityTypePlayer) { PlayerDestroy(entity); }
-	if (entity->type == EntityTypeParticle) { ParticleDestroy(entity); }
-	free(entity);
 }

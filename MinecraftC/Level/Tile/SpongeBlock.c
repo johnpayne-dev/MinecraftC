@@ -5,7 +5,7 @@ SpongeBlock SpongeBlockCreate() {
 	return BlockCreate(BlockTypeSponge, 48);
 }
 
-void SpongeBlockOnAdded(SpongeBlock block, Level level, int x, int y, int z) {
+void SpongeBlockOnAdded(SpongeBlock block, Level * level, int x, int y, int z) {
 	for (int i = x - 2; i <= x + 2; i++) {
 		for (int j = y - 2; j <= y + 2; j++) {
 			for (int k = z - 2; k <= z + 2; k++) {
@@ -15,7 +15,7 @@ void SpongeBlockOnAdded(SpongeBlock block, Level level, int x, int y, int z) {
 	}
 }
 
-void SpongeBlockOnRemoved(SpongeBlock block, Level level, int x, int y, int z) {
+void SpongeBlockOnRemoved(SpongeBlock block, Level * level, int x, int y, int z) {
 	for (int i = x - 2; i <= x + 2; i++) {
 		for (int j = y - 2; j <= y + 2; j++) {
 			for (int k = z - 2; k <= z + 2; k++) {

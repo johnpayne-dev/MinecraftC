@@ -3,11 +3,11 @@
 #include "TerrainParticle.h"
 #include "../Utilities/SinTable.h"
 #include "../Utilities/OpenGL.h"
+#include "../Level/Level.h"
 
-PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z) {
-	Entity entity = EntityCreate(level);
+void PrimedTNTCreate(PrimedTNT * entity, Level * level, float x, float y, float z) {
+	EntityCreate(entity, level);
 	entity->type = EntityTypePrimedTNT;
-	entity->typeData = malloc(sizeof(struct PrimedTNTData));
 	EntitySetSize(entity, 0.98, 0.98);
 	entity->heightOffset = entity->aabbHeight / 2.0;
 	EntitySetPosition(entity, x, y, z);
@@ -16,25 +16,24 @@ PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z) {
 	entity->yo = y;
 	entity->zo = z;
 	float r = RandomUniform() * 2.0 * M_PI;
-	PrimedTNTData this = entity->typeData;
+	PrimedTNTData * this = &entity->tnt;
 	this->xd = -tsin(r * M_PI / 180.0) * 0.02;
 	this->yd = 0.2;
 	this->zd = -cos(r * M_PI / 180.0) * 0.02;
 	this->life = 40;
 	this->defused = false;
-	return entity;
 }
 
-void PrimedTNTOnHit(PrimedTNT entity) {
+void PrimedTNTOnHit(PrimedTNT * entity) {
 	if (!entity->removed) { EntityRemove(entity); }
 }
 
-bool PrimedTNTIsPickable(PrimedTNT entity) {
+bool PrimedTNTIsPickable(PrimedTNT * entity) {
 	return !entity->removed;
 }
 
-void PrimedTNTTick(PrimedTNT entity) {
-	PrimedTNTData this = entity->typeData;
+void PrimedTNTTick(PrimedTNT * entity) {
+	PrimedTNTData * this = &entity->tnt;
 	entity->xo = entity->x;
 	entity->yo = entity->y;
 	entity->zo = entity->z;
@@ -52,26 +51,30 @@ void PrimedTNTTick(PrimedTNT entity) {
 	if (!this->defused) {
 		this->life--;
 		if (this->life > 0) {
-			ParticleManagerSpawnParticle(entity->level->particleEngine, SmokeParticleCreate(entity->level, entity->x, entity->y + 0.6, entity->z));
+			SmokeParticle * particle = malloc(sizeof(SmokeParticle));
+			SmokeParticleCreate(particle, entity->level, entity->x, entity->y + 0.6, entity->z);
+			ParticleManagerSpawnParticle(entity->level->particleEngine, particle);
 		} else {
 			EntityRemove(entity);
-			RandomGenerator random = RandomGeneratorCreate(time(NULL));
+			RandomGenerator random;
+			RandomGeneratorCreate(&random, time(NULL));
 			float radius = 4.0;
-			LevelExplode(entity->level, NULL, entity->x, entity->y, entity->z, radius);
+			LevelExplode(entity->level, entity->x, entity->y, entity->z, radius);
 			for (int i = 0; i < 100; i++) {
-				float ox = RandomGeneratorNormal(random, 1.0) * radius / 4.0;
-				float oy = RandomGeneratorNormal(random, 1.0) * radius / 4.0;
-				float oz = RandomGeneratorNormal(random, 1.0) * radius / 4.0;
+				float ox = RandomGeneratorNormal(&random, 1.0) * radius / 4.0;
+				float oy = RandomGeneratorNormal(&random, 1.0) * radius / 4.0;
+				float oz = RandomGeneratorNormal(&random, 1.0) * radius / 4.0;
 				float l = ox * ox + oy * oy + oz * oz;
-				ParticleManagerSpawnParticle(entity->level->particleEngine, TerrainParticleCreate(entity->level, entity->x + ox, entity->y + oy, entity->z + oz, ox / l, oy / l, oz / l, Blocks.table[BlockTypeTNT]));
+				TerrainParticle * particle = malloc(sizeof(TerrainParticle));
+				TerrainParticleCreate(particle, entity->level, entity->x + ox, entity->y + oy, entity->z + oz, ox / l, oy / l, oz / l, Blocks.table[BlockTypeTNT]);
+				ParticleManagerSpawnParticle(entity->level->particleEngine, particle);
 			}
-			RandomGeneratorDestroy(random);
 		}
 	}
 }
 
-void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float dt) {
-	PrimedTNTData this = tnt->typeData;
+void PrimedTNTRender(PrimedTNT * tnt, TextureManager * textures, float dt) {
+	PrimedTNTData * this = &tnt->tnt;
 	int texture = TextureManagerLoad(textures, "Terrain.png");
 	glBindTexture(GL_TEXTURE_2D, texture);
 	float brightness = LevelGetBrightness(tnt->level, tnt->x, tnt->y, tnt->z);
@@ -97,8 +100,4 @@ void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float dt) {
 	glEnable(GL_LIGHTING);
 	glPopMatrix();
 	glPopMatrix();
-}
-
-void PrimedTNTDestroy(PrimedTNT tnt) {
-	free(tnt->typeData);
 }

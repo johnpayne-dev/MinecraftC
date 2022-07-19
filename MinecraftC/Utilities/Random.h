@@ -5,21 +5,19 @@ typedef struct RandomGenerator {
 	uint64_t seed;
 	uint64_t state;
 	double lastNormal;
-} * RandomGenerator;
+} RandomGenerator;
 
-RandomGenerator RandomGeneratorCreate(uint64_t seed);
+void RandomGeneratorCreate(RandomGenerator * generator, uint64_t seed);
 
-uint64_t RandomGeneratorInteger(RandomGenerator generator);
+uint64_t RandomGeneratorInteger(RandomGenerator * generator);
 
-int64_t RandomGeneratorIntegerRange(RandomGenerator generator, int64_t min, int64_t max);
+int64_t RandomGeneratorIntegerRange(RandomGenerator * generator, int64_t min, int64_t max);
 
-double RandomGeneratorUniform(RandomGenerator generator);
+double RandomGeneratorUniform(RandomGenerator * generator);
 
-double RandomGeneratorUniformRange(RandomGenerator generator, double min, double max);
+double RandomGeneratorUniformRange(RandomGenerator * generator, double min, double max);
 
-double RandomGeneratorNormal(RandomGenerator generator, double stddev);
-
-void RandomGeneratorDestroy(RandomGenerator generator);
+double RandomGeneratorNormal(RandomGenerator * generator, double stddev);
 
 void RandomSetSeed(unsigned int seed);
 

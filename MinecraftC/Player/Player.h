@@ -4,7 +4,9 @@
 #include "PlayerAI.h"
 #include "../Player/Player.h"
 
-typedef Entity Player;
+struct Level;
+
+typedef struct Entity Player;
 
 typedef struct PlayerData {
 	float bodyRotation;
@@ -18,13 +20,12 @@ typedef struct PlayerData {
 	int userType;
 	float bobbing;
 	float oldBobbing;
-} * PlayerData;
+} PlayerData;
 
-Player PlayerCreate(Level level);
-void PlayerTick(Player player);
-void PlayerTravel(Player player, float x, float y);
-void PlayerResetPosition(Player player);
-void PlayerStepAI(Player player);
-void PlayerReleaseAllKeys(Player player);
-void PlayerSetKey(Player player, int key, bool state);
-void PlayerDestroy(Player player);
+void PlayerCreate(Player * player, struct Level * level);
+void PlayerTick(Player * player);
+void PlayerTravel(Player * player, float x, float y);
+void PlayerResetPosition(Player * player);
+void PlayerStepAI(Player * player);
+void PlayerReleaseAllKeys(Player * player);
+void PlayerSetKey(Player * player, int key, bool state);

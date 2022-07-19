@@ -5,7 +5,7 @@ SandBlock SandBlockCreate(BlockType type, int texture) {
 	return BlockCreate(type, texture);
 }
 
-static void Fall(SandBlock block, Level level, int x, int y, int z) {
+static void Fall(SandBlock block, Level * level, int x, int y, int z) {
 	int vx = x, vy = y, vz = z;
 	while (true) {
 		BlockType tile = LevelGetTile(level, vx, vy - 1, vz);
@@ -24,10 +24,10 @@ static void Fall(SandBlock block, Level level, int x, int y, int z) {
 	}
 }
 
-void SandBlockOnNeighborChanged(SandBlock block, Level level, int x, int y, int z, BlockType tile) {
+void SandBlockOnNeighborChanged(SandBlock block, Level * level, int x, int y, int z, BlockType tile) {
 	Fall(block, level, x, y, z);
 }
 
-void SandBlockOnPlaced(SandBlock block, Level level, int x, int y, int z) {
+void SandBlockOnPlaced(SandBlock block, Level * level, int x, int y, int z) {
 	Fall(block, level, x, y, z);
 }

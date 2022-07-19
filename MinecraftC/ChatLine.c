@@ -1,16 +1,13 @@
 #include "ChatLine.h"
 #include <stdlib.h>
 
-ChatLine ChatLineCreate(char * message) {
-	ChatLine line = malloc(sizeof(struct ChatLine));
-	*line = (struct ChatLine) {
+void ChatLineCreate(ChatLine * line, char * message) {
+	*line = (ChatLine) {
 		.message = StringCreate(message),
 		.time = 0,
 	};
-	return line;
 }
 
-void ChatLineDestroy(ChatLine line) {
+void ChatLineDestroy(ChatLine * line) {
 	StringFree(line->message);
-	free(line);
 }

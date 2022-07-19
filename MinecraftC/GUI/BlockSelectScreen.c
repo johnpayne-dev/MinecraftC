@@ -32,7 +32,7 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
 	}
 	ScreenDrawCenteredString(screen->font, "Select block", screen->width / 2, 40, 0xffffffff);
 	
-	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(screen->minecraft->textureManager, "Terrain.png"));
+	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&screen->minecraft->textureManager, "Terrain.png"));
 	for (int i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
 		Block block = SessionDataAllowedBlocks[i];
 		glPushMatrix();
@@ -55,7 +55,7 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
 
 void BlockSelectScreenOnMouseClicked(BlockSelectScreen screen, int x, int y, int button) {
 	if (button == SDL_BUTTON_LEFT) {
-		InventoryReplaceSlot(((PlayerData)screen->minecraft->player->typeData)->inventory, GetBlockOnScreen(screen, x, y ));
+		InventoryReplaceSlot(&screen->minecraft->player.player.inventory, GetBlockOnScreen(screen, x, y ));
 		MinecraftSetCurrentScreen(screen->minecraft, NULL);
 	}
 }

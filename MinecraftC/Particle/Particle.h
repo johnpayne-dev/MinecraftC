@@ -1,5 +1,6 @@
 #pragma once
-#include "../Entity.h"
+
+struct Level;
 
 typedef enum ParticleType {
 	ParticleTypeNone,
@@ -18,12 +19,11 @@ typedef struct ParticleData {
 	float gravity;
 	float r, g, b;
 	ParticleType type;
-} * ParticleData;
+} ParticleData;
 
-typedef Entity Particle;
+typedef struct Entity Particle;
 
-Particle ParticleCreate(struct Level * level, float x, float y, float z, float xd, float yd, float zd);
-void ParticleTick(Particle particle);
-void ParticleRender(Particle particle, float t, float x, float y, float z, float v6, float v7);
-int ParticleGetParticleTexture(Particle particle);
-void ParticleDestroy(Particle particle);
+void ParticleCreate(Particle * particle, struct Level * level, float x, float y, float z, float xd, float yd, float zd);
+void ParticleTick(Particle * particle);
+void ParticleRender(Particle * particle, float t, float x, float y, float z, float v6, float v7);
+int ParticleGetParticleTexture(Particle * particle);

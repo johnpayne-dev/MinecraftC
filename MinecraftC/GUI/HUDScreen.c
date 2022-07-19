@@ -10,32 +10,31 @@ HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height) {
 	HUDScreen hud = malloc(sizeof(struct HUDScreen));
 	*hud = (struct HUDScreen) {
 		.chat = ListCreate(sizeof(ChatLine)),
-		.random = RandomGeneratorCreate(time(NULL)),
 		.hoveredPlayer = NULL,
 		.minecraft = minecraft,
 		.width = width * 240 / height,
 		.height = height * 240 / height,
-		
 	};
+	RandomGeneratorCreate(&hud->random, time(NULL));
 	return hud;
 }
 
 void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
-	PlayerData player = hud->minecraft->player->typeData;
-	RendererEnableGUIMode(hud->minecraft->renderer);
-	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->minecraft->textureManager, "GUI/GUI.png"));
+	PlayerData * player = &hud->minecraft->player.player;
+	RendererEnableGUIMode(&hud->minecraft->renderer);
+	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&hud->minecraft->textureManager, "GUI/GUI.png"));
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_BLEND);
 	ScreenDrawImage(hud->width / 2 - 91, hud->height - 22, 0, 0, 182, 22, -90.0);
-	ScreenDrawImage(hud->width / 2 - 92 + player->inventory->selected * 20, hud->height - 23, 0, 22, 24, 22, -90.0);
-	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->minecraft->textureManager, "GUI/Icons.png"));
+	ScreenDrawImage(hud->width / 2 - 92 + player->inventory.selected * 20, hud->height - 23, 0, 22, 24, 22, -90.0);
+	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&hud->minecraft->textureManager, "GUI/Icons.png"));
 	ScreenDrawImage(hud->width / 2 - 7, hud->height / 2 - 7, 0, 0, 16, 16, -90.0);
 	
 	glDisable(GL_BLEND);
 	for (int i = 0; i < 9; i++) {
 		int x = hud->width / 2 - 90 + i * 20;
 		int y = hud->height - 16;
-		BlockType tile = player->inventory->slots[i];
+		BlockType tile = player->inventory.slots[i];
 		if (tile != -1 && tile != 0) {
 			glPushMatrix();
 			glTranslatef(x, y, -50.0);
@@ -45,7 +44,7 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 			glRotatef(45.0, 0.0, 1.0, 0.0);
 			glTranslatef(-1.5, 0.5, 0.5);
 			glScalef(-1.0, -1.0, -1.0);
-			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(hud->minecraft->textureManager, "Terrain.png"));
+			glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&hud->minecraft->textureManager, "Terrain.png"));
 			ShapeRendererBegin();
 			BlockRenderFullBrightness(Blocks.table[tile]);
 			ShapeRendererEnd();
@@ -54,7 +53,7 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 	}
 		
 	FontRendererRender(hud->minecraft->font, "0.30", 2, 2, 0xffffffff);
-	if (hud->minecraft->settings->showFrameRate) { FontRendererRender(hud->minecraft->font, hud->minecraft->debug, 2, 12, 0xffffffff); }
+	if (hud->minecraft->settings.showFrameRate) { FontRendererRender(hud->minecraft->font, hud->minecraft->debug, 2, 12, 0xffffffff); }
 		
 	int maxLines = 10;
 	bool chatScreen = false;
@@ -63,7 +62,7 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 		chatScreen = true;
 	}
 	for (int i = 0; i < ListLength(hud->chat) && i < maxLines; i++) {
-		if (hud->chat[i]->time < 200 || chatScreen) { FontRendererRender(hud->minecraft->font, hud->chat[i]->message, 2, hud->height - 28 - i * 9, 0xffffffff); }
+		if (hud->chat[i].time < 200 || chatScreen) { FontRendererRender(hud->minecraft->font, hud->chat[i].message, 2, hud->height - 28 - i * 9, 0xffffffff); }
 	}
 	
 	hud->hoveredPlayer = NULL;
@@ -103,13 +102,13 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 }
 
 void HUDScreenAddChat(HUDScreen screen, char * message) {
-	screen->chat = ListPush(screen->chat, &(ChatLine){ ChatLineCreate(message) });
+	screen->chat = ListPush(screen->chat, &(ChatLine){ 0 });
+	ChatLineCreate(&screen->chat[ListLength(screen->chat) - 1], message);
 	while (ListLength(screen->chat) > 50) { screen->chat = ListRemove(screen->chat, 0); }
 }
 
 void HUDScreenDestroy(HUDScreen hud) {
-	for (int i = 0; i < ListLength(hud->chat); i++) { ChatLineDestroy(hud->chat[i]); }
+	for (int i = 0; i < ListLength(hud->chat); i++) { ChatLineDestroy(&hud->chat[i]); }
 	ListFree(hud->chat);
-	RandomGeneratorDestroy(hud->random);
 	free(hud);
 }

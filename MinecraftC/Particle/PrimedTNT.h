@@ -1,18 +1,19 @@
 #pragma once
-#include "../Entity.h"
-#include "../Level/Level.h"
+#include <stdbool.h>
+#include "../Render/TextureManager.h"
 
-typedef Entity PrimedTNT;
+struct Level;
+
+typedef struct Entity PrimedTNT;
 
 typedef struct PrimedTNTData {
 	float xd, yd, zd;
 	int life;
 	bool defused;
-} * PrimedTNTData;
+} PrimedTNTData;
 
-PrimedTNT PrimedTNTCreate(Level level, float x, float y, float z);
-void PrimedTNTOnHit(PrimedTNT tnt);
-bool PrimedTNTIsPickable(PrimedTNT tnt);
-void PrimedTNTTick(PrimedTNT tnt);
-void PrimedTNTRender(PrimedTNT tnt, TextureManager textures, float t);
-void PrimedTNTDestroy(PrimedTNT tnt);
+void PrimedTNTCreate(PrimedTNT * tnt, struct Level * level, float x, float y, float z);
+void PrimedTNTOnHit(PrimedTNT * tnt);
+bool PrimedTNTIsPickable(PrimedTNT * tnt);
+void PrimedTNTTick(PrimedTNT * tnt);
+void PrimedTNTRender(PrimedTNT * tnt, TextureManager * textures, float t);

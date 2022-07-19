@@ -1,6 +1,8 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
+#include "WaterTexture.h"
+#include "LavaTexture.h"
 
 typedef enum AnimatedTextureType {
 	AnimatedTextureTypeNone,
@@ -13,9 +15,11 @@ typedef struct AnimatedTexture {
 	int textureID;
 	bool anaglyph;
 	AnimatedTextureType type;
-	void * typeData;
-} * AnimatedTexture;
+	union {
+		WaterTextureData water;
+		LavaTextureData lava;
+	};
+} AnimatedTexture;
 
-AnimatedTexture AnimatedTextureCreate(int textureID);
-void AnimatedTextureAnimate(AnimatedTexture texture);
-void AnimatedTextureDestroy(AnimatedTexture texture);
+void AnimatedTextureCreate(AnimatedTexture * texture, int textureID);
+void AnimatedTextureAnimate(AnimatedTexture * texture);

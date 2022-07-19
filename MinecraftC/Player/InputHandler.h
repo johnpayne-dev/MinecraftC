@@ -4,13 +4,12 @@
 
 typedef struct InputHandler {
 	bool keyStates[10];
-	GameSettings settings;
+	GameSettings * settings;
 	float x, y;
 	bool jumping;
-} * InputHandler;
+} InputHandler;
 
-InputHandler InputHandlerCreate(GameSettings settings);
-void InputHandlerSetKeyState(InputHandler input, int key, bool state);
-void InputHandlerResetKeys(InputHandler input);
-void InputHandlerUpdateMovement(InputHandler input);
-void InputHandlerDestroy(InputHandler input);
+void InputHandlerCreate(InputHandler * input, GameSettings * settings);
+void InputHandlerSetKeyState(InputHandler * input, int key, bool state);
+void InputHandlerResetKeys(InputHandler * input);
+void InputHandlerUpdateMovement(InputHandler * input);

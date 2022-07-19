@@ -10,11 +10,11 @@ StillLiquidBlock StillLiquidBlockCreate(BlockType blockType, LiquidType liquidTy
 	return block;
 }
 
-void StillLiquidBlockUpdate(StillLiquidBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+void StillLiquidBlockUpdate(StillLiquidBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	return;
 }
 
-void StillLiquidBlockOnNeighborChanged(StillLiquidBlock block, Level level, int x, int y, int z, BlockType tile) {
+void StillLiquidBlockOnNeighborChanged(StillLiquidBlock block, Level * level, int x, int y, int z, BlockType tile) {
 	LiquidBlockData liquid = block->typeData;
 	bool update = false;
 	if (LevelGetTile(level, x - 1, y, z) == BlockTypeNone) { update = true; }

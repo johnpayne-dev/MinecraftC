@@ -1,10 +1,9 @@
 #include <string.h>
 #include "GameSettings.h"
 #include "Minecraft.h"
-#include "KeyBinding.h"
 #include "Utilities/Log.h"
 
-static void Load(GameSettings settings) {
+static void Load(GameSettings * settings) {
 	SDL_RWops * file = SDL_RWFromFile(settings->file, "r");
 	if (file == NULL) {
 		LogWarning("Failed to load options: %s\n", SDL_GetError());
@@ -44,7 +43,7 @@ static void Load(GameSettings settings) {
 	SDL_RWclose(file);
 }
 
-static void Save(GameSettings settings) {
+static void Save(GameSettings * settings) {
 	SDL_RWops * file = SDL_RWFromFile(settings->file, "w");
 	if (file == NULL) {
 		LogWarning("Failed to save options: %s\n", SDL_GetError());
@@ -104,9 +103,8 @@ static void Save(GameSettings settings) {
 	SDL_RWclose(file);
 }
 
-GameSettings GameSettingsCreate(Minecraft minecraft) {
-	GameSettings settings = malloc(sizeof(struct GameSettings));
-	*settings = (struct GameSettings) {
+void GameSettingsCreate(GameSettings * settings, Minecraft * minecraft) {
+	*settings = (GameSettings) {
 		.music = true,
 		.sound = true,
 		.invertMouse = false,
@@ -134,22 +132,21 @@ GameSettings GameSettingsCreate(Minecraft minecraft) {
 	KeyBinding * bindings[] = { &settings->forwardKey, &settings->leftKey, &settings->backKey, &settings->rightKey, &settings->jumpKey, &settings->buildKey, &settings->chatKey, &settings->toggleFogKey, &settings->saveLocationKey, &settings->loadLocationKey };
 	for (int i = 0; i < sizeof(bindings) / sizeof(bindings[0]); i++) { settings->bindings = ListPush(settings->bindings, &bindings[i]); }
 	Load(settings);
-	return settings;
 }
 
-String GameSettingsGetBinding(GameSettings settings, int binding) {
+String GameSettingsGetBinding(GameSettings * settings, int binding) {
 	String string = StringCreate(settings->bindings[binding]->name);
 	StringConcat(&string, ": ");
 	StringConcat(&string, (char *)SDL_GetKeyName(SDL_SCANCODE_TO_KEYCODE(settings->bindings[binding]->key)));
 	return string;
 }
 
-void GameSettingsSetBinding(GameSettings settings, int binding, int key) {
+void GameSettingsSetBinding(GameSettings * settings, int binding, int key) {
 	settings->bindings[binding]->key = key;
 	Save(settings);
 }
 
-void GameSettingsToggleSetting(GameSettings settings, int setting, int var2) {
+void GameSettingsToggleSetting(GameSettings * settings, int setting) {
 	if (setting == 0) { settings->music = !settings->music; }
 	if (setting == 1) { settings->sound = !settings->sound; }
 	if (setting == 2) { settings->invertMouse = !settings->invertMouse; }
@@ -158,8 +155,8 @@ void GameSettingsToggleSetting(GameSettings settings, int setting, int var2) {
 	if (setting == 5) { settings->viewBobbing = !settings->viewBobbing; }
 	if (setting == 6) {
 		settings->anaglyph = !settings->anaglyph;
-		TextureManagerReload(settings->minecraft->textureManager);
-		settings->minecraft->font->texture = TextureManagerLoad(settings->minecraft->textureManager, settings->minecraft->font->textureName);
+		TextureManagerReload(&settings->minecraft->textureManager);
+		settings->minecraft->font->texture = TextureManagerLoad(&settings->minecraft->textureManager, settings->minecraft->font->textureName);
 	}
 	if (setting == 7) {
 		settings->limitFramerate = !settings->limitFramerate;
@@ -170,7 +167,7 @@ void GameSettingsToggleSetting(GameSettings settings, int setting, int var2) {
 
 static char * RenderDistances[] = { "FAR", "NORMAL", "SHORT", "TINY" };
 
-String GameSettingsGetSetting(GameSettings settings, int setting) {
+String GameSettingsGetSetting(GameSettings * settings, int setting) {
 	String string;
 	switch (setting) {
 		case 0:
@@ -212,7 +209,7 @@ String GameSettingsGetSetting(GameSettings settings, int setting) {
 	return string;
 }
 
-void GameSettingsDestroy(GameSettings settings) {
+void GameSettingsDestroy(GameSettings * settings) {
 	StringFree(settings->file);
 	ListFree(settings->bindings);
 	free(settings);

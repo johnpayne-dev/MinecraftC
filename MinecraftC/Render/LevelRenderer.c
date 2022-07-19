@@ -4,10 +4,9 @@
 #include "../Utilities/Log.h"
 #include "../Utilities/OpenGL.h"
 
-LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures) {
-	LevelRenderer renderer = malloc(sizeof(struct LevelRenderer));
-	*renderer = (struct LevelRenderer) {
-		.chunks = ListCreate(sizeof(Chunk)),
+void LevelRendererCreate(LevelRenderer * renderer, Minecraft * minecraft, TextureManager * textures) {
+	*renderer = (LevelRenderer) {
+		.chunks = ListCreate(sizeof(Chunk *)),
 		.chunkDataCache = malloc(65536 * sizeof(int)),
 		.ticks = 0,
 		.lastLoadX = -9999.0,
@@ -17,10 +16,9 @@ LevelRenderer LevelRendererCreate(Minecraft minecraft, TextureManager textures) 
 		.listID = glGenLists(2),
 		.baseListID = glGenLists(4096 << 6 << 1),
 	};
-	return renderer;
 }
 
-void LevelRendererRefresh(LevelRenderer renderer) {
+void LevelRendererRefresh(LevelRenderer * renderer) {
 	if (renderer->chunkCache != NULL) {
 		for (int i = 0; i < renderer->chunkCacheCount; i++) { ChunkDispose(renderer->chunkCache[i]); }
 		free(renderer->chunkCache);
@@ -31,15 +29,16 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 	renderer->yChunks = renderer->level->depth / 16;
 	renderer->zChunks = renderer->level->height / 16;
 	renderer->chunkCacheCount = renderer->xChunks * renderer->yChunks * renderer->zChunks;
-	renderer->chunkCache = malloc(renderer->chunkCacheCount * sizeof(Chunk));
-	renderer->loadQueue = malloc(renderer->chunkCacheCount * sizeof(Chunk));
+	renderer->chunkCache = malloc(renderer->chunkCacheCount * sizeof(Chunk *));
+	renderer->loadQueue = malloc(renderer->chunkCacheCount * sizeof(Chunk *));
 	
 	int l = 0;
 	for (int i = 0; i < renderer->xChunks; i++) {
 		for (int j = 0; j < renderer->yChunks; j++) {
 			for (int k = 0; k < renderer->zChunks; k++) {
 				int c = (k * renderer->yChunks + j) * renderer->xChunks + i;
-				renderer->chunkCache[c] = ChunkCreate(renderer->level, i << 4, j << 4, k << 4, 16, renderer->baseListID + l);
+				renderer->chunkCache[c] = malloc(sizeof(Chunk));
+				ChunkCreate(renderer->chunkCache[c], renderer->level, i << 4, j << 4, k << 4, 16, renderer->baseListID + l);
 				renderer->loadQueue[c] = renderer->chunkCache[c];
 				l += 2;
 			}
@@ -119,7 +118,7 @@ void LevelRendererRefresh(LevelRenderer renderer) {
 	LevelRendererQueueChunks(renderer, 0, 0, 0, renderer->level->width, renderer->level->depth, renderer->level->height);
 }
 
-int LevelRendererSortChunks(LevelRenderer renderer, Player player, int pass) {
+int LevelRendererSortChunks(LevelRenderer * renderer, Player * player, int pass) {
 	float vx = player->x - renderer->lastLoadX;
 	float vy = player->y - renderer->lastLoadY;
 	float vz = player->z - renderer->lastLoadZ;
@@ -127,7 +126,7 @@ int LevelRendererSortChunks(LevelRenderer renderer, Player player, int pass) {
 		renderer->lastLoadX = player->x;
 		renderer->lastLoadY = player->y;
 		renderer->lastLoadZ = player->z;
-		qsort(renderer->loadQueue, renderer->chunkCacheCount, sizeof(Chunk), ChunkDistanceComparator);
+		qsort(renderer->loadQueue, renderer->chunkCacheCount, sizeof(Chunk *), ChunkDistanceComparator);
 	}
 	
 	int count = 0;
@@ -139,7 +138,7 @@ int LevelRendererSortChunks(LevelRenderer renderer, Player player, int pass) {
 	return count;
 }
 
-void LevelRendererQueueChunks(LevelRenderer renderer, int x0, int y0, int z0, int x1, int y1, int z1) {
+void LevelRendererQueueChunks(LevelRenderer * renderer, int x0, int y0, int z0, int x1, int y1, int z1) {
 	x0 /= 16;
 	y0 /= 16;
 	z0 /= 16;
@@ -155,7 +154,7 @@ void LevelRendererQueueChunks(LevelRenderer renderer, int x0, int y0, int z0, in
 	for (int x = x0; x <= x1; x++) {
 		for (int y = y0; y <= y1; y++) {
 			for (int z = z0; z <= z1; z++) {
-				Chunk chunk = renderer->chunkCache[(z * renderer->yChunks + y) * renderer->xChunks + x];
+				Chunk * chunk = renderer->chunkCache[(z * renderer->yChunks + y) * renderer->xChunks + x];
 				if (!chunk->loaded) {
 					chunk->loaded = true;
 					renderer->chunks = ListPush(renderer->chunks, &chunk);
@@ -165,13 +164,16 @@ void LevelRendererQueueChunks(LevelRenderer renderer, int x0, int y0, int z0, in
 	}
 }
 
-void LevelRendererDestroy(LevelRenderer renderer) {
+void LevelRendererDestroy(LevelRenderer * renderer) {
 	glDeleteLists(renderer->baseListID, 4096 << 6 << 1);
 	glDeleteLists(renderer->listID, 2);
 	ListFree(renderer->chunks);
 	free(renderer->chunkDataCache);
 	if (renderer->chunkCache != NULL) {
-		for (int i = 0; i < renderer->chunkCacheCount; i++) { ChunkDestroy(renderer->chunkCache[i]); }
+		for (int i = 0; i < renderer->chunkCacheCount; i++) {
+			ChunkDestroy(renderer->chunkCache[i]);
+			free(renderer->chunkCache[i]);
+		}
 		free(renderer->chunkCache);
 	}
 	if (renderer->loadQueue != NULL) { free(renderer->loadQueue); }

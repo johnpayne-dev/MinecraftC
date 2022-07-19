@@ -10,18 +10,15 @@
 #include "SessionData.h"
 #include "ProgressBarDisplay.h"
 
-typedef void * MinecraftApplet;
-
 typedef struct Minecraft {
 	bool fullScreen;
 	int width, frameWidth;
 	int height, frameHeight;
 	Timer timer;
-	Level level;
+	Level * level;
 	LevelRenderer levelRenderer;
 	Player player;
 	ParticleManager particleManager;
-	SessionData session;
 	SDL_Window * window;
 	SDL_GLContext context;
 	bool levelLoaded;
@@ -46,14 +43,14 @@ typedef struct Minecraft {
 	int lastClick;
 	bool raining;
 	char * workingDirectory;
-} * Minecraft;
+} Minecraft;
 
-Minecraft MinecraftCreate(MinecraftApplet applet, int width, int height, bool fullScreen);
-void MinecraftSetCurrentScreen(Minecraft minecraft, GUIScreen screen);
-void MinecraftShutdown(Minecraft minecraft);
-void MinecraftRun(Minecraft minecraft);
-void MinecraftGrabMouse(Minecraft minecraft);
-void MinecraftPause(Minecraft minecraft);
-void MinecraftGenerateLevel(Minecraft minecraft, int size);
-void MinecraftSetLevel(Minecraft minecraft, Level level);
-void MinecraftDestroy(Minecraft minecraft);
+void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScreen);
+void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen screen);
+void MinecraftShutdown(Minecraft * minecraft);
+void MinecraftRun(Minecraft * minecraft);
+void MinecraftGrabMouse(Minecraft * minecraft);
+void MinecraftPause(Minecraft * minecraft);
+void MinecraftGenerateLevel(Minecraft * minecraft, int size);
+void MinecraftSetLevel(Minecraft * minecraft, Level * level);
+void MinecraftDestroy(Minecraft * minecraft);

@@ -3,28 +3,26 @@
 #include "../Utilities/SinTable.h"
 #include "../Utilities/OpenGL.h"
 
-Renderer RendererCreate(Minecraft minecraft) {
-	Renderer renderer = malloc(sizeof(struct Renderer));
-	*renderer = (struct Renderer) {
+void RendererCreate(Renderer * renderer, Minecraft * minecraft) {
+	*renderer = (Renderer) {
 		.minecraft = minecraft,
 		.fogColorMultiplier = 1.0,
 		.displayActive = false,
 		.fogEnd = 0.0,
 		.heldBlock = (HeldBlock){ .minecraft = minecraft },
 		.entity = NULL,
-		.random = RandomGeneratorCreate(time(NULL)),
 	};
-	return renderer;
+	RandomGeneratorCreate(&renderer->random, time(NULL));
 }
 
-Vector3D RendererGetPlayerVector(Renderer renderer, float dt) {
-	Player entity = renderer->minecraft->player;
+Vector3D RendererGetPlayerVector(Renderer * renderer, float dt) {
+	Player * entity = &renderer->minecraft->player;
 	return (Vector3D){ entity->xo + (entity->x - entity->xo) * dt, entity->yo + (entity->y - entity->yo) * dt, entity->zo + (entity->z - entity->zo) * dt };
 }
 
-void RendererApplyBobbing(Renderer renderer, float dt) {
-	Player entity = renderer->minecraft->player;
-	PlayerData player = entity->typeData;
+void RendererApplyBobbing(Renderer * renderer, float dt) {
+	Player * entity = &renderer->minecraft->player;
+	PlayerData * player = &entity->player;
 	float walk = entity->walkDistance - entity->oldWalkDistance;
 	walk = entity->walkDistance + walk * dt;
 	float bob = player->oldBobbing + (player->bobbing - player->oldBobbing) * dt;
@@ -35,7 +33,7 @@ void RendererApplyBobbing(Renderer renderer, float dt) {
 	glRotatef(tilt, 1.0, 0.0, 0.0);
 }
 
-void RendererSetLighting(Renderer renderer, bool lighting) {
+void RendererSetLighting(Renderer * renderer, bool lighting) {
 	if (!lighting) {
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
@@ -51,7 +49,7 @@ void RendererSetLighting(Renderer renderer, bool lighting) {
 	}
 }
 
-void RendererEnableGUIMode(Renderer renderer) {
+void RendererEnableGUIMode(Renderer * renderer) {
 	int w = renderer->minecraft->width * 240 / renderer->minecraft->height;
 	int h = renderer->minecraft->height * 240 / renderer->minecraft->height;
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -63,9 +61,9 @@ void RendererEnableGUIMode(Renderer renderer) {
 	glTranslatef(0.0, 0.0, -200.0);
 }
 
-void RendererUpdateFog(Renderer renderer) {
-	Level level = renderer->minecraft->level;
-	Player player = renderer->minecraft->player;
+void RendererUpdateFog(Renderer * renderer) {
+	Level * level = renderer->minecraft->level;
+	Player * player = &renderer->minecraft->player;
 	glFogfv(GL_FOG_COLOR, (float []){ renderer->fogR, renderer->fogG, renderer->fogB, 1.0 });
 	glNormal3f(0.0, -1.0, 0.0);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
@@ -76,14 +74,14 @@ void RendererUpdateFog(Renderer renderer) {
 		if (liquid == LiquidTypeWater) {
 			glFogf(GL_FOG_DENSITY, 0.1);
 			Vector3D a = { 0.4, 0.4, 0.9 };
-			if (renderer->minecraft->settings->anaglyph) {
+			if (renderer->minecraft->settings.anaglyph) {
 				a = (Vector3D){ (a.x * 30.0 + a.y * 59.0 + a.z * 11.0) / 100.0, (a.x * 30.0 + a.y * 70.0) / 100.0, (a.x * 30.0 + a.z * 70.0) / 100.0 };
 			}
 			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float []){ a.x, a.y, a.z, 1.0 });
 		} else if (liquid == LiquidTypeLava) {
 			glFogf(GL_FOG_DENSITY, 2.0);
 			Vector3D a = { 0.4, 0.3, 0.3 };
-			if (renderer->minecraft->settings->anaglyph) {
+			if (renderer->minecraft->settings.anaglyph) {
 				a = (Vector3D){ (a.x * 30.0 + a.y * 59.0 + a.z * 11.0) / 100.0, (a.x * 30.0 + a.y * 70.0) / 100.0, (a.x * 30.0 + a.z * 70.0) / 100.0 };
 			}
 			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (float []){ a.x, a.y, a.z, 1.0 });
@@ -96,9 +94,4 @@ void RendererUpdateFog(Renderer renderer) {
 	}
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT);
-}
-
-void RendererDestroy(Renderer renderer) {
-	RandomGeneratorDestroy(renderer->random);
-	free(renderer);
 }

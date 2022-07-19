@@ -7,7 +7,7 @@ MushroomBlock MushroomBlockCreate(BlockType type, int textureID) {
 	return block;
 }
 
-void MushroomBlockUpdate(MushroomBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+void MushroomBlockUpdate(MushroomBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	BlockType tile = LevelGetTile(level, x, y - 1, z);
 	if (LevelIsLit(level, x, y, z) || (tile != BlockTypeStone && tile != BlockTypeGravel && tile != BlockTypeCobbleStone)) {
 		LevelSetTile(level, x, y, z, BlockTypeNone);

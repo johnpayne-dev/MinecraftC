@@ -3,7 +3,7 @@
 #include "../Minecraft.h"
 #include "../Utilities/Log.h"
 
-ControlsScreen ControlsScreenCreate(GUIScreen parent, GameSettings settings) {
+ControlsScreen ControlsScreenCreate(GUIScreen parent, GameSettings * settings) {
 	GUIScreen screen = GUIScreenCreate();
 	ControlsScreenData this = malloc(sizeof(struct ControlsScreenData));
 	screen->type = GUIScreenTypeControls;

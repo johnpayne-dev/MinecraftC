@@ -4,6 +4,6 @@
 
 typedef Particle TerrainParticle;
 
-TerrainParticle TerrainParticleCreate(struct Level * level, float x, float y, float z, float xd, float yd, float zd, Block block);
-int TerrainParticleGetTexture(TerrainParticle particle);
-void TerrainParticleRender(TerrainParticle particle, float t, float x, float y, float z, float v6, float v7);
+void TerrainParticleCreate(TerrainParticle * particle, struct Level * level, float x, float y, float z, float xd, float yd, float zd, Block block);
+int TerrainParticleGetTexture(TerrainParticle * particle);
+void TerrainParticleRender(TerrainParticle * particle, float t, float x, float y, float z, float v6, float v7);

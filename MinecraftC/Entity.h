@@ -1,6 +1,9 @@
 #pragma once
 #include "Physics/AABB.h"
 #include "Render/TextureManager.h"
+#include "Player/Player.h"
+#include "Particle/PrimedTNT.h"
+#include "Particle/Particle.h"
 
 typedef enum EntityType {
 	EntityTypeNone,
@@ -34,25 +37,28 @@ typedef struct Entity {
 	float footSize;
 	bool noPhysics;
 	EntityType type;
-	void * typeData;
-} * Entity;
+	union {
+		PlayerData player;
+		PrimedTNTData tnt;
+		ParticleData particle;
+	};
+} Entity;
 
-Entity EntityCreate(struct Level * level);
-void EntityResetPosition(Entity entity);
-void EntityRemove(Entity entity);
-void EntitySetSize(Entity entity, float w, float h);
-void EntitySetPosition(Entity entity, float x, float y, float z);
-void EntityTurn(Entity entity, float rx, float ry);
-void EntityTick(Entity entity);
-bool EntityIsFree(Entity entity, float x, float y, float z);
-void EntityMove(Entity entity, float x, float y, float z);
-bool EntityIsInWater(Entity entity);
-bool EntityIsUnderWater(Entity entity);
-bool EntityIsInLava(Entity entity);
-void EntityMoveRelative(Entity entity, float x, float z, float speed);
-float EntityGetBrightness(Entity entity, float t);
-void EntitySetLevel(Entity entity, struct Level * level);
-void EntityPlaySound(Entity entity, const char * name, float volume, float pitch);
-bool EntityIsPickable(Entity entity);
-void EntityRender(Entity entity, TextureManager textures, float t);
-void EntityDestroy(Entity entity);
+void EntityCreate(Entity * entity, struct Level * level);
+void EntityResetPosition(Entity * entity);
+void EntityRemove(Entity * entity);
+void EntitySetSize(Entity * entity, float w, float h);
+void EntitySetPosition(Entity * entity, float x, float y, float z);
+void EntityTurn(Entity * entity, float rx, float ry);
+void EntityTick(Entity * entity);
+bool EntityIsFree(Entity * entity, float x, float y, float z);
+void EntityMove(Entity * entity, float x, float y, float z);
+bool EntityIsInWater(Entity * entity);
+bool EntityIsUnderWater(Entity * entity);
+bool EntityIsInLava(Entity * entity);
+void EntityMoveRelative(Entity * entity, float x, float z, float speed);
+float EntityGetBrightness(Entity * entity, float t);
+void EntitySetLevel(Entity * entity, struct Level * level);
+void EntityPlaySound(Entity * entity, const char * name, float volume, float pitch);
+bool EntityIsPickable(Entity * entity);
+void EntityRender(Entity * entity, TextureManager * textures, float dt);

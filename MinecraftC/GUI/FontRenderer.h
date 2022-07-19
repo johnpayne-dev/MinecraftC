@@ -7,10 +7,10 @@ typedef struct FontRenderer {
 	int widthMap[256];
 	char * textureName;
 	int texture;
-	GameSettings settings;
+	GameSettings * settings;
 } * FontRenderer;
 
-FontRenderer FontRendererCreate(GameSettings settings, char * name, TextureManager textures);
+FontRenderer FontRendererCreate(GameSettings * settings, char * name, TextureManager * textures);
 void FontRendererRender(FontRenderer font, char * str, int x, int y, uint32_t color);
 void FontRendererRenderNoShadow(FontRenderer font, char * str, int x, int y, uint32_t color);
 int FontRendererGetWidth(FontRenderer font, char * str);

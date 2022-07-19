@@ -5,15 +5,15 @@
 #include "../Level/Level.h"
 #include "../Render/ShapeRenderer.h"
 
-Particle ParticleCreate(Level level, float x, float y, float z, float xd, float yd, float zd) {
-	Entity entity = EntityCreate(level);
+void ParticleCreate(Particle * entity, Level * level, float x, float y, float z, float xd, float yd, float zd) {
+	EntityCreate(entity, level);
 	entity->type = EntityTypeParticle;
 	EntitySetSize(entity, 0.2, 0.2);
 	entity->heightOffset = entity->aabbHeight / 2.0;
 	EntitySetPosition(entity, x, y, z);
 	entity->makeStepSound = false;
-	ParticleData this = malloc(sizeof(struct ParticleData));
-	*this = (struct ParticleData) {
+	ParticleData * this = &entity->particle;
+	*this = (ParticleData) {
 		.r = 1.0,
 		.g = 1.0,
 		.b = 1.0,
@@ -26,17 +26,15 @@ Particle ParticleCreate(Level level, float x, float y, float z, float xd, float 
 		.lifeTime = 4.0 / (RandomUniform() * 0.9 + 0.1),
 		.age = 0,
 	};
-	entity->typeData = this;
 	float s = (RandomUniform() + RandomUniform() + 1.0) * 0.15 * 0.4 / sqrtf(this->xd * this->xd + this->yd * this->yd + this->zd * this->zd);
 	this->xd *= s;
 	this->yd *= s;
 	this->zd *= s;
 	this->yd += 0.1;
-	return entity;
 }
 
-void ParticleTick(Particle particle) {
-	ParticleData this = particle->typeData;
+void ParticleTick(Particle * particle) {
+	ParticleData * this = &particle->particle;
 	if (this->type == ParticleTypeSmoke) { SmokeParticleTick(particle); }
 	if (this->type == ParticleTypeWaterDrop) { WaterDropParticleTick(particle); }
 	
@@ -55,8 +53,8 @@ void ParticleTick(Particle particle) {
 	}
 }
 
-void ParticleRender(Particle particle, float dt, float x, float y, float z, float v6, float v7) {
-	ParticleData this = particle->typeData;
+void ParticleRender(Particle * particle, float dt, float x, float y, float z, float v6, float v7) {
+	ParticleData * this = &particle->particle;
 	if (this->type == ParticleTypeTerrain) { TerrainParticleRender(particle, dt, x, y, z, v6, v7); return; }
 
 	float u0 = ((this->texture % 16) + this->u / 4.0) / 16.0;
@@ -75,13 +73,8 @@ void ParticleRender(Particle particle, float dt, float x, float y, float z, floa
 	ShapeRendererVertexUV(vx + x * s - v6 * s, vy - y * s, vz + z * s - v7 * s, u1, v1);
 }
 
-int ParticleGetParticleTexture(Particle particle) {
-	ParticleData this = particle->typeData;
+int ParticleGetParticleTexture(Particle * particle) {
+	ParticleData * this = &particle->particle;
 	if (this->type == ParticleTypeTerrain) { return TerrainParticleGetTexture(particle); }
 	return 0;
-}
-
-void ParticleDestroy(Particle particle) {
-	ParticleData this = particle->typeData;
-	free(this);
 }

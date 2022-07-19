@@ -4,7 +4,7 @@
 #include "../../Utilities/Random.h"
 
 typedef struct LevelGenerator {
-	ProgressBarDisplay progressBar;
+	ProgressBarDisplay * progressBar;
 	int width, depth, height;
 	RandomGenerator random;
 	uint8_t * blocks;
@@ -12,6 +12,6 @@ typedef struct LevelGenerator {
 	int * floodData;
 } * LevelGenerator;
 
-LevelGenerator LevelGeneratorCreate(ProgressBarDisplay progressBar);
-Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth);
+LevelGenerator LevelGeneratorCreate(ProgressBarDisplay * progressBar);
+Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth);
 void LevelGeneratorDestroy(LevelGenerator generator);

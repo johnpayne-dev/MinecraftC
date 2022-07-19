@@ -7,7 +7,7 @@ SaplingBlock SaplingBlockCreate() {
 	return block;
 }
 
-void SaplingBlockUpdate(SaplingBlock block, Level level, int x, int y, int z, RandomGenerator random) {
+void SaplingBlockUpdate(SaplingBlock block, Level * level, int x, int y, int z, RandomGenerator * random) {
 	BlockType tile = LevelGetTile(level, x, y - 1, z);
 	if (LevelIsLit(level, x, y, z) && (tile == BlockTypeDirt || tile == BlockTypeGrass)) {
 		if (RandomIntegerRange(0, 4) == 0) {

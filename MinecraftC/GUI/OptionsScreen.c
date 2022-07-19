@@ -3,7 +3,7 @@
 #include "Screen.h"
 #include "../Minecraft.h"
 
-OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings) {
+OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings * settings) {
 	GUIScreen screen = GUIScreenCreate();
 	screen->type = GUIScreenTypeOptions;
 	screen->typeData = malloc(sizeof(struct OptionsScreenData));
@@ -30,7 +30,7 @@ void OptionsScreenOnButtonClicked(OptionsScreen screen, Button button) {
 	OptionsScreenData this = screen->typeData;
 	if (button->active) {
 		if (button->id < 100) {
-			GameSettingsToggleSetting(this->settings, button->id, 1);
+			GameSettingsToggleSetting(this->settings, button->id);
 			StringSet(&button->text, GameSettingsGetSetting(this->settings, button->id));
 		}
 		if (button->id == 100) { MinecraftSetCurrentScreen(screen->minecraft, ControlsScreenCreate(screen, this->settings)); }
