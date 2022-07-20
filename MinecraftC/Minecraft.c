@@ -32,7 +32,7 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	minecraft->debug = StringCreate("");
 }
 
-void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen screen) {
+void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen * screen) {
 	if (minecraft->currentScreen != NULL && minecraft->currentScreen->type == GUIScreenTypeError) { return; }
 	
 	if (minecraft->currentScreen != NULL) { GUIScreenOnClose(minecraft->currentScreen); }
@@ -142,7 +142,7 @@ static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
 		if (System.currentTimeMillis() > var2.lastMusic && var2.playMusic(var1, "calm")) { var2.lastMusic = System.currentTimeMillis() + (long)var2.random.nextInt(900000) + 300000L; }
 	}*/
 	
-	HUDScreen hud = minecraft->hud;
+	HUDScreen * hud = &minecraft->hud;
 	hud->ticks++;
 	for (int i = 0; i < ListLength(hud->chat); i++) { hud->chat[i].time++; }
 	
@@ -196,7 +196,11 @@ static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
 						EntityResetPosition(&minecraft->player);
 					}
 					if (events[i].key.keysym.scancode == SDL_SCANCODE_F5) { minecraft->raining = !minecraft->raining; }
-					if (events[i].key.keysym.scancode == minecraft->settings.buildKey.key) { MinecraftSetCurrentScreen(minecraft, BlockSelectScreenCreate()); }
+					if (events[i].key.keysym.scancode == minecraft->settings.buildKey.key) {
+						BlockSelectScreen * blockSelect = malloc(sizeof(BlockSelectScreen));
+						BlockSelectScreenCreate(blockSelect);
+						MinecraftSetCurrentScreen(minecraft, blockSelect);
+					}
 					if (events[i].key.keysym.scancode == minecraft->settings.chatKey.key)
 					{
 						//PlayerReleaseAllKeys(minecraft->Player);
@@ -318,7 +322,7 @@ void MinecraftRun(Minecraft * minecraft) {
 	AnimatedTexture * waterTexture = malloc(sizeof(AnimatedTexture));
 	WaterTextureCreate(waterTexture);
 	TextureManagerRegisterAnimation(&minecraft->textureManager, waterTexture);
-	minecraft->font = FontRendererCreate(&minecraft->settings, "Default.png", &minecraft->textureManager);
+	FontRendererCreate(&minecraft->font, &minecraft->settings, "Default.png", &minecraft->textureManager);
 	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->textureManager);
 	glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
 	
@@ -358,7 +362,7 @@ void MinecraftRun(Minecraft * minecraft) {
 	} catch (Exception var52) { ; }*/
 	
 	CheckGLError(minecraft, "Post startup");
-	minecraft->hud = HUDScreenCreate(minecraft, minecraft->width, minecraft->height);
+	HUDScreenCreate(&minecraft->hud, minecraft, minecraft->width, minecraft->height);
 	
 	int frame = 0;
 	uint64_t start = TimeMilli();
@@ -372,8 +376,8 @@ void MinecraftRun(Minecraft * minecraft) {
 				SDL_GetWindowSize(minecraft->window, &minecraft->width, &minecraft->height);
 				SDL_GL_GetDrawableSize(minecraft->window, &minecraft->frameWidth, &minecraft->frameHeight);
 				glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
-				HUDScreenDestroy(minecraft->hud);
-				minecraft->hud = HUDScreenCreate(minecraft, minecraft->width, minecraft->height);
+				HUDScreenDestroy(&minecraft->hud);
+				HUDScreenCreate(&minecraft->hud, minecraft, minecraft->width, minecraft->height);
 				if (minecraft->currentScreen != NULL) {
 					int w = minecraft->width * 240 / minecraft->height;
 					int h = minecraft->height * 240 / minecraft->height;
@@ -828,7 +832,7 @@ void MinecraftRun(Minecraft * minecraft) {
 				if (i == 1) { glColorMask(true, true, true, true); }
 			}
 			
-			HUDScreenRender(minecraft->hud, delta, mx, my);
+			HUDScreenRender(&minecraft->hud, delta, mx, my);
 		} else {
 			glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
 			glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -876,16 +880,19 @@ void MinecraftGrabMouse(Minecraft * minecraft) {
 
 void MinecraftPause(Minecraft * minecraft) {
 	if (minecraft->currentScreen == NULL) {
-		MinecraftSetCurrentScreen(minecraft, PauseScreenCreate());
+		PauseScreen * pause = malloc(sizeof(PauseScreen));
+		PauseScreenCreate(pause);
+		MinecraftSetCurrentScreen(minecraft, pause);
 	}
 }
 
 void MinecraftGenerateLevel(Minecraft * minecraft, int size) {
 	char * user = "anonymous";
-	LevelGenerator generator = LevelGeneratorCreate(&minecraft->progressBar);
-	Level * level = LevelGeneratorGenerate(generator, user, 128 << size, 128 << size);
+	LevelGenerator generator;
+	LevelGeneratorCreate(&generator, &minecraft->progressBar);
+	Level * level = LevelGeneratorGenerate(&generator, user, 128 << size, 128 << size);
 	MinecraftSetLevel(minecraft, level);
-	LevelGeneratorDestroy(generator);
+	LevelGeneratorDestroy(&generator);
 }
 
 void MinecraftSetLevel(Minecraft * minecraft, Level * level) {

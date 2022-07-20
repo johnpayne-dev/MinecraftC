@@ -24,7 +24,7 @@ typedef struct Minecraft {
 	bool levelLoaded;
 	TextureManager textureManager;
 	FontRenderer font;
-	GUIScreen currentScreen;
+	GUIScreen * currentScreen;
 	ProgressBarDisplay progressBar;
 	Renderer renderer;
 	LevelIO levelIO;
@@ -46,7 +46,7 @@ typedef struct Minecraft {
 } Minecraft;
 
 void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScreen);
-void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen screen);
+void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen * screen);
 void MinecraftShutdown(Minecraft * minecraft);
 void MinecraftRun(Minecraft * minecraft);
 void MinecraftGrabMouse(Minecraft * minecraft);

@@ -9,9 +9,21 @@ typedef enum NoiseType {
 
 typedef struct Noise {
 	NoiseType type;
-	void * typeData;
-} * Noise;
+	union {
+		struct PerlinNoiseData {
+			int hash[512];
+		} perlin;
+		struct OctaveNoiseData {
+			int count;
+			struct Noise * noises;
+		} octave;
+		struct CombinedNoiseData {
+			struct Noise * noise1;
+			struct Noise * noise2;
+		} combined;
+	};
+} Noise;
 
-Noise NoiseCreate(void);
-float NoiseCompute(Noise noise, float x, float y);
-void NoiseDestroy(Noise noise);
+void NoiseCreate(Noise * noise);
+float NoiseCompute(Noise * noise, float x, float y);
+void NoiseDestroy(Noise * noise);

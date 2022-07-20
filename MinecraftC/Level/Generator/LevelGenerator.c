@@ -6,17 +6,15 @@
 #include "../../Utilities/Log.h"
 #include "../../Utilities/SinTable.h"
 
-LevelGenerator LevelGeneratorCreate(ProgressBarDisplay * progressBar) {
-	LevelGenerator generator = malloc(sizeof(struct LevelGenerator));
-	*generator = (struct LevelGenerator) {
+void LevelGeneratorCreate(LevelGenerator * generator, ProgressBarDisplay * progressBar) {
+	*generator = (LevelGenerator) {
 		.progressBar = progressBar,
 		.floodData = malloc(1024 * 1024 * sizeof(int)),
 	};
 	RandomGeneratorCreate(&generator->random, time(NULL));
-	return generator;
 }
 
-static void PopulateOre(LevelGenerator generator, BlockType ore, int a1, int a2, int a3) {
+static void PopulateOre(LevelGenerator * generator, BlockType ore, int a1, int a2, int a3) {
 	int w = generator->width;
 	int h = generator->height;
 	int d = generator->depth;
@@ -57,7 +55,7 @@ static void PopulateOre(LevelGenerator generator, BlockType ore, int a1, int a2,
 	}
 }
 
-static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, BlockType tile) {
+static int64_t Flood(LevelGenerator * generator, int x, int y, int z, int var, BlockType tile) {
 	List(int *) floodStack = ListCreate(sizeof(int *));
 	
 	int xx = 1, zz = 1;
@@ -136,7 +134,7 @@ static int64_t Flood(LevelGenerator generator, int x, int y, int z, int var, Blo
 	return j;
 }
 
-Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth) {
+Level * LevelGeneratorGenerate(LevelGenerator * generator, const char * userName, int width, int depth) {
 	ProgressBarDisplaySetTitle(generator->progressBar, "Generating level");
 	generator->width = width;
 	generator->depth = depth;
@@ -148,54 +146,42 @@ Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, 
 	int d = generator->depth;
 	
 	ProgressBarDisplaySetText(generator->progressBar, "Raising..");
-	CombinedNoise n1 = CombinedNoiseCreate(OctaveNoiseCreate(&generator->random, 8), OctaveNoiseCreate(&generator->random, 8));
-	CombinedNoise n2 = CombinedNoiseCreate(OctaveNoiseCreate(&generator->random, 8), OctaveNoiseCreate(&generator->random, 8));
-	OctaveNoise n3 = OctaveNoiseCreate(&generator->random, 6);
+	Noise oct[4], n1, n2, n3;
+	for (int i = 0; i < sizeof(oct) / sizeof(oct[0]); i++) {
+		OctaveNoiseCreate(&oct[i], &generator->random, 8);
+	}
+	CombinedNoiseCreate(&n1, &oct[0], &oct[1]);
+	CombinedNoiseCreate(&n2, &oct[2], &oct[3]);
+	OctaveNoiseCreate(&n3, &generator->random, 6);
 	int * heights = malloc(w * d * sizeof(int));
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
- 			float v1 = NoiseCompute(n1, x * 1.3, y * 1.3) / 6.0 - 4.0;
-			float v2 = NoiseCompute(n2, x * 1.3, y * 1.3) / 5.0 + 6.0;
-			if (NoiseCompute(n3, x, y) / 8.0 > 0.0) { v2 = v1; }
+ 			float v1 = NoiseCompute(&n1, x * 1.3, y * 1.3) / 6.0 - 4.0;
+			float v2 = NoiseCompute(&n2, x * 1.3, y * 1.3) / 5.0 + 6.0;
+			if (NoiseCompute(&n3, x, y) / 8.0 > 0.0) { v2 = v1; }
 			float m = fmaxf(v1, v2) / 2.0;
 			if (m < 0.0) { m *= 0.8; }
 			heights[x + y * w] = m;
 		}
 	}
-	NoiseDestroy(((CombinedNoiseData)n1->typeData)->noise1);
-	NoiseDestroy(((CombinedNoiseData)n1->typeData)->noise2);
-	NoiseDestroy(n1);
-	NoiseDestroy(((CombinedNoiseData)n2->typeData)->noise1);
-	NoiseDestroy(((CombinedNoiseData)n2->typeData)->noise2);
-	NoiseDestroy(n2);
-	NoiseDestroy(n3);
 	
 	ProgressBarDisplaySetText(generator->progressBar, "Eroding..");
-	n1 = CombinedNoiseCreate(OctaveNoiseCreate(&generator->random, 8), OctaveNoiseCreate(&generator->random, 8));
-	n2 = CombinedNoiseCreate(OctaveNoiseCreate(&generator->random, 8), OctaveNoiseCreate(&generator->random, 8));
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++)
 		{
-			float v1 = NoiseCompute(n1, x * 2.0, y * 2.0) / 8.0;
-			int v2 = NoiseCompute(n2, x * 2.0, y * 2.0) > 0.0 ? 1 : 0;
+			float v1 = NoiseCompute(&n1, x * 2.0, y * 2.0) / 8.0;
+			int v2 = NoiseCompute(&n2, x * 2.0, y * 2.0) > 0.0 ? 1 : 0;
 			if (v1 > 2.0) { heights[x + y * w] = ((heights[x + y * w] - v2) / 2 << 1) + v2; }
 		}
 	}
-	NoiseDestroy(((CombinedNoiseData)n1->typeData)->noise1);
-	NoiseDestroy(((CombinedNoiseData)n1->typeData)->noise2);
-	NoiseDestroy(n1);
-	NoiseDestroy(((CombinedNoiseData)n2->typeData)->noise1);
-	NoiseDestroy(((CombinedNoiseData)n2->typeData)->noise2);
-	NoiseDestroy(n2);
 	
 	ProgressBarDisplaySetText(generator->progressBar, "Soiling..");
-	OctaveNoise n = OctaveNoiseCreate(&generator->random, 6);
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
-			int v1 = (int)(NoiseCompute(n, x, y) / 24.0) - 4;
+			int v1 = (int)(NoiseCompute(&n3, x, y) / 24.0) - 4;
 			int v2 = heights[x + y * w] + generator->waterLevel;
 			int v3 = v2 + v1;
 			heights[x + y * w] = v2 > v3 ? v2 : v3;
@@ -211,7 +197,6 @@ Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, 
 			}
 		}
 	}
-	NoiseDestroy(n);
 	
 	ProgressBarDisplaySetText(generator->progressBar, "Carving..");
 	int ii = w * d * h / 256 / 64 << 1;
@@ -293,13 +278,11 @@ Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, 
 	ProgressBarDisplaySetProgress(generator->progressBar, 100);
 	
 	ProgressBarDisplaySetText(generator->progressBar, "Growing..");
-	n1 = OctaveNoiseCreate(&generator->random, 8);
-	n2 = OctaveNoiseCreate(&generator->random, 8);
 	for (int x = 0; x < w; x++) {
 		ProgressBarDisplaySetProgress(generator->progressBar, x * 100 / (w - 1));
 		for (int y = 0; y < d; y++) {
-			bool v1 = NoiseCompute(n1, x, y) > 8.0;
-			bool v2 = NoiseCompute(n2, x, y) > 12.0;
+			bool v1 = NoiseCompute(&n1, x, y) > 8.0;
+			bool v2 = NoiseCompute(&n2, x, y) > 12.0;
 			int z = heights[x + y * w];
 			int c = (z * d + y) * w + x;
 			BlockType above = generator->blocks[((z + 1) * d + y) * w + x];
@@ -311,8 +294,6 @@ Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, 
 			}
 		}
 	}
-	NoiseDestroy(n1);
-	NoiseDestroy(n2);
 	
 	ProgressBarDisplaySetText(generator->progressBar, "Planting..");
 	ii = w * d / 3000;
@@ -388,12 +369,18 @@ Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, 
 			}
 		}
 	}
+	
+	for (int i = 0; i < sizeof(oct) / sizeof(oct[0]); i++) {
+		NoiseDestroy(&oct[i]);
+	}
+	NoiseDestroy(&n1);
+	NoiseDestroy(&n2);
+	NoiseDestroy(&n3);
 	free(generator->blocks);
 	free(heights);
 	return level;
 }
 
-void LevelGeneratorDestroy(LevelGenerator generator) {
+void LevelGeneratorDestroy(LevelGenerator * generator) {
 	free(generator->floodData);
-	free(generator);
 }

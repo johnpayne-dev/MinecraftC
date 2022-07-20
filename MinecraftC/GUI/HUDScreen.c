@@ -6,9 +6,8 @@
 #include "../Utilities/SinTable.h"
 #include "../Utilities/OpenGL.h"
 
-HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height) {
-	HUDScreen hud = malloc(sizeof(struct HUDScreen));
-	*hud = (struct HUDScreen) {
+void HUDScreenCreate(HUDScreen * hud, struct Minecraft * minecraft, int width, int height) {
+	*hud = (HUDScreen) {
 		.chat = ListCreate(sizeof(ChatLine)),
 		.hoveredPlayer = NULL,
 		.minecraft = minecraft,
@@ -16,10 +15,9 @@ HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height) {
 		.height = height * 240 / height,
 	};
 	RandomGeneratorCreate(&hud->random, time(NULL));
-	return hud;
 }
 
-void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
+void HUDScreenRender(HUDScreen * hud, float dt, int mx, int my) {
 	PlayerData * player = &hud->minecraft->player.player;
 	RendererEnableGUIMode(&hud->minecraft->renderer);
 	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&hud->minecraft->textureManager, "GUI/GUI.png"));
@@ -52,8 +50,8 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 		}
 	}
 		
-	FontRendererRender(hud->minecraft->font, "0.30", 2, 2, 0xffffffff);
-	if (hud->minecraft->settings.showFrameRate) { FontRendererRender(hud->minecraft->font, hud->minecraft->debug, 2, 12, 0xffffffff); }
+	FontRendererRender(&hud->minecraft->font, "0.30", 2, 2, 0xffffffff);
+	if (hud->minecraft->settings.showFrameRate) { FontRendererRender(&hud->minecraft->font, hud->minecraft->debug, 2, 12, 0xffffffff); }
 		
 	int maxLines = 10;
 	bool chatScreen = false;
@@ -62,7 +60,7 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 		chatScreen = true;
 	}
 	for (int i = 0; i < ListLength(hud->chat) && i < maxLines; i++) {
-		if (hud->chat[i].time < 200 || chatScreen) { FontRendererRender(hud->minecraft->font, hud->chat[i].message, 2, hud->height - 28 - i * 9, 0xffffffff); }
+		if (hud->chat[i].time < 200 || chatScreen) { FontRendererRender(&hud->minecraft->font, hud->chat[i].message, 2, hud->height - 28 - i * 9, 0xffffffff); }
 	}
 	
 	hud->hoveredPlayer = NULL;
@@ -101,14 +99,13 @@ void HUDScreenRender(HUDScreen hud, float dt, int mx, int my) {
 	}*/
 }
 
-void HUDScreenAddChat(HUDScreen screen, char * message) {
+void HUDScreenAddChat(HUDScreen * screen, char * message) {
 	screen->chat = ListPush(screen->chat, &(ChatLine){ 0 });
 	ChatLineCreate(&screen->chat[ListLength(screen->chat) - 1], message);
 	while (ListLength(screen->chat) > 50) { screen->chat = ListRemove(screen->chat, 0); }
 }
 
-void HUDScreenDestroy(HUDScreen hud) {
+void HUDScreenDestroy(HUDScreen * hud) {
 	for (int i = 0; i < ListLength(hud->chat); i++) { ChatLineDestroy(&hud->chat[i]); }
 	ListFree(hud->chat);
-	free(hud);
 }

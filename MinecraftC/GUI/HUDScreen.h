@@ -11,9 +11,9 @@ typedef struct HUDScreen {
 	int width, height;
 	const char * hoveredPlayer;
 	int ticks;
-} * HUDScreen;
+} HUDScreen;
 
-HUDScreen HUDScreenCreate(struct Minecraft * minecraft, int width, int height);
-void HUDScreenRender(HUDScreen hud, float dt, int mx, int my);
-void HUDScreenAddChat(HUDScreen hud, char * message);
-void HUDScreenDestroy(HUDScreen hud);
+void HUDScreenCreate(HUDScreen * hud, struct Minecraft * minecraft, int width, int height);
+void HUDScreenRender(HUDScreen * hud, float dt, int mx, int my);
+void HUDScreenAddChat(HUDScreen * hud, char * message);
+void HUDScreenDestroy(HUDScreen * hud);

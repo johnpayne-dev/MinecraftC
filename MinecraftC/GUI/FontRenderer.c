@@ -7,8 +7,8 @@
 
 #include "../../Resources/Default.h"
 
-FontRenderer FontRendererCreate(GameSettings * settings, char * name, TextureManager * textures) {
-	FontRenderer font = malloc(sizeof(struct FontRenderer));
+void FontRendererCreate(FontRenderer * font, GameSettings * settings, char * name, TextureManager * textures) {
+	*font = (FontRenderer){ 0 };
 	font->settings = settings;
 	font->textureName = name;
 	
@@ -35,10 +35,9 @@ FontRenderer FontRendererCreate(GameSettings * settings, char * name, TextureMan
 		font->widthMap[i] = x;
 	}
 	font->texture = TextureManagerLoad(textures, name);
-	return font;
 }
 
-static void Render(FontRenderer font, char * str, int x, int y, uint32_t color, bool darken) {
+static void Render(FontRenderer * font, char * str, int x, int y, uint32_t color, bool darken) {
 	if (str != NULL) {
 		if (darken) { color = (color & 0xfcfcfc) >> 2; }
 		glBindTexture(GL_TEXTURE_2D, font->texture);
@@ -81,16 +80,16 @@ static void Render(FontRenderer font, char * str, int x, int y, uint32_t color, 
 	}
 }
 
-void FontRendererRender(FontRenderer font, char * str, int x, int y, uint32_t color) {
+void FontRendererRender(FontRenderer * font, char * str, int x, int y, uint32_t color) {
 	Render(font, str, x + 1, y + 1, color, true);
 	Render(font, str, x, y, color, false);
 }
 
-void FontRendererRenderNoShadow(FontRenderer font, char * str, int x, int y, uint32_t color) {
+void FontRendererRenderNoShadow(FontRenderer * font, char * str, int x, int y, uint32_t color) {
 	Render(font, str, x, y, color, false);
 }
 
-int FontRendererGetWidth(FontRenderer font, char * str) {
+int FontRendererGetWidth(FontRenderer * font, char * str) {
 	if (str == NULL) {
 		return 0;
 	} else {
@@ -111,8 +110,4 @@ String FontRendererStripColor(char * str) {
 		else { StringConcat(&string, (char[]){ str[i], '\0' }); }
 	}
 	return string;
-}
-
-void FontRendererDestroy(FontRenderer font) {
-	free(font);
 }

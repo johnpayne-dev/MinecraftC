@@ -156,7 +156,7 @@ void GameSettingsToggleSetting(GameSettings * settings, int setting) {
 	if (setting == 6) {
 		settings->anaglyph = !settings->anaglyph;
 		TextureManagerReload(&settings->minecraft->textureManager);
-		settings->minecraft->font->texture = TextureManagerLoad(&settings->minecraft->textureManager, settings->minecraft->font->textureName);
+		settings->minecraft->font.texture = TextureManagerLoad(&settings->minecraft->textureManager, settings->minecraft->font.textureName);
 	}
 	if (setting == 7) {
 		settings->limitFramerate = !settings->limitFramerate;

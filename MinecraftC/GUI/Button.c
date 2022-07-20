@@ -1,12 +1,11 @@
 #include "Button.h"
 #include <stdlib.h>
 
-Button ButtonCreate(int buttonID, int x, int y, char * text) {
-	return ButtonCreateSize(buttonID, x, y, 200, 20, text);
+void ButtonCreate(Button * button, int buttonID, int x, int y, char * text) {
+	ButtonCreateSize(button, buttonID, x, y, 200, 20, text);
 }
 
-Button ButtonCreateSize(int buttonID, int x, int y, int w, int h, char * text) {
-	Button button = malloc(sizeof(struct Button));
+void ButtonCreateSize(Button * button, int buttonID, int x, int y, int w, int h, char * text) {
 	*button = (struct Button) {
 		.id = buttonID,
 		.x = x,
@@ -17,10 +16,8 @@ Button ButtonCreateSize(int buttonID, int x, int y, int w, int h, char * text) {
 		.visible = true,
 		.active = true,
 	};
-	return button;
 }
 
-void ButtonDestroy(Button button) {
+void ButtonDestroy(Button * button) {
 	StringFree(button->text);
-	free(button);
 }

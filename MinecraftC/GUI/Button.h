@@ -9,8 +9,8 @@ typedef struct Button {
 	int id;
 	bool active;
 	bool visible;
-} * Button;
+} Button;
 
-Button ButtonCreate(int buttonID, int x, int y, char * text);
-Button ButtonCreateSize(int buttonID, int x, int y, int w, int h, char * text);
-void ButtonDestroy(Button button);
+void ButtonCreate(Button * button, int buttonID, int x, int y, char * text);
+void ButtonCreateSize(Button * button, int buttonID, int x, int y, int w, int h, char * text);
+void ButtonDestroy(Button * button);

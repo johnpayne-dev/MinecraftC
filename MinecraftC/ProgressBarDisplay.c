@@ -72,8 +72,8 @@ void ProgressBarDisplaySetProgress(ProgressBarDisplay * display, int progress) {
 			glEnable(GL_TEXTURE_2D);
 		}
 		
-		FontRendererRender(display->minecraft->font, display->title, (a1 - FontRendererGetWidth(display->minecraft->font, display->title)) / 2, a2 / 2 - 4 - 16, 0xffffffff);
-		FontRendererRender(display->minecraft->font, display->text, (a1 - FontRendererGetWidth(display->minecraft->font, display->text)) / 2, a2 / 2 - 4 + 8, 0xffffffff);
+		FontRendererRender(&display->minecraft->font, display->title, (a1 - FontRendererGetWidth(&display->minecraft->font, display->title)) / 2, a2 / 2 - 4 - 16, 0xffffffff);
+		FontRendererRender(&display->minecraft->font, display->text, (a1 - FontRendererGetWidth(&display->minecraft->font, display->text)) / 2, a2 / 2 - 4 + 8, 0xffffffff);
 		
 		while (SDL_PollEvent(&(SDL_Event){ 0 }));
 		SDL_GL_SwapWindow(display->minecraft->window);

@@ -3,7 +3,7 @@
 
 typedef GUIScreen PauseScreen;
 
-PauseScreen PauseScreenCreate(void);
-void PauseScreenOnOpen(PauseScreen screen);
-void PauseScreenOnButtonClicked(PauseScreen screen, Button button);
-void PauseScreenRender(PauseScreen screen, int mx, int my);
+void PauseScreenCreate(PauseScreen * screen);
+void PauseScreenOnOpen(PauseScreen * screen);
+void PauseScreenOnButtonClicked(PauseScreen * screen, Button * button);
+void PauseScreenRender(PauseScreen * screen, int mx, int my);

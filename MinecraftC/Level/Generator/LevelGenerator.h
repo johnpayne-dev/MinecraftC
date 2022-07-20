@@ -10,8 +10,8 @@ typedef struct LevelGenerator {
 	uint8_t * blocks;
 	int waterLevel;
 	int * floodData;
-} * LevelGenerator;
+} LevelGenerator;
 
-LevelGenerator LevelGeneratorCreate(ProgressBarDisplay * progressBar);
-Level * LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth);
-void LevelGeneratorDestroy(LevelGenerator generator);
+void LevelGeneratorCreate(LevelGenerator * generator, ProgressBarDisplay * progressBar);
+Level * LevelGeneratorGenerate(LevelGenerator * generator, const char * userName, int width, int depth);
+void LevelGeneratorDestroy(LevelGenerator * generator);

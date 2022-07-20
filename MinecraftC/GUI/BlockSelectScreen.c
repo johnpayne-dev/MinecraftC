@@ -6,14 +6,13 @@
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/OpenGL.h"
 
-BlockSelectScreen BlockSelectScreenCreate() {
-	GUIScreen screen = GUIScreenCreate();
+void BlockSelectScreenCreate(BlockSelectScreen * screen) {
+	GUIScreenCreate(screen);
 	screen->type = GUIScreenTypeBlockSelect;
 	screen->grabsMouse = true;
-	return screen;
 }
 
-static int GetBlockOnScreen(BlockSelectScreen screen, int mx, int my) {
+static int GetBlockOnScreen(BlockSelectScreen * screen, int mx, int my) {
 	for (int32_t i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
 		int x = screen->width / 2 + i % 9 * 24 + -108 - 3;
 		int y = screen->height / 2 + i / 9 * 24 + -60 + 3;
@@ -22,7 +21,7 @@ static int GetBlockOnScreen(BlockSelectScreen screen, int mx, int my) {
 	return -1;
 }
 
-void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
+void BlockSelectScreenRender(BlockSelectScreen * screen, int mx, int my) {
 	int blockNum = GetBlockOnScreen(screen, mx, my);
 	ScreenDrawFadingBox(screen->width / 2 - 120, 30, screen->width / 2 + 120, 180, 0x05050090, 0x303060C0);
 	if (blockNum >= 0) {
@@ -53,7 +52,7 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int mx, int my) {
 	}
 }
 
-void BlockSelectScreenOnMouseClicked(BlockSelectScreen screen, int x, int y, int button) {
+void BlockSelectScreenOnMouseClicked(BlockSelectScreen * screen, int x, int y, int button) {
 	if (button == SDL_BUTTON_LEFT) {
 		InventoryReplaceSlot(&screen->minecraft->player.player.inventory, GetBlockOnScreen(screen, x, y ));
 		MinecraftSetCurrentScreen(screen->minecraft, NULL);

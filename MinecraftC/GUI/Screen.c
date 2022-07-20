@@ -33,11 +33,11 @@ void ScreenDrawFadingBox(int x0, int y0, int x1, int y1, uint32_t col0, uint32_t
 	glDisable(GL_BLEND);
 }
 
-void ScreenDrawCenteredString(FontRenderer font, char * str, int x, int y, uint32_t color) {
+void ScreenDrawCenteredString(FontRenderer * font, char * str, int x, int y, uint32_t color) {
 	FontRendererRender(font, str, x - FontRendererGetWidth(font, str) / 2, y, color);
 }
 
-void ScreenDrawString(FontRenderer font, char * str, int x, int y, uint32_t color) {
+void ScreenDrawString(FontRenderer * font, char * str, int x, int y, uint32_t color) {
 	FontRendererRender(font, str, x, y, color);
 }
 

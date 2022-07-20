@@ -3,42 +3,35 @@
 #include "Screen.h"
 #include "../Minecraft.h"
 
-ChatInputScreen ChatInputScreenCreate() {
-	GUIScreen screen = GUIScreenCreate();
+void ChatInputScreenCreate(ChatInputScreen * screen) {
+	GUIScreenCreate(screen);
 	screen->type = GUIScreenTypeChatInput;
-	screen->typeData = malloc(sizeof(struct ChatInputScreenData));
-	ChatInputScreenData this = screen->typeData;
-	*this = (struct ChatInputScreenData) {
+	screen->chatInput = (ChatInputScreenData) {
 		.message = StringCreate(""),
 		.counter = 0,
 	};
-	return screen;
 }
 
-void ChatInputScreenOnOpen(ChatInputScreen screen) {
+void ChatInputScreenOnOpen(ChatInputScreen * screen) {
 }
 
-void ChatInputScreenOnClose(ChatInputScreen screen) {
+void ChatInputScreenOnClose(ChatInputScreen * screen) {
 }
 
-void ChatInputScreenTick(ChatInputScreen screen)
-{
-	ChatInputScreenData this = screen->typeData;
-	this->counter++;
+void ChatInputScreenTick(ChatInputScreen * screen) {
+	screen->chatInput.counter++;
 }
 
-void ChatInputScreenRender(ChatInputScreen screen, int mx, int my) {
-	ChatInputScreenData this = screen->typeData;
+void ChatInputScreenRender(ChatInputScreen * screen, int mx, int my) {
 	ScreenDrawBox(2, screen->height - 14, screen->width - 2, screen->height - 2, 0x00000080);
-	String msg = StringCreate(this->message);
+	String msg = StringCreate(screen->chatInput.message);
 	StringConcatFront("> ", &msg);
-	StringConcat(&msg, this->counter / 6 % 2 == 0 ? "_" : "");
+	StringConcat(&msg, screen->chatInput.counter / 6 % 2 == 0 ? "_" : "");
 	ScreenDrawString(screen->font, msg, 4, screen->height - 12, 0xE0E0E0FF);
 	StringFree(msg);
 }
 
-void ChatInputScreenOnKeyPressed(ChatInputScreen screen, char eventChar, int eventKey) {
-	ChatInputScreenData this = screen->typeData;
+void ChatInputScreenOnKeyPressed(ChatInputScreen * screen, char eventChar, int eventKey) {
 	if (eventKey == SDL_SCANCODE_ESCAPE) { MinecraftSetCurrentScreen(screen->minecraft, NULL); }
 	else if (eventKey == SDL_SCANCODE_RETURN) {
 		/*NetworkManager var10000 = this.minecraft.networkManager;
@@ -50,27 +43,24 @@ void ChatInputScreenOnKeyPressed(ChatInputScreen screen, char eventChar, int eve
 		MinecraftSetCurrentScreen(screen->minecraft, NULL);
 	} else {
 		if (eventKey == SDL_SCANCODE_BACKSPACE
-		    && StringLength(this->message) > 0) { this->message = StringSub(this->message, 0, StringLength(this->message) - 1); }
+		    && StringLength(screen->chatInput.message) > 0) { screen->chatInput.message = StringSub(screen->chatInput.message, 0, StringLength(screen->chatInput.message) - 1); }
 		String allowedChars = StringCreate("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\\\"#%/()=+?[]{}<>@|$;");
-		if (StringIndexOf(allowedChars, eventChar) >= 0 && StringLength(this->message) < 64 - (2)) {
-			StringConcat(&this->message, (char[]){ eventChar, '\0' });
+		if (StringIndexOf(allowedChars, eventChar) >= 0 && StringLength(screen->chatInput.message) < 64 - (2)) {
+			StringConcat(&screen->chatInput.message, (char[]){ eventChar, '\0' });
 		}
 		StringFree(allowedChars);
 	}
 }
 
-void ChatInputScreenOnMouseClicked(ChatInputScreen screen, int x, int y, int button) {
-	ChatInputScreenData this = screen->typeData;
-	if (button == SDL_BUTTON_LEFT && screen->minecraft->hud->hoveredPlayer != NULL) {
-		if (StringLength(this->message) > 0 && this->message[StringLength(this->message) - 1] != ' ') { StringConcat(&this->message, " "); }
-		StringConcat(&this->message, (char *)screen->minecraft->hud->hoveredPlayer);
+void ChatInputScreenOnMouseClicked(ChatInputScreen * screen, int x, int y, int button) {
+	if (button == SDL_BUTTON_LEFT && screen->minecraft->hud.hoveredPlayer != NULL) {
+		if (StringLength(screen->chatInput.message) > 0 && screen->chatInput.message[StringLength(screen->chatInput.message) - 1] != ' ') { StringConcat(&screen->chatInput.message, " "); }
+		StringConcat(&screen->chatInput.message, (char *)screen->minecraft->hud.hoveredPlayer);
 		int len = 64;
-		if (StringLength(this->message) > len) { this->message = StringSub(this->message, 0, len); }
+		if (StringLength(screen->chatInput.message) > len) { screen->chatInput.message = StringSub(screen->chatInput.message, 0, len); }
 	}
 }
 
-void ChatInputScreenDestroy(ChatInputScreen screen) {
-	ChatInputScreenData this = screen->typeData;
-	StringFree(this->message);
-	free(this);
+void ChatInputScreenDestroy(ChatInputScreen * screen) {
+	StringFree(screen->chatInput.message);
 }

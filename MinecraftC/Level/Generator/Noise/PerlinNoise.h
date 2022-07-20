@@ -4,10 +4,7 @@
 
 typedef Noise PerlinNoise;
 
-typedef struct PerlinNoiseData {
-	int hash[512];
-} * PerlinNoiseData;
+typedef struct PerlinNoiseData PerlinNoiseData;
 
-PerlinNoise PerlinNoiseCreate(RandomGenerator * random);
-float PerlinNoiseCompute(PerlinNoise noise, float x, float y);
-void PerlinNoiseDestroy(PerlinNoise noise);
+void PerlinNoiseCreate(PerlinNoise * noise, RandomGenerator * random);
+float PerlinNoiseCompute(PerlinNoise * noise, float x, float y);
