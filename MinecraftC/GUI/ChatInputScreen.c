@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "ChatInputScreen.h"
 #include "Screen.h"
 #include "../Minecraft.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "Render/LevelRenderer.h"
 #include "Particle/ParticleManager.h"
 #include "GUI/GUIScreen.h"

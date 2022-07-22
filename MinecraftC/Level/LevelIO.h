@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2/SDL_rwops.h>
+#include <SDL_rwops.h>
 #include "../ProgressBarDisplay.h"
 #include "Level.h"
 
