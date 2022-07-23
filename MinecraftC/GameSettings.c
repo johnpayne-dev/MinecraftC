@@ -6,7 +6,6 @@
 static void Load(GameSettings * settings) {
 	SDL_RWops * file = SDL_RWFromFile(settings->file, "r");
 	if (file == NULL) {
-		LogWarning("Failed to load options: %s\n", SDL_GetError());
 		return;
 	}
 	

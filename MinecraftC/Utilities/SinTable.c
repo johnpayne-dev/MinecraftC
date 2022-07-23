@@ -1,7 +1,6 @@
 #include "SinTable.h"
-#include <math.h>
 
-static float SinTable[0xFFFF];
+static float SinTable[0x10000];
 
 void SinTableInitialize() {
 	for (int i = 0; i < sizeof(SinTable) / sizeof(float); i++) {
