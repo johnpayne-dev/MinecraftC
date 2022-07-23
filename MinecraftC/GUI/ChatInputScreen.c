@@ -34,16 +34,11 @@ void ChatInputScreenRender(ChatInputScreen * screen, int mx, int my) {
 void ChatInputScreenOnKeyPressed(ChatInputScreen * screen, char eventChar, int eventKey) {
 	if (eventKey == SDL_SCANCODE_ESCAPE) { MinecraftSetCurrentScreen(screen->minecraft, NULL); }
 	else if (eventKey == SDL_SCANCODE_RETURN) {
-		/*NetworkManager var10000 = this.minecraft.networkManager;
-		 String var4 = this.message.trim();
-		 NetworkManager var3 = var10000;
-		 if((var4 = var4.trim()).length() > 0) {
-		    var3.netHandler.send(PacketType.CHAT_MESSAGE, new Object[]{Integer.valueOf(-1), var4});
-		 }*/
 		MinecraftSetCurrentScreen(screen->minecraft, NULL);
 	} else {
-		if (eventKey == SDL_SCANCODE_BACKSPACE
-		    && StringLength(screen->chatInput.message) > 0) { screen->chatInput.message = StringSub(screen->chatInput.message, 0, StringLength(screen->chatInput.message) - 1); }
+		if (eventKey == SDL_SCANCODE_BACKSPACE && StringLength(screen->chatInput.message) > 0) {
+			screen->chatInput.message = StringSub(screen->chatInput.message, 0, StringLength(screen->chatInput.message) - 2);
+		}
 		String allowedChars = StringCreate("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\\\"#%/()=+?[]{}<>@|$;");
 		if (StringIndexOf(allowedChars, eventChar) >= 0 && StringLength(screen->chatInput.message) < 64 - (2)) {
 			StringConcat(&screen->chatInput.message, (char[]){ eventChar, '\0' });

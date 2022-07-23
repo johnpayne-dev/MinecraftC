@@ -5,29 +5,26 @@
 #include "../Utilities/SinTable.h"
 #include "../Particle/PrimedTNT.h"
 
-void LevelCreate(Level * level) {
+void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 	*level = (Level) {
 		.tickList = ListCreate(sizeof(NextTickListEntry)),
-		.entities = ListCreate(sizeof(Entity)),
+		.entities = ListCreate(sizeof(Entity *)),
 		.unprocessed = 0,
 		.tickCount = 0,
+		.skyColor = 0x99CCFFFF,
+		.fogColor = 0xffffffff,
+		.cloudColor = 0xffffffff,
 	};
 	RandomGeneratorCreate(&level->random, time(NULL));
 	level->randomValue = (int)RandomGeneratorInteger(&level->random);
+	LevelGeneratorCreate(&level->generator, progressBar);
+	LevelGeneratorGenerate(&level->generator, 128 << size, 128 << size, level);
 }
 
-void LevelInitializeTransient(Level * level) {
-	if (level->blocks == NULL) { LogFatal("The level is corrupt!\n"); }
-	//level->Renderers = ListCreate(sizeof(LevelRenderer));
-	//level->LightBlockers = MemoryAllocate(level->Width * level->Height * sizeof(int));
-	//for (int i = 0; i < level->Width * level->Height; i++) { level->LightBlockers[i] = level->Depth; }
-	//LevelCalculateLightDepths(level, 0, 0, level->Width, level->Height);
-	//level->Random = RandomGeneratorCreate(0);
-	//level->RandomValue = (int)RandomGeneratorInteger(level->Random);
-	level->skyColor = 0x99CCFFFF;
-	level->fogColor = 0xffffffff;
-	level->cloudColor = 0xffffffff;
-	LevelFindSpawn(level);
+void LevelRegenerate(Level * level, int size) {
+	free(level->blocks);
+	free(level->lightBlockers);
+	LevelGeneratorGenerate(&level->generator, 128 << size, 128 << size, level);
 }
 
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
@@ -37,12 +34,15 @@ void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
 	level->blocks = malloc(w * d * h);
 	memcpy(level->blocks, blocks, w * d * h);
 	level->lightBlockers = malloc(w * h * sizeof(int));
-	for (int i = 0; i < w * h; i++) { level->lightBlockers[i] = level->depth - 1; }
+	for (int i = 0; i < w * h; i++) {
+		level->lightBlockers[i] = level->depth - 1;
+	}
 	LevelCalculateLightDepths(level, 0, 0, w, h);
-	if (level->renderer != NULL) { LevelRendererRefresh(level->renderer); }
+	if (level->renderer != NULL) {
+		LevelRendererRefresh(level->renderer);
+	}
 	level->tickList = ListClear(level->tickList);
 	LevelFindSpawn(level);
-	LevelInitializeTransient(level);
 }
 
 void LevelFindSpawn(Level * level) {
@@ -128,14 +128,6 @@ void LevelSwap(Level * level, int x0, int y0, int z0, int x1, int y1, int z1) {
 }
 
 bool LevelSetTile(Level * level, int x, int y, int z, BlockType tile) {
-	if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
-		LevelUpdateNeighborsAt(level, x, y, z, tile);
-		return true;
-	}
-	else { return false; }
-}
-
-bool LevelNetSetTile(Level * level, int x, int y, int z, BlockType tile) {
 	if (LevelSetTileNoNeighborChange(level, x, y, z, tile)) {
 		LevelUpdateNeighborsAt(level, x, y, z, tile);
 		return true;

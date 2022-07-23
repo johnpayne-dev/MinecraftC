@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "LevelGenerator.h"
 #include "Noise/Noise.h"
 #include "Noise/OctaveNoise.h"
@@ -5,6 +6,8 @@
 #include "../../Utilities/Time.h"
 #include "../../Utilities/Log.h"
 #include "../../Utilities/SinTable.h"
+#include "../Tile/Block.h"
+#include "../Level.h"
 
 void LevelGeneratorCreate(LevelGenerator * generator, ProgressBarDisplay * progressBar) {
 	*generator = (LevelGenerator) {
@@ -134,7 +137,7 @@ static int64_t Flood(LevelGenerator * generator, int x, int y, int z, int var, B
 	return j;
 }
 
-Level * LevelGeneratorGenerate(LevelGenerator * generator, const char * userName, int width, int depth) {
+void LevelGeneratorGenerate(LevelGenerator * generator, int width, int depth, Level * level) {
 	ProgressBarDisplaySetTitle(generator->progressBar, "Generating level");
 	generator->width = width;
 	generator->depth = depth;
@@ -347,8 +350,6 @@ Level * LevelGeneratorGenerate(LevelGenerator * generator, const char * userName
 		}
 	}
 	
-	Level * level = malloc(sizeof(Level));
-	LevelCreate(level);
 	level->waterLevel = generator->waterLevel;
 	LevelSetData(level, w, 64, d, generator->blocks);
 	ii = w * d / 4000;
@@ -378,7 +379,6 @@ Level * LevelGeneratorGenerate(LevelGenerator * generator, const char * userName
 	NoiseDestroy(&n3);
 	free(generator->blocks);
 	free(heights);
-	return level;
 }
 
 void LevelGeneratorDestroy(LevelGenerator * generator) {

@@ -15,26 +15,20 @@ typedef struct Minecraft {
 	int width, frameWidth;
 	int height, frameHeight;
 	Timer timer;
-	Level * level;
+	Level level;
 	LevelRenderer levelRenderer;
 	Player player;
 	ParticleManager particleManager;
 	SDL_Window * window;
 	SDL_GLContext context;
-	bool levelLoaded;
 	TextureManager textureManager;
 	FontRenderer font;
 	GUIScreen * currentScreen;
 	ProgressBarDisplay progressBar;
 	Renderer renderer;
 	LevelIO levelIO;
-	//SoundManager SoundManager;
-	//ResourceDownloadThread ResourceThread;
 	int ticks;
-	//Robot Robot;
 	HUDScreen hud;
-	//NetworkManager NetworkManager;
-	//SoundPlayer SoundPlayer;
 	MovingObjectPosition selected;
 	GameSettings settings;
 	bool running;
@@ -47,10 +41,7 @@ typedef struct Minecraft {
 
 void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScreen);
 void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen * screen);
-void MinecraftShutdown(Minecraft * minecraft);
 void MinecraftRun(Minecraft * minecraft);
 void MinecraftGrabMouse(Minecraft * minecraft);
 void MinecraftPause(Minecraft * minecraft);
-void MinecraftGenerateLevel(Minecraft * minecraft, int size);
-void MinecraftSetLevel(Minecraft * minecraft, Level * level);
 void MinecraftDestroy(Minecraft * minecraft);

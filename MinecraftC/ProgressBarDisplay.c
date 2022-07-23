@@ -15,8 +15,6 @@ void ProgressBarDisplayCreate(ProgressBarDisplay * display, Minecraft * minecraf
 }
 
 void ProgressBarDisplaySetTitle(ProgressBarDisplay * display, char * title) {
-	if (!display->minecraft->running) { LogFatal("\n"); }
-	
 	display->title = title;
 	int a1 = display->minecraft->width * 240 / display->minecraft->height;
 	int a2 = display->minecraft->height * 240 / display->minecraft->height;
@@ -30,15 +28,11 @@ void ProgressBarDisplaySetTitle(ProgressBarDisplay * display, char * title) {
 }
 
 void ProgressBarDisplaySetText(ProgressBarDisplay * display, char * text) {
-	if (!display->minecraft->running) { LogFatal("\n"); }
-	
 	display->text = text;
 	ProgressBarDisplaySetProgress(display, -1);
 }
 
 void ProgressBarDisplaySetProgress(ProgressBarDisplay * display, int progress) {
-	if (!display->minecraft->running) { LogFatal("\n"); }
-	
 	int64_t time = TimeMilli();
 	if (time - display->start < 0 || time - display->start >= 20) {
 		display->start = time;

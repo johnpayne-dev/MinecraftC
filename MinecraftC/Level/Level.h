@@ -9,6 +9,7 @@
 #include "../Physics/AABB.h"
 #include "../GUI/FontRenderer.h"
 #include "../Entity.h"
+#include "Generator/LevelGenerator.h"
 
 typedef struct Level {
 	int width, height, depth;
@@ -29,10 +30,11 @@ typedef struct Level {
 	Entity * player;
 	List(Entity *) entities;
 	ParticleManager * particleEngine;
+	LevelGenerator generator;
 } Level;
 
-void LevelCreate(Level * level);
-void LevelInitializeTransient(Level * level);
+void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size);
+void LevelRegenerate(Level * level, int size);
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks);
 void LevelFindSpawn(Level * level);
 void LevelCalculateLightDepths(Level * level, int x0, int y0, int x1, int y1);
@@ -41,7 +43,6 @@ bool LevelIsLightBlocker(Level * level, int x, int y, int z);
 List(AABB) LevelGetCubes(Level * level, AABB box);
 void LevelSwap(Level * level, int x0, int y0, int z0, int x1, int y1, int z1);
 bool LevelSetTile(Level * level, int x, int y, int z, BlockType tile);
-bool LevelNetSetTile(Level * level, int x, int y, int z, BlockType tile);
 bool LevelSetTileNoNeighborChange(Level * level, int x, int y, int z, BlockType tile);
 void LevelUpdateNeighborsAt(Level * Level, int x, int y, int z, BlockType tile);
 bool LevelSetTileNoUpdate(Level * level, int x, int y, int z, BlockType tile);

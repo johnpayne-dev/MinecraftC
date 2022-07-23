@@ -62,7 +62,7 @@ void RendererEnableGUIMode(Renderer * renderer) {
 }
 
 void RendererUpdateFog(Renderer * renderer) {
-	Level * level = renderer->minecraft->level;
+	Level * level = &renderer->minecraft->level;
 	Player * player = &renderer->minecraft->player;
 	glFogfv(GL_FOG_COLOR, (float []){ renderer->fogR, renderer->fogG, renderer->fogB, 1.0 });
 	glNormal3f(0.0, -1.0, 0.0);

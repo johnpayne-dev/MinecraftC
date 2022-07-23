@@ -73,7 +73,6 @@ void LoadLevelScreenOpenLevel(LoadLevelScreen * screen, int level) {
 void LoadLevelScreenOpenLevelFromFile(LoadLevelScreen * screen, char * file) {
 	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevelFromFile(screen, file); return; }
 	Level * level = LevelIOLoad(&screen->minecraft->levelIO, SDL_RWFromFile(file, "rb"));
-	if (level != NULL) { MinecraftSetLevel(screen->minecraft, level); }
 	MinecraftSetCurrentScreen(screen->minecraft, screen->level.parent);
 }
 
