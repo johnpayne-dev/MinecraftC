@@ -52,14 +52,8 @@ typedef struct GUIScreen {
 		} levelName;
 		struct LoadLevelScreenData {
 			struct GUIScreen * parent;
-			bool finished;
-			bool loaded;
-			char * levels[5];
-			char * status;
 			char * title;
-			bool frozen;
-			bool saving;
-			char * selectedFile;
+			char * levelNames[5];
 		} level;
 		struct OptionsScreenData {
 			struct GUIScreen * parent;

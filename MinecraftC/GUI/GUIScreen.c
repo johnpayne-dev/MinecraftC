@@ -133,15 +133,11 @@ void GUIScreenKeyboardEvent(GUIScreen * screen, SDL_Event event) {
 void GUIScreenTick(GUIScreen * screen) {
 	if (screen->type == GUIScreenTypeChatInput) { ChatInputScreenTick(screen); return; }
 	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenTick(screen); return; }
-	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenTick(screen); return; }
-	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenTick(screen); return; }
 }
 
 void GUIScreenOnClose(GUIScreen * screen) {
 	if (screen->type == GUIScreenTypeChatInput) { ChatInputScreenOnClose(screen); return; }
 	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenOnClose(screen); return; }
-	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnClose(screen); return; }
-	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnClose(screen); return; }
 }
 
 void GUIScreenDestroy(GUIScreen * screen) {

@@ -7,16 +7,7 @@ void SaveLevelScreenCreate(SaveLevelScreen * screen, GUIScreen * parent) {
 	LoadLevelScreenCreate(screen, parent);
 	screen->type = GUIScreenTypeSaveLevel;
 	screen->level.title = "Save level";
-	screen->level.saving = true;
 	screen->level.parent = parent;
-}
-
-void SaveLevelScreenSetLevels(SaveLevelScreen * screen, char * strings[5]) {
-	for (int i = 0; i < 5; i++) {
-		StringSet(&screen->buttons[i].text, strings[i]);
-		screen->buttons[i].visible = true;
-		screen->buttons[i].active = true;
-	}
 }
 
 void SaveLevelScreenOnOpen(SaveLevelScreen * screen) {
