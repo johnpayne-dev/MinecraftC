@@ -203,6 +203,7 @@ elseif(WIN32)
 		)
 elseif(UNIX)
 	set(SOURCES ${MINECRAFTC_SOURCES})
+	set(FLAGS ${FLAGS} "-I/usr/include/SDL2" "-D_GNU_SOURCE=1" "-D_REENTRANT")
 	set(LIBRARIES
 		m
 		SDL2
