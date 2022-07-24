@@ -4,6 +4,7 @@
 #include "../Utilities/Log.h"
 #include "../Utilities/SinTable.h"
 #include "../Particle/PrimedTNT.h"
+#include "../Minecraft.h"
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 	*level = (Level) {
@@ -441,10 +442,18 @@ MovingObjectPosition LevelClip(Level * level, Vector3D v0, Vector3D v1) {
 	return (MovingObjectPosition){ .null = true };
 }
 
-void LevelPlaySound(Level * level, const char * sound, Entity * entity, float volume, float pitch) {
+void LevelPlaySound(Level * level, char * sound, Entity * entity, float volume, float pitch) {
+	GameSettings * settings = level->renderer->textures->settings;
+	if (!settings->sound) { return; }
+	if (Vector3DSqDistance((Vector3D){ entity->x, entity->y, entity->z }, (Vector3D){ level->player->x, level->player->y, level->player->z }) < 1024.0) {
+		SoundManagerPlaySound(&settings->minecraft->sound, sound, volume, pitch);
+	}
 }
 
-void LevelPlaySoundAt(Level * level, const char * sound, float x, float y, float z, float volume, float pitch) {
+void LevelPlaySoundAt(Level * level, char * sound, float x, float y, float z, float volume, float pitch) {
+	GameSettings * settings = level->renderer->textures->settings;
+	if (!settings->sound) { return; }
+	SoundManagerPlaySound(&settings->minecraft->sound, sound, volume, pitch);
 }
 
 bool LevelMaybeGrowTree(Level * level, int x, int y, int z) {

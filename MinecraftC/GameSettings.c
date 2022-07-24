@@ -1,4 +1,5 @@
 #include <string.h>
+#include <cute_sound.h>
 #include "GameSettings.h"
 #include "Minecraft.h"
 #include "Utilities/Log.h"
@@ -146,7 +147,10 @@ void GameSettingsSetBinding(GameSettings * settings, int binding, int key) {
 }
 
 void GameSettingsToggleSetting(GameSettings * settings, int setting) {
-	if (setting == 0) { settings->music = !settings->music; }
+	if (setting == 0) {
+		settings->music = !settings->music;
+		cs_music_set_volume((float)settings->music);
+	}
 	if (setting == 1) { settings->sound = !settings->sound; }
 	if (setting == 2) { settings->invertMouse = !settings->invertMouse; }
 	if (setting == 3) { settings->showFrameRate = !settings->showFrameRate; }

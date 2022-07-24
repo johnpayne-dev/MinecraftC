@@ -59,6 +59,6 @@ bool EntityIsInLava(Entity * entity);
 void EntityMoveRelative(Entity * entity, float x, float z, float speed);
 float EntityGetBrightness(Entity * entity, float t);
 void EntitySetLevel(Entity * entity, struct Level * level);
-void EntityPlaySound(Entity * entity, const char * name, float volume, float pitch);
+void EntityPlaySound(Entity * entity, char * name, float volume, float pitch);
 bool EntityIsPickable(Entity * entity);
 void EntityRender(Entity * entity, TextureManager * textures, float dt);

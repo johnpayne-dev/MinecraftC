@@ -1,3 +1,8 @@
+#include <stb_vorbis.c>
+#define CUTE_SOUND_SCALAR_MODE
+#define CUTE_SOUND_IMPLEMENTATION
+#define CUTE_SOUND_FORCE_SDL
+#include <cute_sound.h>
 #include <string.h>
 #include "Minecraft.h"
 #include "GUI/PauseScreen.h"
@@ -67,11 +72,13 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	glMatrixMode(GL_MODELVIEW);
 	CheckGLError(minecraft, "Startup");
 	
+	SoundManagerCreate(&minecraft->sound);
 	TimerCreate(&minecraft->timer, 20.0);
 	ProgressBarDisplayCreate(&minecraft->progressBar, minecraft);
 	RendererCreate(&minecraft->renderer, minecraft);
 	GameSettingsCreate(&minecraft->settings, minecraft);
 	SDL_GL_SetSwapInterval(minecraft->settings.limitFramerate ? 1 : 0);
+	cs_music_set_volume((float)minecraft->settings.music);
 	TextureManagerCreate(&minecraft->textureManager, &minecraft->settings);
 	AnimatedTexture * lavaTexture = malloc(sizeof(AnimatedTexture));
 	LavaTextureCreate(lavaTexture);
@@ -174,7 +181,7 @@ static void OnMouseClicked(Minecraft * minecraft, int button) {
 					bool setTile = LevelSetTile(level, vx, vy, vz, 0);
 					if (block->type != BlockTypeNone && setTile) {
 						if (block->sound.type != TileSoundTypeNone) {
-							LevelPlaySoundAt(level, "step.wtf", vx, vy, vz, (TileSoundGetVolume(block->sound) + 1.0) / 2.0, TileSoundGetPitch(block->sound) * 0.8);
+							LevelPlaySoundAt(level, (char *)block->sound.name, vx, vy, vz, (TileSoundGetVolume(block->sound) + 1.0) / 2.0, TileSoundGetPitch(block->sound) * 0.8);
 						}
 						BlockSpawnBreakParticles(block, level, vx, vy, vz, &minecraft->particleManager);
 					}
@@ -196,6 +203,11 @@ static void OnMouseClicked(Minecraft * minecraft, int button) {
 }
 
 static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
+	if (TimeMilli() > minecraft->sound.lastMusic) {
+		SoundManagerPlayMusic(&minecraft->sound, "Calm");
+		minecraft->sound.lastMusic = TimeMilli() + RandomGeneratorIntegerRange(&minecraft->sound.random, 0, 900000) + 300000;
+	}
+	
 	HUDScreen * hud = &minecraft->hud;
 	hud->ticks++;
 	for (int i = 0; i < ListLength(hud->chat); i++) {
@@ -407,6 +419,7 @@ void MinecraftRun(Minecraft * minecraft) {
 		timer->elapsedDelta -= timer->elapsedTicks;
 		timer->delta = timer->elapsedDelta;
 		
+		cs_update(timer->delta);
 		for (int i = 0; i < timer->elapsedTicks; i++) {
 			minecraft->ticks++;
 			Tick(minecraft, events);
@@ -878,7 +891,12 @@ int main(int argc, char * argv[]) {
 	ShapeRendererInitialize();
 	SessionDataInitialize();
 	RandomSetSeed((unsigned int)time(NULL));
-	SDL_Init(SDL_INIT_EVERYTHING);
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+		LogFatal("failed to initialize SDL");
+	}
+	if (cs_init(NULL, 44100, 1024, NULL) > 0) {
+		LogFatal("failed to initialize sound");
+	}
 	MinecraftCreate(&minecraft, 860, 480, false);
 	MinecraftRun(&minecraft);
 	return 0;

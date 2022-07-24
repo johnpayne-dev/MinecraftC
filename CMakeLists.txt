@@ -125,6 +125,8 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Render/ShapeRenderer.h
 	MinecraftC/Render/TextureManager.c
 	MinecraftC/Render/TextureManager.h
+	MinecraftC/Sound/SoundManager.c
+	MinecraftC/Sound/SoundManager.h
 	MinecraftC/Utilities/List.c
 	MinecraftC/Utilities/List.h
 	MinecraftC/Utilities/Log.c
@@ -165,14 +167,18 @@ endif()
 set(FLAGS "$<IF:$<CONFIG:Debug>,${DEBUG_FLAGS},${RELEASE_FLAGS}>")
 
 add_definitions(
-    -DSDL_dynapi_h_
-    -DSDL_DYNAMIC_API=0
-    -DSDL_VIDEO_OPENGL_EGL=0
-    -DSDL_VIDEO_RENDER_OGL_ES2=0
-    )
+	-DSDL_dynapi_h_
+	-DSDL_DYNAMIC_API=0
+	-DSDL_VIDEO_OPENGL_EGL=0
+	-DSDL_VIDEO_RENDER_OGL_ES2=0
+	)
 
 if(APPLE)
-	set(SOURCES ${MINECRAFTC_SOURCES} ${SDL2_COMMON_SOURCES} ${SDL2_APPLE_SOURCES})
+	set(SOURCES
+		${MINECRAFTC_SOURCES}
+		${SDL2_COMMON_SOURCES}
+		${SDL2_APPLE_SOURCES}
+		)
 	set(FLAGS ${FLAGS} "-fobjc-arc" "-Wno-deprecated")
 	set(LIBRARIES
 		"-framework AudioToolbox"
@@ -190,7 +196,12 @@ if(APPLE)
 		"-framework OpenGL"
 		)
 elseif(WIN32)
-	set(SOURCES ${MINECRAFTC_SOURCES} ${SDL2_COMMON_SOURCES} ${SDL2_WINDOWS_SOURCES} Resources/App/AppIcon.rc)
+	set(SOURCES
+		${MINECRAFTC_SOURCES}
+		${SDL2_COMMON_SOURCES}
+		${SDL2_WINDOWS_SOURCES}
+		Resources/App/AppIcon.rc
+		)
 	set(LIBRARIES
 		opengl32
 		glu32
@@ -215,5 +226,9 @@ target_compile_options(MinecraftC PRIVATE ${FLAGS})
 if(MSVC)
 	target_link_options(MinecraftC PRIVATE ${LINKER_FLAGS})
 endif()
-target_include_directories(MinecraftC PRIVATE Submodules/SDL/include)
+target_include_directories(MinecraftC PRIVATE
+	External/SDL/include
+	External/cute_headers
+	External/stb
+	)
 target_link_libraries(MinecraftC ${LIBRARIES})

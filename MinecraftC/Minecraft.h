@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "SessionData.h"
 #include "ProgressBarDisplay.h"
+#include "Sound/SoundManager.h"
 
 typedef struct Minecraft {
 	bool fullScreen;
@@ -35,6 +36,7 @@ typedef struct Minecraft {
 	int lastClick;
 	bool raining;
 	char * workingDirectory;
+	SoundManager sound;
 } Minecraft;
 
 void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScreen);
