@@ -43,6 +43,6 @@ if len(sys.argv) == 2 or len(sys.argv) == 3:
 		info.write(plist)
 	if len(sys.argv) == 3:
 		os.system('xattr -cr ' + appPath)
-		os.system(f'codesign -s {sys.argv[2]} {appPath}/Contents/MacOS/*')
+		os.system(f'codesign --deep --force -s {sys.argv[2]} --timestamp {appPath}')
 else:
 	print('usage: python MacOS-App.py <executable> [developer-id]')
