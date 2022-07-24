@@ -53,7 +53,7 @@ typedef struct GUIScreen {
 		struct LoadLevelScreenData {
 			struct GUIScreen * parent;
 			char * title;
-			char * levelNames[5];
+			String names[5];
 		} level;
 		struct OptionsScreenData {
 			struct GUIScreen * parent;

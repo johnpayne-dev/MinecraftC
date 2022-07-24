@@ -2,6 +2,7 @@
 #include "LevelNameScreen.h"
 #include "Screen.h"
 #include "../Minecraft.h"
+#include "../Utilities/Log.h"
 
 void LevelNameScreenCreate(LevelNameScreen * screen, GUIScreen * parent, char * name, int id) {
 	GUIScreenCreate(screen);
@@ -10,22 +11,21 @@ void LevelNameScreenCreate(LevelNameScreen * screen, GUIScreen * parent, char * 
 	screen->levelName.counter = 0;
 	screen->levelName.parent = parent;
 	screen->levelName.name = StringCreate(name);
-	if (strcmp(name, "-") == 0) { StringSet(&screen->levelName.name, ""); }
+	screen->levelName.id = id;
+	if (strcmp(name, "---") == 0) { StringSet(&screen->levelName.name, ""); }
 }
 
 void LevelNameScreenOnOpen(LevelNameScreen * screen) {
 	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
 	screen->buttons = ListClear(screen->buttons);
-	//Keyboard.enableRepeatEvents(true);
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 0, screen->width / 2 - 100, screen->height / 4 + 120, "Save");
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
-	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 0, screen->width / 2 - 100, screen->height / 4 + 144, "Cancel");
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 1, screen->width / 2 - 100, screen->height / 4 + 144, "Cancel");
 	screen->buttons[0].active = StringLength(screen->levelName.name) > 0;
 }
 
 void LevelNameScreenOnClose(LevelNameScreen * screen) {
-	//Keyboard.enableRepeatEvents(false);
 }
 
 void LevelNameScreenTick(LevelNameScreen * screen) {
@@ -46,21 +46,30 @@ void LevelNameScreenRender(LevelNameScreen * screen, int mx, int my) {
 }
 
 void LevelNameScreenOnKeyPressed(LevelNameScreen * screen, char eventChar, int eventKey) {
-	if (eventKey == 14 && StringLength(screen->levelName.name) > 0) {
-		screen->levelName.name = StringSub(screen->levelName.name, 0, StringLength(screen->levelName.name) - 1);
+	if (eventKey == SDL_SCANCODE_BACKSPACE && StringLength(screen->levelName.name) > 0) {
+		screen->levelName.name = StringSub(screen->levelName.name, 0, StringLength(screen->levelName.name) - 2);
 	}
 	
 	String allowedChars = StringCreate("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\"#%/()=+?[]{}<>");
 	if (StringIndexOf(allowedChars, eventChar) >= 0 && StringLength(screen->levelName.name) < 64) {
 		StringConcat(&screen->levelName.name, (char[]){ eventChar, '\0' });
 	}
-	
+	StringFree(allowedChars);
 	screen->buttons[0].active = StringLength(screen->levelName.name) > 0;
 }
 
 void LevelNameScreenOnButtonClicked(LevelNameScreen * screen, Button * button) {
 	if (button->active) {
 		if (button->id == 0 && StringLength(screen->levelName.name) > 0) {
+			String filePath = StringCreate(screen->minecraft->workingDirectory);
+			StringConcat(&filePath, "Level0.dat");
+			filePath[StringLength(filePath) - 5] += screen->levelName.id;
+			bool success = LevelSave(&screen->minecraft->level, filePath, screen->levelName.name);
+			StringFree(filePath);
+			if (!success) {
+				LogWarning("failed to save level\n");
+			}
+			
 			MinecraftSetCurrentScreen(screen->minecraft, NULL);
 			MinecraftGrabMouse(screen->minecraft);
 		}

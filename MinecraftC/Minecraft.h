@@ -5,7 +5,6 @@
 #include "GUI/GUIScreen.h"
 #include "GUI/HUDScreen.h"
 #include "Render/Renderer.h"
-#include "Level/LevelIO.h"
 #include "Timer.h"
 #include "SessionData.h"
 #include "ProgressBarDisplay.h"
@@ -26,7 +25,6 @@ typedef struct Minecraft {
 	GUIScreen * currentScreen;
 	ProgressBarDisplay progressBar;
 	Renderer renderer;
-	LevelIO levelIO;
 	int ticks;
 	HUDScreen hud;
 	MovingObjectPosition selected;

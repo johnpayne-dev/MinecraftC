@@ -21,6 +21,5 @@ void SaveLevelScreenOpenLevel(SaveLevelScreen * screen, int level) {
 }
 
 void SaveLevelScreenOpenLevelFromFile(SaveLevelScreen * screen, char * file) {
-	LevelIOSave(&screen->minecraft->levelIO, &screen->minecraft->level, SDL_RWFromFile(file, "wb"));
 	MinecraftSetCurrentScreen(screen->minecraft, screen->level.parent);
 }

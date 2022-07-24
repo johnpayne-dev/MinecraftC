@@ -70,7 +70,6 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	TimerCreate(&minecraft->timer, 20.0);
 	ProgressBarDisplayCreate(&minecraft->progressBar, minecraft);
 	RendererCreate(&minecraft->renderer, minecraft);
-	LevelIOCreate(&minecraft->levelIO, &minecraft->progressBar);
 	GameSettingsCreate(&minecraft->settings, minecraft);
 	SDL_GL_SetSwapInterval(minecraft->settings.limitFramerate ? 1 : 0);
 	TextureManagerCreate(&minecraft->textureManager, &minecraft->settings);

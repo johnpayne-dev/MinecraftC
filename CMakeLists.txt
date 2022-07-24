@@ -82,8 +82,6 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Level/Tile/TNTBlock.h
 	MinecraftC/Level/Level.c
 	MinecraftC/Level/Level.h
-	MinecraftC/Level/LevelIO.c
-	MinecraftC/Level/LevelIO.h
 	MinecraftC/Level/NextTickListEntry.h
 	MinecraftC/Particle/PrimedTNT.c
 	MinecraftC/Particle/PrimedTNT.h

@@ -35,6 +35,8 @@ typedef struct Level {
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size);
 void LevelRegenerate(Level * level, int size);
+bool LevelLoad(Level * level, char * filePath);
+bool LevelSave(Level * level, char * filePath, char * name);
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks);
 void LevelFindSpawn(Level * level);
 void LevelCalculateLightDepths(Level * level, int x0, int y0, int x1, int y1);
