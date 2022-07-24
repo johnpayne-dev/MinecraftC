@@ -11,9 +11,7 @@
 <img width="858" alt="Screen Shot 2021-08-16 at 6 28 46 PM" src="https://user-images.githubusercontent.com/79012575/129637157-e6727c40-7fd6-40be-9562-bfaa5b7b3f68.png">
 
 ## Downloads
-- [Windows (64 bit)](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-Windows-64.zip)
-- [MacOS (Universal)](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-MacOS-ARM.zip)
-- [Linux](https://github.com/johnpayne-dev/MinecraftC/releases/download/v1.0/MinecraftC-Linux.zip)
+- [MinecraftC Releases](https://github.com/johnpayne-dev/MinecraftC/releases)
 
 ## Planned features
 - Sound effects and music
