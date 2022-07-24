@@ -1,5 +1,2 @@
 *.DS_Store
-*.xcodeproj
-Libraries/*
-Include/*
-Output/*
+Build/*

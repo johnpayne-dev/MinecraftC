@@ -3,59 +3,46 @@
 #include "Screen.h"
 #include "../Minecraft.h"
 
-OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings)
-{
-	GUIScreen screen = GUIScreenCreate();
-	screen->Type = GUIScreenTypeOptions;
-	screen->TypeData = MemoryAllocate(sizeof(struct OptionsScreenData));
-	OptionsScreenData this = screen->TypeData;
-	this->Parent = parent;
-	this->Settings = settings;
-	this->Title = "Options";
-	return screen;
+void OptionsScreenCreate(OptionsScreen * screen, GUIScreen * parent, GameSettings * settings) {
+	GUIScreenCreate(screen);
+	screen->type = GUIScreenTypeOptions;
+	screen->options.parent = parent;
+	screen->options.settings = settings;
+	screen->options.title = "Options";
 }
 
-void OptionsScreenOnOpen(OptionsScreen screen)
-{
-	OptionsScreenData this = screen->TypeData;
-	for (int i = 0; i < ListCount(screen->Buttons); i++) { ButtonDestroy(screen->Buttons[i]); }
-	screen->Buttons = ListClear(screen->Buttons);
-	for (int i = 0; i < this->Settings->SettingsCount; i++)
-	{
-		screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreateSize(i, screen->Width / 2 - 155 + i % 2 * 160, screen->Height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, GameSettingsGetSetting(this->Settings, i)) });
+void OptionsScreenOnOpen(OptionsScreen * screen) {
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
+	screen->buttons = ListClear(screen->buttons);
+	for (int i = 0; i < screen->options.settings->settingsCount; i++) {
+		screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+		ButtonCreateSize(&screen->buttons[i], i, screen->width / 2 - 155 + i % 2 * 160, screen->height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, GameSettingsGetSetting(screen->options.settings, i));
 	}
 	
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(100, screen->Width / 2 - 100, screen->Height / 6 + 132, "Controls...") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(200, screen->Width / 2 - 100, screen->Height / 6 + 168, "Done") });
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 100, screen->width / 2 - 100, screen->height / 6 + 132, "Controls...");
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 200, screen->width / 2 - 100, screen->height / 6 + 168, "Done");
 }
 
-void OptionsScreenOnButtonClicked(OptionsScreen screen, Button button)
-{
-	OptionsScreenData this = screen->TypeData;
-	if (button->Active)
-	{
-		if (button->ID < 100)
-		{
-			GameSettingsToggleSetting(this->Settings, button->ID, 1);
-			button->Text = StringSet(button->Text, GameSettingsGetSetting(this->Settings, button->ID));
+void OptionsScreenOnButtonClicked(OptionsScreen * screen, Button * button) {
+	if (button->active) {
+		if (button->id < 100) {
+			GameSettingsToggleSetting(screen->options.settings, button->id);
+			StringSet(&button->text, GameSettingsGetSetting(screen->options.settings, button->id));
 		}
-		if (button->ID == 100) { MinecraftSetCurrentScreen(screen->Minecraft, ControlsScreenCreate(screen, this->Settings)); }
-		if (button->ID == 200)
-		{
-			MinecraftSetCurrentScreen(screen->Minecraft, this->Parent);
+		if (button->id == 100) {
+			ControlsScreen * controls = malloc(sizeof(ControlsScreen));
+			ControlsScreenCreate(controls, screen, screen->options.settings);
+			MinecraftSetCurrentScreen(screen->minecraft, controls);
+		}
+		if (button->id == 200) {
+			MinecraftSetCurrentScreen(screen->minecraft, screen->options.parent);
 		}
 	}
 }
 
-void OptionsScreenRender(OptionsScreen screen, int2 mousePos)
-{
-	OptionsScreenData this = screen->TypeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->Width, screen->Height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->Font, this->Title, (int2){ screen->Width / 2, 20 }, ColorWhite);
-}
-
-void OptionsScreenDestroy(OptionsScreen screen)
-{
-	OptionsScreenData this = screen->TypeData;
-	MemoryFree(this);
+void OptionsScreenRender(OptionsScreen * screen, int mx, int my) {
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, screen->options.title, screen->width / 2, 20, 0xffffffff);
 }

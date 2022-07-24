@@ -1,16 +1,9 @@
 #include "BookshelfBlock.h"
 
-BookshelfBlock BookshelfBlockCreate()
-{
-	return BlockCreate(BlockTypeBookshelf, 35);
+void BookshelfBlockCreate(BookshelfBlock * block, TileSound sound, float particleGravity) {
+	BlockCreate(block, BlockTypeBookshelf, 35, sound, particleGravity);
 }
 
-int BookshelfBlockGetTextureID(BookshelfBlock block, int face)
-{
-	return face <= 1 ? 4 : block->TextureID;
-}
-
-int BookshelfBlockGetDropCount(BookshelfBlock block)
-{
-	return 0;
+int BookshelfBlockGetTextureID(BookshelfBlock * block, int face) {
+	return face <= 1 ? 4 : block->textureID;
 }

@@ -4,41 +4,28 @@
 #include "PlayerAI.h"
 #include "../Player/Player.h"
 
-typedef Entity Player;
+struct Level;
 
-typedef struct PlayerData
-{
-	float Rotation;
-	float TimeOffset;
-	float Speed;
-	float RotationA;
-	float BodyRotation;
-	float OldBodyRotation;
-	float Run;
-	float OldRun;
-	float AnimationStep;
-	float OldAnimationStep;
-	int TickCount;
-	bool AllowAlpha;
-	float RotationOffset;
-	float BobbingStrength;
-	float RenderOffset;
-	float Tilt;
-	float OldTilt;
-	PlayerAI AI;
-	InputHandler Input;
-	Inventory Inventory;
-	int UserType;
-	float Bobbing;
-	float OldBobbing;
-} * PlayerData;
+typedef struct Entity Player;
 
-Player PlayerCreate(Level level);
-void PlayerTick(Player player);
-void PlayerTravel(Player player, float x, float y);
-void PlayerResetPosition(Player player);
-void PlayerStepAI(Player player);
-void PlayerReleaseAllKeys(Player player);
-void PlayerSetKey(Player player, int key, bool state);
-bool PlayerAddResource(Player player, BlockType resource);
-void PlayerDestroy(Player player);
+typedef struct PlayerData {
+	float bodyRotation;
+	float oldBodyRotation;
+	float oldAnimationStep;
+	float tilt;
+	float oldTilt;
+	PlayerAI ai;
+	InputHandler input;
+	Inventory inventory;
+	int userType;
+	float bobbing;
+	float oldBobbing;
+} PlayerData;
+
+void PlayerCreate(Player * player, struct Level * level);
+void PlayerTick(Player * player);
+void PlayerTravel(Player * player, float x, float y);
+void PlayerResetPosition(Player * player);
+void PlayerStepAI(Player * player);
+void PlayerReleaseAllKeys(Player * player);
+void PlayerSetKey(Player * player, int key, bool state);

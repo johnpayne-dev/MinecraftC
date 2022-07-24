@@ -4,17 +4,10 @@
 
 typedef GUIScreen ControlsScreen;
 
-typedef struct ControlsScreenData
-{
-	GUIScreen Parent;
-	char * Title;
-	GameSettings Settings;
-	int Selected;
-} * ControlsScreenData;
+typedef struct ControlsScreenData ControlsScreenData;
 
-ControlsScreen ControlsScreenCreate(GUIScreen parent, GameSettings settings);
-void ControlsScreenOnOpen(ControlsScreen screen);
-void ControlsScreenRender(ControlsScreen screen, int2 mousePos);
-void ControlsScreenOnKeyPressed(ControlsScreen screen, char eventChar, int eventKey);
-void ControlsScreenOnButtonClicked(ControlsScreen screen, Button button);
-void ControlsScreenDestroy(ControlsScreen screen);
+void ControlsScreenCreate(ControlsScreen * screen, GUIScreen * parent, GameSettings * settings);
+void ControlsScreenOnOpen(ControlsScreen * screen);
+void ControlsScreenRender(ControlsScreen * screen, int mx, int my);
+void ControlsScreenOnKeyPressed(ControlsScreen * screen, char eventChar, int eventKey);
+void ControlsScreenOnButtonClicked(ControlsScreen * screen, Button * button);

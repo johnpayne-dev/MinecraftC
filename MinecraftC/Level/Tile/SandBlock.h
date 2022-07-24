@@ -3,6 +3,6 @@
 
 typedef Block SandBlock;
 
-SandBlock SandBlockCreate(BlockType type, int texture);
-void SandBlockOnNeighborChanged(SandBlock block, struct Level * level, int x, int y, int z, BlockType tile);
-void SandBlockOnPlaced(SandBlock block, struct Level * level, int x, int y, int z);
+void SandBlockCreate(SandBlock * block, BlockType type, int texture, TileSound sound, float particleGravity);
+void SandBlockOnNeighborChanged(SandBlock * block, struct Level * level, int x, int y, int z, BlockType tile);
+void SandBlockOnPlaced(SandBlock * block, struct Level * level, int x, int y, int z);

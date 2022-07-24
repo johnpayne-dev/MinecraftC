@@ -3,12 +3,7 @@
 
 typedef Noise CombinedNoise;
 
-typedef struct CombinedNoiseData
-{
-	Noise Noise1;
-	Noise Noise2;
-} * CombinedNoiseData;
+typedef struct CombinedNoiseData CombinedNoiseData;
 
-CombinedNoise CombinedNoiseCreate(Noise n1, Noise n2);
-float CombinedNoiseCompute(CombinedNoise noise, float2 v);
-void CombinedNoiseDestroy(CombinedNoise noise);
+void CombinedNoiseCreate(CombinedNoise * noise, Noise * n1, Noise * n2);
+float CombinedNoiseCompute(CombinedNoise * noise, float x, float y);

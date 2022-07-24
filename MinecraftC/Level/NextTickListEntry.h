@@ -1,9 +1,7 @@
 #pragma once
-#include "../Utilities/LinearMath.h"
 
-typedef struct NextTickListEntry
-{
-	int3 Position;
+typedef struct NextTickListEntry {
+	int x, y, z;
 	BlockType Tile;
 	int Ticks;
 } NextTickListEntry;

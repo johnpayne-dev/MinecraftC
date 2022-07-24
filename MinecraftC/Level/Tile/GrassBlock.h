@@ -3,6 +3,6 @@
 
 typedef Block GrassBlock;
 
-GrassBlock GrassBlockCreate(void);
-int GrassBlockGetTextureID(GrassBlock block, int side);
-void GrassBlockUpdate(GrassBlock block, struct Level * level, int x, int y, int z, RandomGenerator random);
+void GrassBlockCreate(GrassBlock * block, TileSound sound, float particleGravity);
+int GrassBlockGetTextureID(GrassBlock * block, int side);
+void GrassBlockUpdate(GrassBlock * block, struct Level * level, int x, int y, int z, RandomGenerator * random);

@@ -1,11 +1,10 @@
 #pragma once
 #include "Utilities/String.h"
 
-typedef struct ChatLine
-{
-	String Message;
-	int Time;
-} * ChatLine;
+typedef struct ChatLine {
+	String message;
+	int time;
+} ChatLine;
 
-ChatLine ChatLineCreate(char * message);
-void ChatLineDestroy(ChatLine line);
+void ChatLineCreate(ChatLine * line, char * message);
+void ChatLineDestroy(ChatLine * line);

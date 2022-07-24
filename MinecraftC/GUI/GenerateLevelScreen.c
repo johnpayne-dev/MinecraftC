@@ -2,49 +2,36 @@
 #include "Screen.h"
 #include "../Minecraft.h"
 
-GenerateLevelScreen GenerateLevelScreenCreate(GUIScreen parent)
-{
-	GUIScreen screen = GUIScreenCreate();
-	screen->Type = GUIScreenTypeGenerateLevel;
-	screen->TypeData = MemoryAllocate(sizeof(struct GenerateLevelScreenData));
-	GenerateLevelScreenData this = screen->TypeData;
-	this->Parent = parent;
-	return screen;
+void GenerateLevelScreenCreate(GenerateLevelScreen * screen, GUIScreen * parent) {
+	GUIScreenCreate(screen);
+	screen->type = GUIScreenTypeGenerateLevel;
+	screen->generateLevel.parent = parent;
 }
 
-void GenerateLevelScreenOnOpen(GenerateLevelScreen screen)
-{
-	for (int i = 0; i < ListCount(screen->Buttons); i++) { ButtonDestroy(screen->Buttons[i]); }
-	screen->Buttons = ListClear(screen->Buttons);
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(0, screen->Width / 2 - 100, screen->Height / 4, "Small") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(1, screen->Width / 2 - 100, screen->Height / 4 + 24, "Normal") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(2, screen->Width / 2 - 100, screen->Height / 4 + 48, "Huge") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(3, screen->Width / 2 - 100, screen->Height / 4 + 120, "Cancel") });
+void GenerateLevelScreenOnOpen(GenerateLevelScreen * screen) {
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
+	screen->buttons = ListClear(screen->buttons);
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[0], 0, screen->width / 2 - 100, screen->height / 4, "Small");
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[1], 1, screen->width / 2 - 100, screen->height / 4 + 24, "Normal");
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[2], 2, screen->width / 2 - 100, screen->height / 4 + 48, "Huge");
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[3], 3, screen->width / 2 - 100, screen->height / 4 + 120, "Cancel");
 }
 
-void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen screen, Button button)
-{
-	GenerateLevelScreenData this = screen->TypeData;
-	if (button->ID == 3)
-	{
-		MinecraftSetCurrentScreen(screen->Minecraft, this->Parent);
-	}
-	else
-	{
-		MinecraftGenerateLevel(screen->Minecraft, button->ID);
-		MinecraftSetCurrentScreen(screen->Minecraft, NULL);
-		MinecraftGrabMouse(screen->Minecraft);
+void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen * screen, Button * button) {
+	if (button->id == 3) {
+		MinecraftSetCurrentScreen(screen->minecraft, screen->generateLevel.parent);
+	} else {
+		LevelRegenerate(&screen->minecraft->level, button->id);
+		MinecraftSetCurrentScreen(screen->minecraft, NULL);
+		MinecraftGrabMouse(screen->minecraft);
 	}
 }
 
-void GenerateLevelScreenRender(GenerateLevelScreen screen, int2 mousePos)
-{
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->Width, screen->Height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->Font, "Generate new level", (int2){ screen->Width / 2, 40 }, ColorWhite);
-}
-
-void GenerateLevelScreenDestroy(GenerateLevelScreen screen)
-{
-	GenerateLevelScreenData this = screen->TypeData;
-	MemoryFree(this);
+void GenerateLevelScreenRender(GenerateLevelScreen * screen, int mx, int my) {
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, "Generate new level", screen->width / 2, 40, 0xffffffff);
 }

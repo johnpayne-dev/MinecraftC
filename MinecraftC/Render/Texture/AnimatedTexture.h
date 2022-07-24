@@ -1,23 +1,25 @@
 #pragma once
 #include <stdbool.h>
-#include "../../Utilities/LinearMath.h"
+#include <stdint.h>
+#include "WaterTexture.h"
+#include "LavaTexture.h"
 
-typedef enum AnimatedTextureType
-{
+typedef enum AnimatedTextureType {
 	AnimatedTextureTypeNone,
 	AnimatedTextureTypeWater,
 	AnimatedTextureTypeLava,
 } AnimatedTextureType;
 
-typedef struct AnimatedTexture
-{
-	uint8_t Data[1024];
-	int TextureID;
-	bool Anaglyph;
-	AnimatedTextureType Type;
-	void * TypeData;
-} * AnimatedTexture;
+typedef struct AnimatedTexture {
+	uint8_t data[1024];
+	int textureID;
+	bool anaglyph;
+	AnimatedTextureType type;
+	union {
+		WaterTextureData water;
+		LavaTextureData lava;
+	};
+} AnimatedTexture;
 
-AnimatedTexture AnimatedTextureCreate(int textureID);
-void AnimatedTextureAnimate(AnimatedTexture texture);
-void AnimatedTextureDestroy(AnimatedTexture texture);
+void AnimatedTextureCreate(AnimatedTexture * texture, int textureID);
+void AnimatedTextureAnimate(AnimatedTexture * texture);

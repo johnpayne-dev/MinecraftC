@@ -3,6 +3,6 @@
 
 typedef GUIScreen BlockSelectScreen;
 
-BlockSelectScreen BlockSelectScreenCreate(void);
-void BlockSelectScreenRender(BlockSelectScreen screen, int2 mouse);
-void BlockSelectScreenOnMouseClicked(BlockSelectScreen screen, int x, int y, int button);
+void BlockSelectScreenCreate(BlockSelectScreen * screen);
+void BlockSelectScreenRender(BlockSelectScreen * screen, int mx, int my);
+void BlockSelectScreenOnMouseClicked(BlockSelectScreen * screen, int x, int y, int button);

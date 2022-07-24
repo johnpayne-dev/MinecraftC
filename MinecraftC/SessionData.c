@@ -1,72 +1,53 @@
 #include "SessionData.h"
 
-list(Block) SessionDataAllowedBlocks = NULL;
+List(BlockType) SessionDataAllowedBlocks = NULL;
 
-void SessionDataInitialize()
-{
-	SessionDataAllowedBlocks = ListCreate(sizeof(Block));
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeStone]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeCobbleStone]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeBrick]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeDirt]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeWood]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeLog]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeLeaves]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeGlass]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeSlab]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeMossyCobbleStone]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeSapling]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeDandelion]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeRose]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeBrownMushroom]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeRedMushroom]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeSand]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeGravel]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeSponge]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeRedWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeOrangeWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeYellowWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeLimeWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeGreenWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeAquaGreenWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeCyanWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeBlueWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypePurpleWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeIndigoWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeVioletWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeMagentaWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypePinkWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeBlackWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeGrayWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeWhiteWool]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeCoalOre]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeIronOre]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeGoldOre]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeIron]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeGold]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeBookshelf]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeTNT]);
-	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &Blocks.Table[BlockTypeObsidian]);
+void SessionDataInitialize() {
+	SessionDataAllowedBlocks = ListCreate(sizeof(BlockType));
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeStone });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeCobbleStone });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeBrick });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeDirt });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeWood });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeLog });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeLeaves });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeGlass });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeSlab });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeMossyCobbleStone });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeSapling });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeDandelion });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeRose });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeBrownMushroom });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeRedMushroom });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeSand });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeGravel });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeSponge });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeRedWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeOrangeWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeYellowWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeLimeWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeGreenWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeAquaGreenWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeCyanWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeBlueWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypePurpleWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeIndigoWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeVioletWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeMagentaWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypePinkWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeBlackWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeGrayWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeWhiteWool });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeCoalOre });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeIronOre });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeGoldOre });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeIron });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeGold });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeBookshelf });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeTNT });
+	SessionDataAllowedBlocks = ListPush(SessionDataAllowedBlocks, &(BlockType){ BlockTypeObsidian });
 }
 
-void SessionDataDeinitialize()
-{
-	ListDestroy(SessionDataAllowedBlocks);
-}
-
-SessionData SessionDataCreate(char * userName, char * sessionID)
-{
-	SessionData session = MemoryAllocate(sizeof(struct SessionData));
-	*session = (struct SessionData)
-	{
-		.UserName = StringCreate(userName),
-		.SessionID = sessionID,
-	};
-	return session;
-}
-
-void SessionDataDestroy(SessionData session)
-{
-	StringDestroy(session->UserName);
-	MemoryFree(session);
+void SessionDataFree() {
+	ListFree(SessionDataAllowedBlocks);
 }

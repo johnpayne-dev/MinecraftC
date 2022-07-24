@@ -1,40 +1,43 @@
 #pragma once
 #include <stdbool.h>
 #include <stdio.h>
-#include <SDL2/SDL.h>
-#include "KeyBinding.h"
+#include <SDL.h>
 #include "Utilities/List.h"
 #include "Utilities/String.h"
 
-typedef struct GameSettings
-{
-	bool Music;
-	bool Sound;
-	bool InvertMouse;
-	bool ShowFrameRate;
-	int ViewDistance;
-	bool ViewBobbing;
-	bool Anaglyph;
-	bool LimitFramerate;
-	KeyBinding ForwardKey;
-	KeyBinding LeftKey;
-	KeyBinding BackKey;
-	KeyBinding RightKey;
-	KeyBinding JumpKey;
-	KeyBinding BuildKey;
-	KeyBinding ChatKey;
-	KeyBinding ToggleFogKey;
-	KeyBinding SaveLocationKey;
-	KeyBinding LoadLocationKey;
-	list(KeyBinding *) Bindings;
-	struct Minecraft * Minecraft;
-	String File;
-	int SettingsCount;
-} * GameSettings;
+typedef struct KeyBinding {
+	char * name;
+	int key;
+} KeyBinding;
 
-GameSettings GameSettingsCreate(struct Minecraft * minecraft);
-String GameSettingsGetBinding(GameSettings settings, int binding);
-void GameSettingsSetBinding(GameSettings settings, int binding, int key);
-void GameSettingsToggleSetting(GameSettings settings, int setting, int var2);
-String GameSettingsGetSetting(GameSettings settings, int setting);
-void GameSettingsDestroy(GameSettings settings);
+typedef struct GameSettings {
+	bool music;
+	bool sound;
+	bool invertMouse;
+	bool showFrameRate;
+	int viewDistance;
+	bool viewBobbing;
+	bool anaglyph;
+	bool limitFramerate;
+	KeyBinding forwardKey;
+	KeyBinding leftKey;
+	KeyBinding backKey;
+	KeyBinding rightKey;
+	KeyBinding jumpKey;
+	KeyBinding buildKey;
+	KeyBinding chatKey;
+	KeyBinding toggleFogKey;
+	KeyBinding saveLocationKey;
+	KeyBinding loadLocationKey;
+	List(KeyBinding *) bindings;
+	struct Minecraft * minecraft;
+	String file;
+	int settingsCount;
+} GameSettings;
+
+void GameSettingsCreate(GameSettings * settings, struct Minecraft * minecraft);
+String GameSettingsGetBinding(GameSettings * settings, int binding);
+void GameSettingsSetBinding(GameSettings * settings, int binding, int key);
+void GameSettingsToggleSetting(GameSettings * settings, int setting);
+String GameSettingsGetSetting(GameSettings * settings, int setting);
+void GameSettingsDestroy(GameSettings * settings);

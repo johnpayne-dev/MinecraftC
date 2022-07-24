@@ -3,18 +3,17 @@
 #include "../GameSettings.h"
 #include "Texture/AnimatedTexture.h"
 
-typedef struct TextureManager
-{
-	list(unsigned int) Textures;
-	list(char *) TextureNames;
-	uint8_t * TextureBuffer;
-	unsigned int IDBuffer;
-	list(AnimatedTexture) Animations;
-	GameSettings Settings;
-} * TextureManager;
+typedef struct TextureManager {
+	List(unsigned int) textures;
+	List(char *) textureNames;
+	uint8_t * textureBuffer;
+	unsigned int idBuffer;
+	List(AnimatedTexture *) animations;
+	GameSettings * settings;
+} TextureManager;
 
-TextureManager TextureManagerCreate(GameSettings settings);
-int TextureManagerLoad(TextureManager textures, char * resource);
-void TextureManagerReload(TextureManager manager);
-void TextureManagerRegisterAnimation(TextureManager textures, AnimatedTexture texture);
-void TextureManagerDestroy(TextureManager textures);
+void TextureManagerCreate(TextureManager * manager, GameSettings * settings);
+int TextureManagerLoad(TextureManager * manager, char * resource);
+void TextureManagerReload(TextureManager * manager);
+void TextureManagerRegisterAnimation(TextureManager * textures, AnimatedTexture * texture);
+void TextureManagerDestroy(TextureManager * textures);

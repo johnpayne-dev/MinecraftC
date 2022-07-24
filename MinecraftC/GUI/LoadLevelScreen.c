@@ -4,64 +4,53 @@
 #include "../Minecraft.h"
 #include "Screen.h"
 
-LoadLevelScreen LoadLevelScreenCreate(GUIScreen parent)
-{
-	GUIScreen screen = GUIScreenCreate();
-	screen->Type = GUIScreenTypeLoadLevel;
-	screen->TypeData = MemoryAllocate(sizeof(struct LoadLevelScreenData));
-	LoadLevelScreenData this = screen->TypeData;
-	this->Parent = parent;
-	this->Title = "Load level";
-	this->Status = "";
-	this->Finished = false;
-	this->Loaded = false;
-	this->Frozen = false;
-	this->Saving = false;
-	return screen;
+void LoadLevelScreenCreate(LoadLevelScreen * screen, GUIScreen * parent) {
+	GUIScreenCreate(screen);
+	screen->type = GUIScreenTypeLoadLevel;
+	screen->level.parent = parent;
+	screen->level.title = "Load level";
+	screen->level.status = "";
+	screen->level.finished = false;
+	screen->level.loaded = false;
+	screen->level.frozen = false;
+	screen->level.saving = false;
 }
 
-void LoadLevelScreenRun(LoadLevelScreen screen)
-{
-	LoadLevelScreenData this = screen->TypeData;
-	this->Status = "Failed to load levels";
-	this->Finished = true;
+void LoadLevelScreenRun(LoadLevelScreen * screen) {
+	screen->level.status = "Failed to load levels";
+	screen->level.finished = true;
 }
 
-void LoadLevelScreenSetLevels(LoadLevelScreen screen, char * levels[5])
-{
-	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenSetLevels(screen, levels); return; }
-	for (int i = 0; i < 5; i++)
-	{
-		screen->Buttons[i]->Active = !(strcmp(levels[i], "-") == 0);
-		screen->Buttons[i]->Text = StringSet(screen->Buttons[i]->Text, levels[i]);
-		screen->Buttons[i]->Visible = true;
+void LoadLevelScreenSetLevels(LoadLevelScreen * screen, char * levels[5]) {
+	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenSetLevels(screen, levels); return; }
+	for (int i = 0; i < 5; i++) {
+		screen->buttons[i].active = !(strcmp(levels[i], "-") == 0);
+		StringSet(&screen->buttons[i].text, levels[i]);
+		screen->buttons[i].visible = true;
 	}
 }
 
-void LoadLevelScreenOnOpen(LoadLevelScreen screen)
-{
+void LoadLevelScreenOnOpen(LoadLevelScreen * screen) {
 	LoadLevelScreenRun(screen);
-	for (int i = 0; i < 5; i++)
-	{
-		screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(i, screen->Width / 2 - 100, screen->Height / 6 + i * 24, "---") });
-		screen->Buttons[i]->Visible = false;
-		screen->Buttons[i]->Active = false;
+	for (int i = 0; i < 5; i++) {
+		screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+		ButtonCreate(&screen->buttons[i], i, screen->width / 2 - 100, screen->height / 6 + i * 24, "---");
+		screen->buttons[i].visible = false;
+		screen->buttons[i].active = false;
 	}
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(5, screen->Width / 2 - 100, screen->Height / 6 + 132, "Load file...") });
-	screen->Buttons = ListPush(screen->Buttons, &(Button){ ButtonCreate(6, screen->Width / 2 - 100, screen->Height / 6 + 168, "Cancel") });
-	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenOnOpen(screen); return; }
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 5, screen->width / 2 - 100, screen->height / 6 + 132, "Load file...");
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 6, screen->width / 2 - 100, screen->height / 6 + 168, "Cancel");
+	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenOnOpen(screen); return; }
 }
 
-void LoadLevelScreenOnButtonClicked(LoadLevelScreen screen, Button button)
-{
-	LoadLevelScreenData this = screen->TypeData;
-	if (!this->Frozen && button->Active)
-	{
-		if (this->Loaded && button->ID < 5) { LoadLevelScreenOpenLevel(screen, button->ID); }
+void LoadLevelScreenOnButtonClicked(LoadLevelScreen * screen, Button * button) {
+	if (!screen->level.frozen && button->active) {
+		if (screen->level.loaded && button->id < 5) { LoadLevelScreenOpenLevel(screen, button->id); }
 		
-		if (this->Finished || (this->Loaded && button->ID == 5))
-		{
-			this->Frozen = true;
+		if (screen->level.finished || (screen->level.loaded && button->id == 5)) {
+			screen->level.frozen = true;
 			/*
 			 LevelDialog var2;
 			 (var2 = new LevelDialog(this)).setDaemon(true);
@@ -69,32 +58,25 @@ void LoadLevelScreenOnButtonClicked(LoadLevelScreen screen, Button button)
 			 */
 		}
 		
-		if (this->Finished || (this->Loaded && button->ID == 6))
-		{
-			MinecraftSetCurrentScreen(screen->Minecraft, this->Parent);
+		if (screen->level.finished || (screen->level.loaded && button->id == 6)) {
+			MinecraftSetCurrentScreen(screen->minecraft, screen->level.parent);
 		}
 	}
 }
 
-void LoadLevelScreenOpenLevel(LoadLevelScreen screen, int level)
-{
-	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevel(screen, level); return; }
-	MinecraftLoadOnlineLevel(screen->Minecraft, screen->Minecraft->Session->UserName, level);
-	MinecraftSetCurrentScreen(screen->Minecraft, NULL);
-	MinecraftGrabMouse(screen->Minecraft);
+void LoadLevelScreenOpenLevel(LoadLevelScreen * screen, int level) {
+	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevel(screen, level); return; }
+	MinecraftSetCurrentScreen(screen->minecraft, NULL);
+	MinecraftGrabMouse(screen->minecraft);
 }
 
-void LoadLevelScreenOpenLevelFromFile(LoadLevelScreen screen, char * file)
-{
-	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevelFromFile(screen, file); return; }
-	LoadLevelScreenData this = screen->TypeData;
-	Level level = LevelIOLoad(screen->Minecraft->LevelIO, SDL_RWFromFile(file, "rb"));
-	if (level != NULL) { MinecraftSetLevel(screen->Minecraft, level); }
-	MinecraftSetCurrentScreen(screen->Minecraft, this->Parent);
+void LoadLevelScreenOpenLevelFromFile(LoadLevelScreen * screen, char * file) {
+	if (screen->type == GUIScreenTypeSaveLevel) { SaveLevelScreenOpenLevelFromFile(screen, file); return; }
+	Level * level = LevelIOLoad(&screen->minecraft->levelIO, SDL_RWFromFile(file, "rb"));
+	MinecraftSetCurrentScreen(screen->minecraft, screen->level.parent);
 }
 
-void LoadLevelScreenOnClose(LoadLevelScreen screen)
-{
+void LoadLevelScreenOnClose(LoadLevelScreen * screen) {
 	/*
 	 super.onClose();
 	       if(this.chooser != null) {
@@ -103,34 +85,24 @@ void LoadLevelScreenOnClose(LoadLevelScreen screen)
 	 */
 }
 
-void LoadLevelScreenTick(LoadLevelScreen screen)
-{
-	LoadLevelScreenData this = screen->TypeData;
-	if (this->SelectedFile != NULL)
-	{
-		LoadLevelScreenOpenLevelFromFile(screen, this->SelectedFile);
-		this->SelectedFile = NULL;
+void LoadLevelScreenTick(LoadLevelScreen * screen) {
+	if (screen->level.selectedFile != NULL) {
+		LoadLevelScreenOpenLevelFromFile(screen, screen->level.selectedFile);
+		screen->level.selectedFile = NULL;
 	}
 }
 
-void LoadLevelScreenRender(LoadLevelScreen screen, int2 mousePos)
-{
-	LoadLevelScreenData this = screen->TypeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->Width, screen->Height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->Font, this->Title, (int2){ screen->Width / 2, 20 }, ColorWhite);
-	if (this->Frozen) { ScreenDrawCenteredString(screen->Font, "Selecting file..", (int2){ screen->Width / 2, screen->Height / 2 - 4 }, ColorWhite); }
-	else
-	{
-		if (!this->Loaded) { ScreenDrawCenteredString(screen->Font, this->Status, (int2){ screen->Width / 2, screen->Height / 2 - 4 }, ColorWhite); }
-		screen->Type = GUIScreenTypeNone;
-		GUIScreenRender(screen, mousePos);
-		screen->Type = GUIScreenTypeLoadLevel;
+void LoadLevelScreenRender(LoadLevelScreen * screen, int mx, int my) {
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, screen->level.title, screen->width / 2, 20, 0xffffffff);
+	if (screen->level.frozen) {
+		ScreenDrawCenteredString(screen->font, "Selecting file..", screen->width / 2, screen->height / 2 - 4, 0xffffffff);
+	} else {
+		if (!screen->level.loaded) {
+			ScreenDrawCenteredString(screen->font, screen->level.status, screen->width / 2, screen->height / 2 - 4, 0xffffffff);
+		}
+		screen->type = GUIScreenTypeNone;
+		GUIScreenRender(screen, mx, my);
+		screen->type = GUIScreenTypeLoadLevel;
 	}
-	if (screen->Type == GUIScreenTypeSaveLevel) { SaveLevelScreenRender(screen, mousePos); return; }
-}
-
-void LoadLevelScreenDestroy(LoadLevelScreen screen)
-{
-	LoadLevelScreenData this = screen->TypeData;
-	MemoryFree(this);
 }

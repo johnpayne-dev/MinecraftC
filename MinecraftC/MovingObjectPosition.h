@@ -1,12 +1,11 @@
 #pragma once
-#include "Utilities/LinearMath.h"
+#include "Physics/Vector3D.h"
 
-typedef struct MovingObjectPosition
-{
-	int EntityPosition;
-	int3 XYZ;
-	int Face;
-	float3 Vector;
-	struct Entity * Entity;
-	bool Null;
+typedef struct MovingObjectPosition {
+	int entityPosition;
+	int x, y, z;
+	int face;
+	Vector3D vector;
+	struct Entity * entity;
+	bool null;
 } MovingObjectPosition;

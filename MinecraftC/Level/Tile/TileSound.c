@@ -1,23 +1,20 @@
 #include "TileSound.h"
 #include "../../Utilities/Random.h"
 
-struct TileSounds TileSounds =
-{
-	.None = { .Name = "-", .Volume = 0.0, .Pitch = 0.0, .Type = TileSoundTypeNone },
-	.Grass = { .Name = "Grass", .Volume = 0.6, .Pitch = 1.0, .Type = TileSoundTypeGrass },
-	.Cloth = { .Name = "Grass", .Volume = 0.7, .Pitch = 1.2, .Type = TileSoundTypeCloth },
-	.Gravel = { .Name = "Gravel", .Volume = 1.0, .Pitch = 1.0, .Type = TileSoundTypeGravel },
-	.Stone = { .Name = "Stone", .Volume = 1.0, .Pitch = 1.0, .Type = TileSoundTypeStone },
-	.Metal = { .Name = "Stone", .Volume = 1.0, .Pitch = 2.0, .Type = TileSoundTypeMetal },
-	.Wood = { .Name = "Wood", .Volume = 1.0, .Pitch = 1.0, .Type = TileSoundTypeWood },
+struct TileSounds TileSounds = {
+	.none = { .name = "-", .volume = 0.0, .pitch = 0.0, .type = TileSoundTypeNone },
+	.grass = { .name = "Grass", .volume = 0.6, .pitch = 1.0, .type = TileSoundTypeGrass },
+	.cloth = { .name = "Grass", .volume = 0.7, .pitch = 1.2, .type = TileSoundTypeCloth },
+	.gravel = { .name = "Gravel", .volume = 1.0, .pitch = 1.0, .type = TileSoundTypeGravel },
+	.stone = { .name = "Stone", .volume = 1.0, .pitch = 1.0, .type = TileSoundTypeStone },
+	.metal = { .name = "Stone", .volume = 1.0, .pitch = 2.0, .type = TileSoundTypeMetal },
+	.wood = { .name = "Wood", .volume = 1.0, .pitch = 1.0, .type = TileSoundTypeWood },
 };
 
-float TileSoundGetVolume(TileSound sound)
-{
-	return sound.Volume / (RandomUniform() * 0.4 + 1.0) * 0.5;
+float TileSoundGetVolume(TileSound sound) {
+	return sound.volume / (RandomUniform() * 0.4 + 1.0) * 0.5;
 }
 
-float TileSoundGetPitch(TileSound sound)
-{
-	return sound.Pitch / (RandomUniform() * 0.2 + 0.9);
+float TileSoundGetPitch(TileSound sound) {
+	return sound.pitch / (RandomUniform() * 0.2 + 0.9);
 }

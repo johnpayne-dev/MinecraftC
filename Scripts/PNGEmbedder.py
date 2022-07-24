@@ -2,16 +2,16 @@ from PIL import Image
 import os
 import sys
 
-def export(filePath):
-	outputPath = __file__[:__file__.rfind('/Tools')] + '/Resources' + filePath[filePath.rfind('/Input'):][6:]
-	outputPath = outputPath[:-4] + '.h'
-	cName = filePath[filePath.rfind('/Input'):][7:-4].replace('/', '_')
+RESOURCE_PATH = os.path.realpath(__file__ + '/../../Resources')
+
+def export(filePath, outPath):
+	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace('/', '_')
 	
 	image = Image.open(filePath).convert('RGBA')
 	pixels = image.load()
 	width, height = image.size
 	
-	output = open(outputPath, 'w')
+	output = open(outPath, 'w')
 	output.write('static unsigned int Resource_' + cName + '_Width = ' + str(width) + ';\n\n')
 	output.write('static unsigned int Resource_' + cName + '_Height = ' + str(height) + ';\n\n')
 	output.write('static unsigned char Resource_' + cName + '_RGBA[] = \n')
@@ -28,10 +28,9 @@ def export(filePath):
 	output.close()
 	
 	image.close()
-	
 
-for subdir, dirs, files in os.walk(__file__[:__file__.rfind('/')] + '/Input'):
+for subdir, dirs, files in os.walk(RESOURCE_PATH):
 	for fileName in files:
 		filePath = subdir + os.sep + fileName
 		if filePath.endswith('.png'):
-			export(filePath)
+			export(filePath, filePath[:-4] + '.h')

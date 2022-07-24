@@ -4,15 +4,9 @@
 
 typedef GUIScreen OptionsScreen;
 
-typedef struct OptionsScreenData
-{
-	GUIScreen Parent;
-	char * Title;
-	GameSettings Settings;
-} * OptionsScreenData;
+typedef struct OptionsScreenData OptionsScreenData;
 
-OptionsScreen OptionsScreenCreate(GUIScreen parent, GameSettings settings);
-void OptionsScreenOnOpen(OptionsScreen screen);
-void OptionsScreenOnButtonClicked(OptionsScreen screen, Button button);
-void OptionsScreenRender(OptionsScreen screen, int2 mousePos);
-void OptionsScreenDestroy(OptionsScreen screen);
+void OptionsScreenCreate(OptionsScreen * screen, GUIScreen * parent, GameSettings * settings);
+void OptionsScreenOnOpen(OptionsScreen * screen);
+void OptionsScreenOnButtonClicked(OptionsScreen * screen, Button * button);
+void OptionsScreenRender(OptionsScreen * screen, int mx, int my);

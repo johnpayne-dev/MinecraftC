@@ -1,59 +1,36 @@
 #include "SlabBlock.h"
 #include "../Level.h"
 
-SlabBlock SlabBlockCreate(BlockType type, bool doubleSlab)
-{
-	Block block = BlockCreate(type, 6);
-	SlabBlockData slab = MemoryAllocate(sizeof(struct SlabBlockData));
-	block->TypeData = slab;
-	*slab = (struct SlabBlockData){ .DoubleSlab = doubleSlab, };
-	if (!doubleSlab) { BlockSetBounds(block, zero3f, one3f - up3f * 0.5); }
-	return block;
+void SlabBlockCreate(SlabBlock * block, BlockType type, bool doubleSlab, TileSound sound, float particleGravity) {
+	BlockCreate(block, type, 6, sound, particleGravity);
+	block->slab.doubleSlab = doubleSlab;
+	if (!doubleSlab) { BlockSetBounds(block, 0, 0, 0, 1, 0.5, 1); }
 }
 
-int SlabBlockGetTextureID(SlabBlock block, int face)
-{
+int SlabBlockGetTextureID(SlabBlock * block, int face) {
 	return face <= 1 ? 6 : 5;
 }
 
-bool SlabBlockIsSolid(SlabBlock block)
-{
-	return block->Type == BlockTypeDoubleSlab;
+bool SlabBlockIsSolid(SlabBlock * block) {
+	return block->type == BlockTypeDoubleSlab;
 }
 
-void SlabBlockOnNeighborChanged(SlabBlock block, Level level, int x, int y, int z, int side)
-{
-	if (block->Type == BlockTypeSlab)
-	{
-		
+void SlabBlockOnNeighborChanged(SlabBlock * block, Level * level, int x, int y, int z, int side) {
+	if (block->type == BlockTypeSlab) {
 	}
 }
 
-void SlabBlockOnAdded(SlabBlock block, Level level, int x, int y, int z)
-{
-	if (LevelGetTile(level, x, y - 1, z) == BlockTypeSlab)
-	{
+void SlabBlockOnAdded(SlabBlock * block, Level * level, int x, int y, int z) {
+	if (LevelGetTile(level, x, y - 1, z) == BlockTypeSlab) {
 		LevelSetTile(level, x, y, z, BlockTypeNone);
 		LevelSetTile(level, x, y - 1, z, BlockTypeDoubleSlab);
 	}
 }
 
-BlockType SlabBlockGetDrop(SlabBlock block)
-{
-	return BlockTypeSlab;
+bool SlabBlockIsCube(SlabBlock * block) {
+	return block->type == BlockTypeDoubleSlab;
 }
 
-bool SlabBlockIsCube(SlabBlock block)
-{
-	return block->Type == BlockTypeDoubleSlab;
-}
-
-bool SlabBlockCanRenderSide(SlabBlock block, struct Level * level, int x, int y, int z, int side)
-{
-	return side == 1 ? true : (LevelIsSolidTile(level, x, y, z) ? false : (side == 0 ? true : LevelGetTile(level, x, y, z) != block->Type));
-}
-
-void SlabBlockDestroy(SlabBlock block)
-{
-	MemoryFree(block->TypeData);
+bool SlabBlockCanRenderSide(SlabBlock * block, Level * level, int x, int y, int z, int side) {
+	return side == 1 ? true : (LevelIsSolidTile(level, x, y, z) ? false : (side == 0 ? true : LevelGetTile(level, x, y, z) != block->type));
 }

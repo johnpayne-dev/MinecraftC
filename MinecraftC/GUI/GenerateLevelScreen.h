@@ -3,13 +3,9 @@
 
 typedef GUIScreen GenerateLevelScreen;
 
-typedef struct GenerateLevelScreenData
-{
-	GUIScreen Parent;
-} * GenerateLevelScreenData;
+typedef struct GenerateLevelScreenData GenerateLevelScreenData;
 
-GenerateLevelScreen GenerateLevelScreenCreate(GUIScreen parent);
-void GenerateLevelScreenOnOpen(GenerateLevelScreen screen);
-void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen screen, Button button);
-void GenerateLevelScreenRender(GenerateLevelScreen screen, int2 mousePos);
-void GenerateLevelScreenDestroy(GenerateLevelScreen screen);
+void GenerateLevelScreenCreate(GenerateLevelScreen * screen, GUIScreen * parent);
+void GenerateLevelScreenOnOpen(GenerateLevelScreen * screen);
+void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen * screen, Button * button);
+void GenerateLevelScreenRender(GenerateLevelScreen * screen, int mx, int my);

@@ -1,17 +1,16 @@
 #pragma once
-#include "../Utilities/LinearMath.h"
+#include <stdbool.h>
 #include "../Utilities/String.h"
 
-typedef struct Button
-{
-	int2 Position;
-	int2 Size;
-	String Text;
-	int ID;
-	bool Active;
-	bool Visible;
-} * Button;
+typedef struct Button {
+	int x, y;
+	int width, height;
+	String text;
+	int id;
+	bool active;
+	bool visible;
+} Button;
 
-Button ButtonCreate(int buttonID, int x, int y, char * text);
-Button ButtonCreateSize(int buttonID, int x, int y, int w, int h, char * text);
-void ButtonDestroy(Button button);
+void ButtonCreate(Button * button, int buttonID, int x, int y, char * text);
+void ButtonCreateSize(Button * button, int buttonID, int x, int y, int w, int h, char * text);
+void ButtonDestroy(Button * button);

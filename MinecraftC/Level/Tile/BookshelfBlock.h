@@ -3,5 +3,5 @@
 
 typedef Block BookshelfBlock;
 
-BookshelfBlock BookshelfBlockCreate(void);
-int BookshelfBlockGetTextureID(BookshelfBlock block, int face);
+void BookshelfBlockCreate(BookshelfBlock * block, TileSound sound, float particleGravity);
+int BookshelfBlockGetTextureID(BookshelfBlock * block, int face);

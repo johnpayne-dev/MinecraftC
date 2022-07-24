@@ -1,7 +1,6 @@
 #pragma once
 
-typedef enum TileSoundType
-{
+typedef enum TileSoundType {
 	TileSoundTypeNone,
 	TileSoundTypeGrass,
 	TileSoundTypeCloth,
@@ -11,23 +10,21 @@ typedef enum TileSoundType
 	TileSoundTypeWood,
 } TileSoundType;
 
-typedef struct TileSound
-{
-	const char * Name;
-	float Volume;
-	float Pitch;
-	TileSoundType Type;
+typedef struct TileSound {
+	const char * name;
+	float volume;
+	float pitch;
+	TileSoundType type;
 } TileSound;
 
-extern struct TileSounds
-{
-	TileSound None;
-	TileSound Grass;
-	TileSound Cloth;
-	TileSound Gravel;
-	TileSound Stone;
-	TileSound Metal;
-	TileSound Wood;
+extern struct TileSounds {
+	TileSound none;
+	TileSound grass;
+	TileSound cloth;
+	TileSound gravel;
+	TileSound stone;
+	TileSound metal;
+	TileSound wood;
 } TileSounds;
 
 float TileSoundGetVolume(TileSound sound);

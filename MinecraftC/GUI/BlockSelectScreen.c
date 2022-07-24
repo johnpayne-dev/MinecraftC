@@ -6,44 +6,37 @@
 #include "../Render/ShapeRenderer.h"
 #include "../Utilities/OpenGL.h"
 
-BlockSelectScreen BlockSelectScreenCreate()
-{
-	GUIScreen screen = GUIScreenCreate();
-	screen->Type = GUIScreenTypeBlockSelect;
-	screen->GrabsMouse = true;
-	return screen;
+void BlockSelectScreenCreate(BlockSelectScreen * screen) {
+	GUIScreenCreate(screen);
+	screen->type = GUIScreenTypeBlockSelect;
+	screen->grabsMouse = true;
 }
 
-static int GetBlockOnScreen(BlockSelectScreen screen, int2 m)
-{
-	for (int i = 0; i < ListCount(SessionDataAllowedBlocks); i++)
-	{
-		int x = screen->Width / 2 + i % 9 * 24 + -108 - 3;
-		int y = screen->Height / 2 + i / 9 * 24 + -60 + 3;
-		if (m.x >= x && m.x <= x + 24 && m.y >= y - 12 && m.y <= y + 12) { return i; }
+static int GetBlockOnScreen(BlockSelectScreen * screen, int mx, int my) {
+	for (int32_t i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
+		int x = screen->width / 2 + i % 9 * 24 + -108 - 3;
+		int y = screen->height / 2 + i / 9 * 24 + -60 + 3;
+		if (mx >= x && mx <= x + 24 && my >= y - 12 && my <= y + 12) { return i; }
 	}
 	return -1;
 }
 
-void BlockSelectScreenRender(BlockSelectScreen screen, int2 mouse)
-{
-	int blockNum = GetBlockOnScreen(screen, mouse);
-	ScreenDrawFadingBox((int2){ screen->Width / 2 - 120, 30 }, (int2){ screen->Width / 2 + 120, 180 }, ColorFromHex(0x05050090), ColorFromHex(0x303060C0));
-	if (blockNum >= 0)
-	{
-		int x = screen->Width / 2 + blockNum % 9 * 24 + -108;
-		int y = screen->Height / 2 + blockNum / 9 * 24 + -60;
-		ScreenDrawFadingBox((int2){ x - 3, y - 8 }, (int2){ x + 23, y + 24 - 6 }, ColorFromHex(0xFFFFFF90), ColorFromHex(0xFFFFFFC0));
+void BlockSelectScreenRender(BlockSelectScreen * screen, int mx, int my) {
+	int blockNum = GetBlockOnScreen(screen, mx, my);
+	ScreenDrawFadingBox(screen->width / 2 - 120, 30, screen->width / 2 + 120, 180, 0x05050090, 0x303060C0);
+	if (blockNum >= 0) {
+		int x = screen->width / 2 + blockNum % 9 * 24 + -108;
+		int y = screen->height / 2 + blockNum / 9 * 24 + -60;
+		ScreenDrawFadingBox(x - 3, y - 8, x + 23, y + 24 - 6, 0xFFFFFF90, 0xFFFFFFC0);
 	}
-	ScreenDrawCenteredString(screen->Font, "Select block", (int2){ screen->Width / 2, 40 }, ColorWhite);
+	ScreenDrawCenteredString(screen->font, "Select block", screen->width / 2, 40, 0xffffffff);
 	
-	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(screen->Minecraft->TextureManager, "Terrain.png"));
-	for (int i = 0; i < ListCount(SessionDataAllowedBlocks); i++)
-	{
-		Block block = SessionDataAllowedBlocks[i];
+	glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&screen->minecraft->textureManager, "Terrain.png"));
+	for (int i = 0; i < ListLength(SessionDataAllowedBlocks); i++) {
+		BlockType tile = SessionDataAllowedBlocks[i];
 		glPushMatrix();
-		int x = screen->Width / 2 + i % 9 * 24 + -108;
-		int y = screen->Height / 2 + i / 9 * 24 + -60;
+		int x = screen->width / 2 + i % 9 * 24 + -108;
+		int y = screen->height / 2 + i / 9 * 24 + -60;
 		glTranslatef(x, y, 0.0);
 		glScalef(10.0, 10.0, 10.0);
 		glTranslatef(1.0, 0.5, 8.0);
@@ -53,17 +46,15 @@ void BlockSelectScreenRender(BlockSelectScreen screen, int2 mouse)
 		glTranslatef(-1.5, 0.5, 0.5);
 		glScalef(-1.0, -1.0, -1.0);
 		ShapeRendererBegin();
-		BlockRenderFullBrightness(block);
+		BlockRenderFullBrightness(&Blocks.table[tile]);
 		ShapeRendererEnd();
 		glPopMatrix();
 	}
 }
 
-void BlockSelectScreenOnMouseClicked(BlockSelectScreen screen, int x, int y, int button)
-{
-	if (button == SDL_BUTTON_LEFT)
-	{
-		InventoryReplaceSlot(((PlayerData)screen->Minecraft->Player->TypeData)->Inventory, GetBlockOnScreen(screen, (int2){ x, y }));
-		MinecraftSetCurrentScreen(screen->Minecraft, NULL);
+void BlockSelectScreenOnMouseClicked(BlockSelectScreen * screen, int x, int y, int button) {
+	if (button == SDL_BUTTON_LEFT) {
+		InventoryReplaceSlot(&screen->minecraft->player.player.inventory, GetBlockOnScreen(screen, x, y ));
+		MinecraftSetCurrentScreen(screen->minecraft, NULL);
 	}
 }

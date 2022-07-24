@@ -1,18 +1,18 @@
 #pragma once
-#include "../Level.h"
 #include "../../ProgressBarDisplay.h"
 #include "../../Utilities/Random.h"
 
-typedef struct LevelGenerator
-{
-	ProgressBarDisplay ProgressBar;
-	int Width, Depth, Height;
-	RandomGenerator Random;
-	uint8_t * Blocks;
-	int WaterLevel;
-	int * FloodData;
-} * LevelGenerator;
+struct Level;
 
-LevelGenerator LevelGeneratorCreate(ProgressBarDisplay progressBar);
-Level LevelGeneratorGenerate(LevelGenerator generator, const char * userName, int width, int depth, int var);
-void LevelGeneratorDestroy(LevelGenerator generator);
+typedef struct LevelGenerator {
+	ProgressBarDisplay * progressBar;
+	int width, depth, height;
+	RandomGenerator random;
+	uint8_t * blocks;
+	int waterLevel;
+	int * floodData;
+} LevelGenerator;
+
+void LevelGeneratorCreate(LevelGenerator * generator, ProgressBarDisplay * progressBar);
+void LevelGeneratorGenerate(LevelGenerator * generator, int width, int depth, struct Level * level);
+void LevelGeneratorDestroy(LevelGenerator * generator);

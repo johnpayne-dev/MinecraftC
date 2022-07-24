@@ -1,13 +1,10 @@
-#include "LinearMath.h"
 #include "SinTable.h"
 
-static float SinTable[0xFFFF];
+static float SinTable[0x10000];
 
-void SinTableInitialize()
-{
-	for (int i = 0; i < sizeof(SinTable) / sizeof(float); i++)
-	{
-		SinTable[i] = sin(i * 2.0 * pi / (float)0xFFFF);
+void SinTableInitialize() {
+	for (int i = 0; i < sizeof(SinTable) / sizeof(float); i++) {
+		SinTable[i] = sin(i * 2.0 * M_PI / (float)0xFFFF);
 	}
 }
 

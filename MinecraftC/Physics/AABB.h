@@ -1,26 +1,19 @@
 #pragma once
 #include <stdbool.h>
-#include "../Utilities/LinearMath.h"
 #include "../MovingObjectPosition.h"
 
-typedef struct AABB
-{
-	float3 V0;
-	float3 V1;
+typedef struct AABB {
+	float x0, y0, z0;
+	float x1, y1, z1;
+	bool null;
 } AABB;
 
-#define AABBNull ((AABB){ 0 })
-
-AABB AABBExpand(AABB c, float3 a);
-AABB AABBGrow(AABB c, float3 a);
-AABB AABBMove(AABB c, float3 a);
+AABB AABBExpand(AABB c, float x, float y, float z);
+AABB AABBGrow(AABB c, float x, float y, float z);
+AABB AABBMove(AABB c, float x, float y, float z);
 float AABBClipXCollide(AABB c0, AABB c1, float xa);
 float AABBClipYCollide(AABB c0, AABB c1, float ya);
 float AABBClipZCollide(AABB c0, AABB c1, float za);
 bool AABBIntersects(AABB c0, AABB c1);
 bool AABBIntersectsInner(AABB c0, AABB c1);
-bool AABBContainsPoint(AABB c, float3 p);
-float AABBGetSize(AABB c);
-AABB AABBShrink(AABB c, float3 a);
-MovingObjectPosition AABBClip(AABB c, float3 v1, float3 v2);
-bool AABBIsNull(AABB c);
+MovingObjectPosition AABBClip(AABB c, Vector3D v1, Vector3D v2);

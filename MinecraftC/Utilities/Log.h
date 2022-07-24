@@ -4,8 +4,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-typedef enum LogType
-{
+typedef enum LogType {
 	LogTypeTrace,
 	LogTypeDebug,
 	LogTypeInfo,

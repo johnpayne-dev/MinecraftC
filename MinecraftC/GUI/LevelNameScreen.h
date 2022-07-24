@@ -3,20 +3,13 @@
 
 typedef GUIScreen LevelNameScreen;
 
-typedef struct LevelNameScreenData
-{
-	GUIScreen Parent;
-	char * Title;
-	int ID;
-	String Name;
-	int Counter;
-} * LevelNameScreenData;
+typedef struct LevelNameScreenData LevelNameScreenData;
 
-LevelNameScreen LevelNameScreenCreate(GUIScreen parent, char * name, int id);
-void LevelNameScreenOnOpen(LevelNameScreen screen);
-void LevelNameScreenOnClose(LevelNameScreen screen);
-void LevelNameScreenTick(LevelNameScreen screen);
-void LevelNameScreenRender(LevelNameScreen screen, int2 mousePos);
-void LevelNameScreenOnKeyPressed(LevelNameScreen screen, char eventChar, int eventKey);
-void LevelNameScreenOnButtonClicked(LevelNameScreen screen, Button button);
-void LevelNameScreenDestroy(LevelNameScreen screen);
+void LevelNameScreenCreate(LevelNameScreen * screen, GUIScreen * parent, char * name, int id);
+void LevelNameScreenOnOpen(LevelNameScreen * screen);
+void LevelNameScreenOnClose(LevelNameScreen * screen);
+void LevelNameScreenTick(LevelNameScreen * screen);
+void LevelNameScreenRender(LevelNameScreen * screen, int mx, int my);
+void LevelNameScreenOnKeyPressed(LevelNameScreen * screen, char eventChar, int eventKey);
+void LevelNameScreenOnButtonClicked(LevelNameScreen * screen, Button * button);
+void LevelNameScreenDestroy(LevelNameScreen * screen);

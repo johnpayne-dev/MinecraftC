@@ -3,84 +3,62 @@
 #include "../Minecraft.h"
 #include "../Utilities/Log.h"
 
-ControlsScreen ControlsScreenCreate(GUIScreen parent, GameSettings settings)
-{
-	GUIScreen screen = GUIScreenCreate();
-	ControlsScreenData this = MemoryAllocate(sizeof(struct ControlsScreenData));
-	screen->Type = GUIScreenTypeControls;
-	screen->TypeData = this;
-	this->Parent = parent;
-	this->Selected = -1;
-	this->Settings = settings;
-	this->Title = "Controls";
-	return screen;
+void ControlsScreenCreate(ControlsScreen * screen, GUIScreen * parent, GameSettings * settings) {
+	GUIScreenCreate(screen);
+	screen->type = GUIScreenTypeControls;
+	screen->controls.parent = parent;
+	screen->controls.selected = -1;
+	screen->controls.settings = settings;
+	screen->controls.title = "Controls";
 }
 
-void ControlsScreenOnOpen(ControlsScreen screen)
-{
-	ControlsScreenData this = screen->TypeData;
-	for (int i = 0; i < ListCount(this->Settings->Bindings); i++)
-	{
-		String text = GameSettingsGetBinding(this->Settings, i);
-		Button button = ButtonCreateSize(i, screen->Width / 2 - 155 + i % 2 * 160, screen->Height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, text);
-		screen->Buttons = ListPush(screen->Buttons, &button);
-		StringDestroy(text);
+void ControlsScreenOnOpen(ControlsScreen * screen) {
+	for (int i = 0; i < ListLength(screen->controls.settings->bindings); i++) {
+		String text = GameSettingsGetBinding(screen->controls.settings, i);
+		Button button;
+		ButtonCreateSize(&button, i, screen->width / 2 - 155 + i % 2 * 160, screen->height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, text);
+		screen->buttons = ListPush(screen->buttons, &button);
+		StringFree(text);
 	}
-	Button button = ButtonCreate(200, screen->Width / 2 - 100, screen->Height / 6 + 168, "Done");
-	screen->Buttons = ListPush(screen->Buttons, &button);
+	Button button;
+	ButtonCreate(&button, 200, screen->width / 2 - 100, screen->height / 6 + 168, "Done");
+	screen->buttons = ListPush(screen->buttons, &button);
 }
 
-void ControlsScreenRender(ControlsScreen screen, int2 mousePos)
-{
-	ControlsScreenData this = screen->TypeData;
-	ScreenDrawFadingBox((int2){ 0, 0 }, (int2){ screen->Width, screen->Height }, ColorFromHex(0x05050060), ColorFromHex(0x303060A0));
-	ScreenDrawCenteredString(screen->Font, this->Title, (int2){ screen->Width / 2, 20 }, ColorWhite);
+void ControlsScreenRender(ControlsScreen * screen, int mx, int my) {
+	ScreenDrawFadingBox(0, 0, screen->width, screen->height, 0x05050060, 0x303060A0);
+	ScreenDrawCenteredString(screen->font, screen->controls.title, screen->width / 2, 20, 0xFFFFFFFF);
 }
 
-void ControlsScreenOnKeyPressed(ControlsScreen screen, char eventChar, int eventKey)
-{
-	ControlsScreenData this = screen->TypeData;
-	if (this->Selected >= 0)
-	{
-		GameSettingsSetBinding(this->Settings, this->Selected, eventKey);
-		String text = GameSettingsGetBinding(this->Settings, this->Selected);
-		screen->Buttons[this->Selected]->Text = StringSet(screen->Buttons[this->Selected]->Text, text);
-		this->Selected = -1;
-		StringDestroy(text);
-	}
-	else
-	{
-		screen->Type = GUIScreenTypeNone;
+void ControlsScreenOnKeyPressed(ControlsScreen * screen, char eventChar, int eventKey) {
+	if (screen->controls.selected >= 0) {
+		GameSettingsSetBinding(screen->controls.settings, screen->controls.selected, eventKey);
+		String text = GameSettingsGetBinding(screen->controls.settings, screen->controls.selected);
+		StringSet(&screen->buttons[screen->controls.selected].text, text);
+		screen->controls.selected = -1;
+		StringFree(text);
+	} else {
+		screen->type = GUIScreenTypeNone;
 		GUIScreenOnKeyPressed(screen, eventChar, eventKey);
-		screen->Type = GUIScreenTypeControls;
+		screen->type = GUIScreenTypeControls;
 	}
 }
 
-void ControlsScreenOnButtonClicked(ControlsScreen screen, Button button)
-{
-	ControlsScreenData this = screen->TypeData;
-	for (int i = 0; i < ListCount(this->Settings->Bindings); i++)
-	{
-		String text = GameSettingsGetBinding(this->Settings, i);
-		screen->Buttons[i]->Text = StringSet(screen->Buttons[i]->Text, text);
-		StringDestroy(text);
+void ControlsScreenOnButtonClicked(ControlsScreen * screen, Button * button) {
+	for (int i = 0; i < ListLength(screen->controls.settings->bindings); i++) {
+		String text = GameSettingsGetBinding(screen->controls.settings, i);
+		StringSet(&screen->buttons[i].text, text);
+		StringFree(text);
 	}
 	
-	if (button->ID == 200)
-	{
-		MinecraftSetCurrentScreen(screen->Minecraft, this->Parent);
+	if (button->id == 200) {
+		MinecraftSetCurrentScreen(screen->minecraft, screen->controls.parent);
+	} else {
+		screen->controls.selected = button->id;
+		String text = GameSettingsGetBinding(screen->controls.settings, button->id);
+		StringConcatFront("> ", &text);
+		StringConcat(&text, " <");
+		StringSet(&button->text, text);
+		StringFree(text);
 	}
-	else
-	{
-		this->Selected = button->ID;
-		String text = StringConcat(StringConcatFront("> ", GameSettingsGetBinding(this->Settings, button->ID)), " <");
-		button->Text = StringSet(button->Text, text);
-		StringDestroy(text);
-	}
-}
-
-void ControlsScreenDestroy(ControlsScreen screen)
-{
-	ControlsScreenData this = screen->TypeData;
-	MemoryFree(this);
 }

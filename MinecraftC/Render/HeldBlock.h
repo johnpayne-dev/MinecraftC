@@ -1,12 +1,11 @@
 #pragma once
 #include "../Level/Tile/Block.h"
 
-typedef struct HeldBlock
-{
-	struct Minecraft * Minecraft;
-	Block Block;
-	float Position;
-	float LastPosition;
-	int Offset;
-	bool Moving;
+typedef struct HeldBlock {
+	struct Minecraft * minecraft;
+	Block * block;
+	float position;
+	float lastPosition;
+	int offset;
+	bool moving;
 } HeldBlock;
