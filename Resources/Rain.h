@@ -1,8 +1,8 @@
-static unsigned int Resource_Rain_Width = 64;
+static const unsigned int Resource_Rain_Width = 64;
 
-static unsigned int Resource_Rain_Height = 256;
+static const unsigned int Resource_Rain_Height = 256;
 
-static unsigned char Resource_Rain_RGBA[] = 
+static const unsigned char Resource_Rain_RGBA[] = 
 {
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 

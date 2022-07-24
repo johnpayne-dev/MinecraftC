@@ -1,8 +1,8 @@
-static unsigned int Resource_Clouds_Width = 256;
+static const unsigned int Resource_Clouds_Width = 256;
 
-static unsigned int Resource_Clouds_Height = 256;
+static const unsigned int Resource_Clouds_Height = 256;
 
-static unsigned char Resource_Clouds_RGBA[] = 
+static const unsigned char Resource_Clouds_RGBA[] = 
 {
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 

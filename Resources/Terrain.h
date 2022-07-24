@@ -1,8 +1,8 @@
-static unsigned int Resource_Terrain_Width = 256;
+static const unsigned int Resource_Terrain_Width = 256;
 
-static unsigned int Resource_Terrain_Height = 256;
+static const unsigned int Resource_Terrain_Height = 256;
 
-static unsigned char Resource_Terrain_RGBA[] = 
+static const unsigned char Resource_Terrain_RGBA[] = 
 {
 	0x74, 0xB4, 0x4A, 0xFF, 
 	0x76, 0xB6, 0x4C, 0xFF, 

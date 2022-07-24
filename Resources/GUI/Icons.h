@@ -1,8 +1,8 @@
-static unsigned int Resource_GUI_Icons_Width = 256;
+static const unsigned int Resource_GUI_Icons_Width = 256;
 
-static unsigned int Resource_GUI_Icons_Height = 256;
+static const unsigned int Resource_GUI_Icons_Height = 256;
 
-static unsigned char Resource_GUI_Icons_RGBA[] = 
+static const unsigned char Resource_GUI_Icons_RGBA[] = 
 {
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 

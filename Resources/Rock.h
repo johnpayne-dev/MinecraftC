@@ -1,8 +1,8 @@
-static unsigned int Resource_Rock_Width = 16;
+static const unsigned int Resource_Rock_Width = 16;
 
-static unsigned int Resource_Rock_Height = 16;
+static const unsigned int Resource_Rock_Height = 16;
 
-static unsigned char Resource_Rock_RGBA[] = 
+static const unsigned char Resource_Rock_RGBA[] = 
 {
 	0x57, 0x57, 0x57, 0xFF, 
 	0x33, 0x33, 0x33, 0xFF, 

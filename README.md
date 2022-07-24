@@ -66,11 +66,11 @@ make
 ```
 
 ### Modifying Resources
-If you're creating a mod and want to change or add any `.png` resouces, then run this script to update the resource headers:
+If you're creating a mod and want to change or add any `.png` or `.ogg` resouces, then run this script to update the resource headers:
 ```sh
-python3 Scripts/PNGEmbedder.py
+python3 Scripts/EmbedResources.py
 ```
-It will recursively go through all `.png` files in `Resources/`, and convert them to `.h`
+It will recursively go through all `.png` and `.ogg` files in `Resources/`, and convert them to `.h`
 
 ## Known Issues
 - There is no survival mode, it was removed for simplicity and compatibility with raytracing (not released yet)

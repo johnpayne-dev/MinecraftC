@@ -1,8 +1,8 @@
-static unsigned int Resource_GUI_GUI_Width = 256;
+static const unsigned int Resource_GUI_GUI_Width = 256;
 
-static unsigned int Resource_GUI_GUI_Height = 256;
+static const unsigned int Resource_GUI_GUI_Height = 256;
 
-static unsigned char Resource_GUI_GUI_RGBA[] = 
+static const unsigned char Resource_GUI_GUI_RGBA[] = 
 {
 	0x00, 0x00, 0x00, 0xFF, 
 	0x00, 0x00, 0x00, 0xFF, 

@@ -1,8 +1,8 @@
-static unsigned int Resource_Particles_Width = 128;
+static const unsigned int Resource_Particles_Width = 128;
 
-static unsigned int Resource_Particles_Height = 128;
+static const unsigned int Resource_Particles_Height = 128;
 
-static unsigned char Resource_Particles_RGBA[] = 
+static const unsigned char Resource_Particles_RGBA[] = 
 {
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 

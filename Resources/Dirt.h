@@ -1,8 +1,8 @@
-static unsigned int Resource_Dirt_Width = 16;
+static const unsigned int Resource_Dirt_Width = 16;
 
-static unsigned int Resource_Dirt_Height = 16;
+static const unsigned int Resource_Dirt_Height = 16;
 
-static unsigned char Resource_Dirt_RGBA[] = 
+static const unsigned char Resource_Dirt_RGBA[] = 
 {
 	0xB9, 0x85, 0x5C, 0xFF, 
 	0x96, 0x6C, 0x4A, 0xFF, 
