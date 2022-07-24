@@ -163,7 +163,6 @@ if(MSVC)
 else()
 	set(RELEASE_FLAGS "-Ofast")
 	set(DEBUG_FLAGS "-O0")
-	set(LINKER_FLAGS "")
 endif()
 set(FLAGS "$<IF:$<CONFIG:Debug>,${DEBUG_FLAGS},${RELEASE_FLAGS}>")
 
@@ -202,11 +201,21 @@ elseif(WIN32)
 		Version
 		Imm32
 		)
+elseif(UNIX)
+	set(SOURCES ${MINECRAFTC_SOURCES})
+	set(LIBRARIES
+		m
+		SDL2
+		GL
+		GLU
+		)
 endif()
 
 add_executable(MinecraftC ${SOURCES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 target_compile_options(MinecraftC PRIVATE ${FLAGS})
-target_link_options(MinecraftC PRIVATE ${LINKER_FLAGS})
+if(MSVC)
+	target_link_options(MinecraftC PRIVATE ${LINKER_FLAGS})
+endif()
 target_include_directories(MinecraftC PRIVATE Submodules/SDL/include)
 target_link_libraries(MinecraftC ${LIBRARIES})
