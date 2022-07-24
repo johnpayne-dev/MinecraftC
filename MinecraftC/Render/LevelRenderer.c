@@ -4,7 +4,7 @@
 #include "../Utilities/Log.h"
 #include "../Utilities/OpenGL.h"
 
-void LevelRendererCreate(LevelRenderer * renderer, Minecraft * minecraft, TextureManager * textures) {
+void LevelRendererCreate(LevelRenderer * renderer, Minecraft * minecraft, Level * level, TextureManager * textures) {
 	*renderer = (LevelRenderer) {
 		.chunks = ListCreate(sizeof(Chunk *)),
 		.chunkDataCache = malloc(65536 * sizeof(int)),
@@ -15,6 +15,7 @@ void LevelRendererCreate(LevelRenderer * renderer, Minecraft * minecraft, Textur
 		.textures = textures,
 		.listID = glGenLists(2),
 		.baseListID = glGenLists(4096 << 6 << 1),
+		.level = level,
 	};
 }
 
@@ -171,11 +172,9 @@ void LevelRendererDestroy(LevelRenderer * renderer) {
 	free(renderer->chunkDataCache);
 	if (renderer->chunkCache != NULL) {
 		for (int i = 0; i < renderer->chunkCacheCount; i++) {
-			ChunkDestroy(renderer->chunkCache[i]);
 			free(renderer->chunkCache[i]);
 		}
 		free(renderer->chunkCache);
 	}
 	if (renderer->loadQueue != NULL) { free(renderer->loadQueue); }
-	free(renderer);
 }

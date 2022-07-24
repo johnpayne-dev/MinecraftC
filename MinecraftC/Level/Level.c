@@ -22,9 +22,8 @@ void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 }
 
 void LevelRegenerate(Level * level, int size) {
-	free(level->blocks);
-	free(level->lightBlockers);
-	LevelGeneratorGenerate(&level->generator, 128 << size, 128 << size, level);
+	LevelDestroy(level);
+	LevelCreate(level, level->generator.progressBar, size);
 }
 
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {

@@ -81,7 +81,6 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	WaterTextureCreate(waterTexture);
 	TextureManagerRegisterAnimation(&minecraft->textureManager, waterTexture);
 	FontRendererCreate(&minecraft->font, &minecraft->settings, "Default.png", &minecraft->textureManager);
-	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->textureManager);
 	glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
 	LevelCreate(&minecraft->level, &minecraft->progressBar, 1);
 	PlayerCreate(&minecraft->player, &minecraft->level);
@@ -90,19 +89,13 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	PlayerData * player = &minecraft->player.player;
 	InputHandlerCreate(&player->input, &minecraft->settings);
 	for (int i = 0; i < 9; i++) {
-		if (player->inventory.slots[i] == -1) {
-			player->inventory.slots[i] = SessionDataAllowedBlocks[i];
-		}
+		player->inventory.slots[i] = SessionDataAllowedBlocks[i];
 	}
-	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->textureManager);
-	minecraft->levelRenderer.level = &minecraft->level;
+	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->level, &minecraft->textureManager);
 	LevelSetRenderer(&minecraft->level, &minecraft->levelRenderer);
 	LevelRendererRefresh(&minecraft->levelRenderer);
 	ParticleMangerCreate(&minecraft->particleManager, &minecraft->level, &minecraft->textureManager);
 	minecraft->level.particleEngine = &minecraft->particleManager;
-	for (int i = 0; i < 2; i++) {
-		minecraft->particleManager.particles[i] = ListClear(minecraft->particleManager.particles[i]);
-	}
 	HUDScreenCreate(&minecraft->hud, minecraft, minecraft->width, minecraft->height);
 	CheckGLError(minecraft, "Post startup");
 }
@@ -129,6 +122,25 @@ void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen * screen) {
 	} else {
 		MinecraftGrabMouse(minecraft);
 	}
+}
+
+void MinecraftRegenerateLevel(Minecraft * minecraft, int size) {
+	LevelRegenerate(&minecraft->level, size);
+	PlayerCreate(&minecraft->player, &minecraft->level);
+	EntityResetPosition(&minecraft->player);
+	PlayerData * player = &minecraft->player.player;
+	InputHandlerCreate(&player->input, &minecraft->settings);
+	for (int i = 0; i < 9; i++) {
+		if (player->inventory.slots[i] == -1) {
+			player->inventory.slots[i] = SessionDataAllowedBlocks[i];
+		}
+	}
+	LevelRendererDestroy(&minecraft->levelRenderer);
+	LevelRendererCreate(&minecraft->levelRenderer, minecraft, &minecraft->level, &minecraft->textureManager);
+	LevelSetRenderer(&minecraft->level, &minecraft->levelRenderer);
+	LevelRendererRefresh(&minecraft->levelRenderer);
+	ParticleManagerDestroy(&minecraft->particleManager);
+	ParticleMangerCreate(&minecraft->particleManager, &minecraft->level, &minecraft->textureManager);
 }
 
 static void OnMouseClicked(Minecraft * minecraft, int button) {

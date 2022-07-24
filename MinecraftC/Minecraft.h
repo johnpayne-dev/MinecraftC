@@ -43,5 +43,6 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 void MinecraftSetCurrentScreen(Minecraft * minecraft, GUIScreen * screen);
 void MinecraftRun(Minecraft * minecraft);
 void MinecraftGrabMouse(Minecraft * minecraft);
+void MinecraftRegenerateLevel(Minecraft * minecraft, int size);
 void MinecraftPause(Minecraft * minecraft);
 void MinecraftDestroy(Minecraft * minecraft);

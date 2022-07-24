@@ -66,7 +66,6 @@ void ChunkSetAllDirty(Chunk * chunk) {
 
 void ChunkDispose(Chunk * chunk) {
 	ChunkSetAllDirty(chunk);
-	ChunkDestroy(chunk);
 }
 
 int ChunkAppendLists(Chunk * chunk, int dataCache[], int count, int pass) {
@@ -79,10 +78,6 @@ int ChunkAppendLists(Chunk * chunk, int dataCache[], int count, int pass) {
 
 void ChunkClip(Chunk * chunk, Frustum frustum) {
 	chunk->visible = FrustumContainsBox(frustum, chunk->x, chunk->y, chunk->z, chunk->x + chunk->width, chunk->y + chunk->height, chunk->z + chunk->depth);
-}
-
-void ChunkDestroy(Chunk * chunk) {
-	free(chunk);
 }
 
 int ChunkDistanceComparator(const void * a, const void * b) {

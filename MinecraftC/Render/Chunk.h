@@ -22,7 +22,6 @@ void ChunkSetAllDirty(Chunk * chunk);
 void ChunkDispose(Chunk * chunk);
 int ChunkAppendLists(Chunk * chunk, int dataCache[], int count, int pass);
 void ChunkClip(Chunk * chunk, Frustum frustum);
-void ChunkDestroy(Chunk * chunk);
 
 int ChunkDistanceComparator(const void * a, const void * b);
 int ChunkVisibleDistanceComparator(const void * a, const void * b);

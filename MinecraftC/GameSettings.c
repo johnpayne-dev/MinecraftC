@@ -211,5 +211,4 @@ String GameSettingsGetSetting(GameSettings * settings, int setting) {
 void GameSettingsDestroy(GameSettings * settings) {
 	StringFree(settings->file);
 	ListFree(settings->bindings);
-	free(settings);
 }

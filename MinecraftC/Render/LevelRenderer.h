@@ -17,7 +17,7 @@ typedef struct LevelRenderer {
 	float lastLoadX, lastLoadY, lastLoadZ;
 } LevelRenderer;
 
-void LevelRendererCreate(LevelRenderer * renderer, struct Minecraft * minecraft, TextureManager * textures);
+void LevelRendererCreate(LevelRenderer * renderer, struct Minecraft * minecraft, Level * level, TextureManager * textures);
 void LevelRendererRefresh(LevelRenderer * renderer);
 int LevelRendererSortChunks(LevelRenderer * renderer, Player * player, int pass);
 void LevelRendererQueueChunks(LevelRenderer * renderer, int x0, int y0, int z0, int x1, int y1, int z1);

@@ -25,7 +25,7 @@ void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen * screen, Button * b
 	if (button->id == 3) {
 		MinecraftSetCurrentScreen(screen->minecraft, screen->generateLevel.parent);
 	} else {
-		LevelRegenerate(&screen->minecraft->level, button->id);
+		MinecraftRegenerateLevel(screen->minecraft, button->id);
 		MinecraftSetCurrentScreen(screen->minecraft, NULL);
 		MinecraftGrabMouse(screen->minecraft);
 	}
