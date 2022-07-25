@@ -52,7 +52,9 @@ void SoundManagerCreate(SoundManager * manager) {
 
 void SoundManagerPlayMusic(SoundManager * manager, char * music) {
 	if (strcmp(music, "Calm") == 0) {
+		cs_music_stop(0.0);
 		cs_music_play(manager->calm[RandomGeneratorIntegerRange(&manager->random, 0, 2)], 0.0);
+		cs_music_set_loop(false);
 	}
 }
 

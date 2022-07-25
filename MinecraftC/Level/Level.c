@@ -30,11 +30,16 @@ bool LevelLoad(Level * level, char * filePath) {
 	char nameChar;
 	do { SDL_RWread(file, &nameChar, 1, 1); } while (nameChar != '\0');
 	int x, y, z, w, d, h;
-	float r;
+	float r, px, py, pz, prx, pry;
 	SDL_RWread(file, &x, sizeof(x), 1);
 	SDL_RWread(file, &y, sizeof(y), 1);
 	SDL_RWread(file, &z, sizeof(z), 1);
 	SDL_RWread(file, &r, sizeof(r), 1);
+	SDL_RWread(file, &px, sizeof(px), 1);
+	SDL_RWread(file, &py, sizeof(py), 1);
+	SDL_RWread(file, &pz, sizeof(pz), 1);
+	SDL_RWread(file, &prx, sizeof(prx), 1);
+	SDL_RWread(file, &pry, sizeof(pry), 1);
 	SDL_RWread(file, &w, sizeof(w), 1);
 	SDL_RWread(file, &d, sizeof(d), 1);
 	SDL_RWread(file, &h, sizeof(h), 1);
@@ -51,7 +56,9 @@ bool LevelLoad(Level * level, char * filePath) {
 	level->entities = ListPush(level->entities, &level->player);
 	level->unprocessed = 0;
 	level->tickCount = 0;
-	EntityResetPosition(level->player);
+	EntitySetPosition(level->player, px, py, pz);
+	level->player->xRot = prx;
+	level->player->yRot = pry;
 	return true;
 }
 
@@ -65,6 +72,11 @@ bool LevelSave(Level * level, char * filePath, char * name) {
 	SDL_RWwrite(file, &level->ySpawn, sizeof(level->ySpawn), 1);
 	SDL_RWwrite(file, &level->zSpawn, sizeof(level->zSpawn), 1);
 	SDL_RWwrite(file, &level->spawnRotation, sizeof(level->spawnRotation), 1);
+	SDL_RWwrite(file, &level->player->x, sizeof(level->player->x), 1);
+	SDL_RWwrite(file, &level->player->y, sizeof(level->player->y), 1);
+	SDL_RWwrite(file, &level->player->z, sizeof(level->player->z), 1);
+	SDL_RWwrite(file, &level->player->xRot, sizeof(level->player->x), 1);
+	SDL_RWwrite(file, &level->player->yRot, sizeof(level->player->x), 1);
 	SDL_RWwrite(file, &level->width, sizeof(level->width), 1);
 	SDL_RWwrite(file, &level->depth, sizeof(level->depth), 1);
 	SDL_RWwrite(file, &level->height, sizeof(level->height), 1);

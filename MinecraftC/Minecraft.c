@@ -470,16 +470,19 @@ void MinecraftRun(Minecraft * minecraft) {
 		float reach = 5.0;
 		Vector3D v2 = { v.x + sc * reach, v.y + s2 * reach, v.z + cc * reach };
 		minecraft->selected = LevelClip(&minecraft->level, v, v2);
+		if (!minecraft->selected.null) {
+			reach = sqrtf(Vector3DSqDistance(v, minecraft->selected.vector));
+		}
 		renderer->entity = NULL;
 		a = 0.0;
 		for (int i = 0; i < ListLength(minecraft->level.entities); i++) {
 			Entity * entity = minecraft->level.entities[i];
 			float dist = sqrtf((entity->x - minecraft->level.player->x) * (entity->x - minecraft->level.player->x) + (entity->y - minecraft->level.player->y) * (entity->y - minecraft->level.player->y) + (entity->z - minecraft->level.player->z) * (entity->z - minecraft->level.player->z));
-			if (EntityIsPickable(entity) && dist < reach) {
+			if (EntityIsPickable(entity)) {
 				float r = 0.1;
 				MovingObjectPosition pos = AABBClip(AABBGrow(entity->aabb, r, r, r), v, v2);
 				if (!pos.null) { r = sqrtf(Vector3DSqDistance(v, pos.vector)); }
-				if ((!pos.null && r < a) || a == 0.0) {
+				if (!pos.null && (r < a || a == 0.0)) {
 					renderer->entity = entity;
 					a = r;
 				}
