@@ -59,6 +59,7 @@ bool LevelLoad(Level * level, char * filePath) {
 	EntitySetPosition(level->player, px, py, pz);
 	level->player->xRot = prx;
 	level->player->yRot = pry;
+	SDL_RWclose(file);
 	return true;
 }
 

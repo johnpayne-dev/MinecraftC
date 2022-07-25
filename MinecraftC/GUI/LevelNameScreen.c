@@ -67,7 +67,7 @@ void LevelNameScreenOnButtonClicked(LevelNameScreen * screen, Button * button) {
 			bool success = LevelSave(&screen->minecraft->level, filePath, screen->levelName.name);
 			StringFree(filePath);
 			if (!success) {
-				LogWarning("failed to save level\n");
+				LogWarning("failed to save level: %s\n", SDL_GetError());
 			}
 			
 			MinecraftSetCurrentScreen(screen->minecraft, NULL);
