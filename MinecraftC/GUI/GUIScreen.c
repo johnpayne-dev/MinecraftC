@@ -98,6 +98,8 @@ void GUIScreenOpen(GUIScreen * screen, Minecraft * minecraft, int width, int hei
 }
 
 void GUIScreenOnOpen(GUIScreen * screen) {
+	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
+	screen->buttons = ListClear(screen->buttons);
 	if (screen->type == GUIScreenTypeChatInput) { ChatInputScreenOnOpen(screen); return; }
 	if (screen->type == GUIScreenTypeControls) { ControlsScreenOnOpen(screen); return; }
 	if (screen->type == GUIScreenTypeError) { ErrorScreenOnOpen(screen); return; }

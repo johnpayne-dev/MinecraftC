@@ -12,8 +12,6 @@ void PauseScreenCreate(PauseScreen * screen) {
 }
 
 void PauseScreenOnOpen(PauseScreen * screen) {
-	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
-	screen->buttons = ListClear(screen->buttons);
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[0], 0, screen->width / 2 - 100, screen->height / 4, "Options...");
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });

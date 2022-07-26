@@ -16,8 +16,6 @@ void LevelNameScreenCreate(LevelNameScreen * screen, GUIScreen * parent, char * 
 }
 
 void LevelNameScreenOnOpen(LevelNameScreen * screen) {
-	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
-	screen->buttons = ListClear(screen->buttons);
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 0, screen->width / 2 - 100, screen->height / 4 + 120, "Save");
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
