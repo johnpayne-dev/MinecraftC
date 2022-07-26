@@ -12,13 +12,12 @@ def embed_png(filePath, outPath):
 	width, height = image.size
 	
 	output = open(outPath, 'w')
-	output.write('static const unsigned int Resource_' + cName + '_Width = ' + str(width) + ';\n\n')
-	output.write('static const unsigned int Resource_' + cName + '_Height = ' + str(height) + ';\n\n')
-	output.write('static const unsigned char Resource_' + cName + '_RGBA[] = \n')
-	output.write('{')
+	output.write(f'static const unsigned int Resource_{cName}_Width = {width};\n\n')
+	output.write(f'static const unsigned int Resource_{cName}_Height = {height};\n\n')
+	output.write(f'static const unsigned char Resource_{cName}_RGBA[] = {{')
 	for y in range(height):
 		for x in range(width):
-			if (x * width + y) % 4 == 0: output.write('\n\t')
+			if (y * width + x) % 4 == 0: output.write('\n\t')
 			r, g, b, a = pixels[x, y]
 			output.write('0x%0.2X, ' % r)
 			output.write('0x%0.2X, ' % g)
