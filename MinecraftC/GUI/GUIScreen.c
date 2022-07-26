@@ -128,7 +128,9 @@ void GUIScreenMouseEvent(GUIScreen * screen, SDL_Event event) {
 
 void GUIScreenKeyboardEvent(GUIScreen * screen, SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
-		GUIScreenOnKeyPressed(screen, event.key.keysym.sym, event.key.keysym.scancode);
+		GUIScreenOnKeyPressed(screen, '\0', event.key.keysym.scancode);
+	} else if (event.type == SDL_TEXTINPUT) {
+		GUIScreenOnKeyPressed(screen, event.text.text[0], '\0');
 	}
 }
 

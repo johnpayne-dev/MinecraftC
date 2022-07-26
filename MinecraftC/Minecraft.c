@@ -258,7 +258,7 @@ static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
 			if (events[i].type == SDL_KEYDOWN || events[i].type == SDL_KEYUP) {
 				PlayerSetKey(&minecraft->player, events[i].key.keysym.scancode, events[i].type == SDL_KEYDOWN);
 			}
-			if (events[i].type == SDL_KEYDOWN) {
+			if (events[i].type == SDL_KEYDOWN || events[i].type == SDL_TEXTINPUT) {
 				if (minecraft->currentScreen != NULL) {
 					GUIScreenKeyboardEvent(minecraft->currentScreen, events[i]);
 				} else {
@@ -281,7 +281,7 @@ static void Tick(Minecraft * minecraft, List(SDL_Event) events) {
 						BlockSelectScreenCreate(blockSelect);
 						MinecraftSetCurrentScreen(minecraft, blockSelect);
 					}
-					if (events[i].key.keysym.scancode == minecraft->settings.chatKey.key) {
+					if (events[i].key.keysym.scancode == minecraft->settings.chatKey.key && false) {
 						PlayerReleaseAllKeys(&minecraft->player);
 						ChatInputScreen * chatInput = malloc(sizeof(ChatInputScreen));
 						ChatInputScreenCreate(chatInput);
