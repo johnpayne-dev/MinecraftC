@@ -35,6 +35,8 @@ typedef struct Level {
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size);
 void LevelRegenerate(Level * level, int size);
+bool LevelLoad(Level * level, char * filePath);
+bool LevelSave(Level * level, char * filePath, char * name);
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks);
 void LevelFindSpawn(Level * level);
 void LevelCalculateLightDepths(Level * level, int x0, int y0, int x1, int y1);
@@ -63,8 +65,8 @@ void LevelSetSpawnPosition(Level * level, int x, int y, int z, float rotation);
 float LevelGetBrightness(Level * level, int x, int y, int z);
 bool LevelIsWater(Level * level, int x, int y, int z);
 MovingObjectPosition LevelClip(Level * level, Vector3D v0, Vector3D v1);
-void LevelPlaySound(Level * level, const char * sound, Entity * entity, float volume, float pitch);
-void LevelPlaySoundAt(Level * level, const char * sound, float x, float y, float z, float volume, float pitch);
+void LevelPlaySound(Level * level, char * sound, Entity * entity, float volume, float pitch);
+void LevelPlaySoundAt(Level * level, char * sound, float x, float y, float z, float volume, float pitch);
 bool LevelMaybeGrowTree(Level * level, int x, int y, int z);
 Entity * LevelGetPlayer(Level * level);
 void LevelAddEntity(Level * level, Entity * entity);

@@ -20,7 +20,7 @@ static inline float Vector3DLength(Vector3D a) {
 }
 
 static inline float Vector3DSqDistance(Vector3D a, Vector3D b) {
-	return (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y) + (b.z - a.z) * (b.x - a.x);
+	return (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y) + (b.z - a.z) * (b.z - a.z);
 }
 
 static inline Vector3D Vector3DNormalize(Vector3D a) {

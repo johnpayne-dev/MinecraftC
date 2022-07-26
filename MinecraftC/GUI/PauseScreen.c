@@ -12,8 +12,6 @@ void PauseScreenCreate(PauseScreen * screen) {
 }
 
 void PauseScreenOnOpen(PauseScreen * screen) {
-	for (int i = 0; i < ListLength(screen->buttons); i++) { ButtonDestroy(&screen->buttons[i]); }
-	screen->buttons = ListClear(screen->buttons);
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[0], 0, screen->width / 2 - 100, screen->height / 4, "Options...");
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
@@ -24,10 +22,6 @@ void PauseScreenOnOpen(PauseScreen * screen) {
 	ButtonCreate(&screen->buttons[3], 3, screen->width / 2 - 100, screen->height / 4 + 72, "Load level..");
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[4], 4, screen->width / 2 - 100, screen->height / 4 + 120, "Back to game");
-	
-	screen->buttons[1].active = true;
-	screen->buttons[2].active = false;
-	screen->buttons[3].active = false;
 }
 
 void PauseScreenOnButtonClicked(PauseScreen * screen, Button * button) {

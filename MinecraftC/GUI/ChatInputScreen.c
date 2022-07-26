@@ -52,7 +52,7 @@ void ChatInputScreenOnMouseClicked(ChatInputScreen * screen, int x, int y, int b
 		if (StringLength(screen->chatInput.message) > 0 && screen->chatInput.message[StringLength(screen->chatInput.message) - 1] != ' ') { StringConcat(&screen->chatInput.message, " "); }
 		StringConcat(&screen->chatInput.message, (char *)screen->minecraft->hud.hoveredPlayer);
 		int len = 64;
-		if (StringLength(screen->chatInput.message) > len) { screen->chatInput.message = StringSub(screen->chatInput.message, 0, len); }
+		if (StringLength(screen->chatInput.message) > len) { screen->chatInput.message = StringSub(screen->chatInput.message, 0, len - 1); }
 	}
 }
 

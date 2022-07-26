@@ -224,7 +224,7 @@ void EntityMove(Entity * entity, float ax, float ay, float az) {
 				entity->nextStep++;
 				TileSound sound = Blocks.table[blockType].sound;
 				if (sound.type != TileSoundTypeNone) {
-					EntityPlaySound(entity, "step.", TileSoundGetVolume(sound) * 0.75, TileSoundGetPitch(sound));
+					EntityPlaySound(entity, (char *)sound.name, TileSoundGetVolume(sound) * 0.75, TileSoundGetPitch(sound));
 				}
 			}
 		}
@@ -267,7 +267,7 @@ void EntitySetLevel(Entity * entity, Level * level) {
 	entity->level = level;
 }
 
-void EntityPlaySound(Entity * entity, const char * name, float volume, float pitch) {
+void EntityPlaySound(Entity * entity, char * name, float volume, float pitch) {
 	LevelPlaySound(entity->level, name, entity, volume, pitch);
 }
 

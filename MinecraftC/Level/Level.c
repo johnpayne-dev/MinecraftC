@@ -4,6 +4,7 @@
 #include "../Utilities/Log.h"
 #include "../Utilities/SinTable.h"
 #include "../Particle/PrimedTNT.h"
+#include "../Minecraft.h"
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 	*level = (Level) {
@@ -19,6 +20,70 @@ void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 	level->randomValue = (int)RandomGeneratorInteger(&level->random);
 	LevelGeneratorCreate(&level->generator, progressBar);
 	LevelGeneratorGenerate(&level->generator, 128 << size, 128 << size, level);
+}
+
+bool LevelLoad(Level * level, char * filePath) {
+	SDL_RWops * file = SDL_RWFromFile(filePath, "rb");
+	if (file == NULL) {
+		return false;
+	}
+	char nameChar;
+	do { SDL_RWread(file, &nameChar, 1, 1); } while (nameChar != '\0');
+	int x, y, z, w, d, h;
+	float r, px, py, pz, prx, pry;
+	SDL_RWread(file, &x, sizeof(x), 1);
+	SDL_RWread(file, &y, sizeof(y), 1);
+	SDL_RWread(file, &z, sizeof(z), 1);
+	SDL_RWread(file, &r, sizeof(r), 1);
+	SDL_RWread(file, &px, sizeof(px), 1);
+	SDL_RWread(file, &py, sizeof(py), 1);
+	SDL_RWread(file, &pz, sizeof(pz), 1);
+	SDL_RWread(file, &prx, sizeof(prx), 1);
+	SDL_RWread(file, &pry, sizeof(pry), 1);
+	SDL_RWread(file, &w, sizeof(w), 1);
+	SDL_RWread(file, &d, sizeof(d), 1);
+	SDL_RWread(file, &h, sizeof(h), 1);
+	uint8_t * blocks = malloc(w * d * h);
+	SDL_RWread(file, blocks, w * d * h, 1);
+	LevelSetData(level, w, d, h, blocks);
+	free(blocks);
+	level->xSpawn = x;
+	level->ySpawn = y;
+	level->zSpawn = z;
+	level->spawnRotation = r;
+	level->tickList = ListClear(level->tickList);
+	level->entities = ListClear(level->entities);
+	level->entities = ListPush(level->entities, &level->player);
+	level->unprocessed = 0;
+	level->tickCount = 0;
+	EntitySetPosition(level->player, px, py, pz);
+	level->player->xRot = prx;
+	level->player->yRot = pry;
+	SDL_RWclose(file);
+	return true;
+}
+
+bool LevelSave(Level * level, char * filePath, char * name) {
+	SDL_RWops * file = SDL_RWFromFile(filePath, "wb");
+	if (file == NULL) {
+		return false;
+	}
+	SDL_RWwrite(file, name, strlen(name) + 1, 1);
+	SDL_RWwrite(file, &level->xSpawn, sizeof(level->xSpawn), 1);
+	SDL_RWwrite(file, &level->ySpawn, sizeof(level->ySpawn), 1);
+	SDL_RWwrite(file, &level->zSpawn, sizeof(level->zSpawn), 1);
+	SDL_RWwrite(file, &level->spawnRotation, sizeof(level->spawnRotation), 1);
+	SDL_RWwrite(file, &level->player->x, sizeof(level->player->x), 1);
+	SDL_RWwrite(file, &level->player->y, sizeof(level->player->y), 1);
+	SDL_RWwrite(file, &level->player->z, sizeof(level->player->z), 1);
+	SDL_RWwrite(file, &level->player->xRot, sizeof(level->player->x), 1);
+	SDL_RWwrite(file, &level->player->yRot, sizeof(level->player->x), 1);
+	SDL_RWwrite(file, &level->width, sizeof(level->width), 1);
+	SDL_RWwrite(file, &level->depth, sizeof(level->depth), 1);
+	SDL_RWwrite(file, &level->height, sizeof(level->height), 1);
+	SDL_RWwrite(file, level->blocks, level->width * level->depth * level->height, 1);
+	SDL_RWclose(file);
+	return true;
 }
 
 void LevelRegenerate(Level * level, int size) {
@@ -390,10 +455,18 @@ MovingObjectPosition LevelClip(Level * level, Vector3D v0, Vector3D v1) {
 	return (MovingObjectPosition){ .null = true };
 }
 
-void LevelPlaySound(Level * level, const char * sound, Entity * entity, float volume, float pitch) {
+void LevelPlaySound(Level * level, char * sound, Entity * entity, float volume, float pitch) {
+	GameSettings * settings = level->renderer->textures->settings;
+	if (!settings->sound) { return; }
+	if (Vector3DSqDistance((Vector3D){ entity->x, entity->y, entity->z }, (Vector3D){ level->player->x, level->player->y, level->player->z }) < 1024.0) {
+		SoundManagerPlaySound(&settings->minecraft->sound, sound, volume, pitch);
+	}
 }
 
-void LevelPlaySoundAt(Level * level, const char * sound, float x, float y, float z, float volume, float pitch) {
+void LevelPlaySoundAt(Level * level, char * sound, float x, float y, float z, float volume, float pitch) {
+	GameSettings * settings = level->renderer->textures->settings;
+	if (!settings->sound) { return; }
+	SoundManagerPlaySound(&settings->minecraft->sound, sound, volume, pitch);
 }
 
 bool LevelMaybeGrowTree(Level * level, int x, int y, int z) {

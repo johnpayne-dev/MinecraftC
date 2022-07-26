@@ -1,4 +1,5 @@
 #include <string.h>
+#include <cute_sound.h>
 #include "GameSettings.h"
 #include "Minecraft.h"
 #include "Utilities/Log.h"
@@ -14,12 +15,12 @@ static void Load(GameSettings * settings) {
 	SDL_RWread(file, text, size, 1);
 	for (int i = 0, j = -1; i < size; i++) {
 		if (text[i] == '\n') {
-			String line = StringSub(StringCreate(text), j + 1, i);
+			String line = StringSub(StringCreate(text), j + 1, i - 1);
 			j = i;
 			int split = StringIndexOf(line, ':');
 			if (split <= 0) { continue; }
-			String value = StringSub(StringCreate(line), split + 1, StringLength(line));
-			line = StringSub(line, 0, split);
+			String value = StringSub(StringCreate(line), split + 1, StringLength(line) - 1);
+			line = StringSub(line, 0, split - 1);
 			if (strcmp(line, "music") == 0) { settings->music = strcmp(value, "true") == 0; }
 			if (strcmp(line, "sound") == 0) { settings->sound = strcmp(value, "true") == 0; }
 			if (strcmp(line, "invertYMouse") == 0) { settings->invertMouse = strcmp(value, "true") == 0; }
@@ -107,7 +108,7 @@ void GameSettingsCreate(GameSettings * settings, Minecraft * minecraft) {
 		.music = true,
 		.sound = true,
 		.invertMouse = false,
-		.showFrameRate = true,
+		.showFrameRate = false,
 		.viewDistance = 0,
 		.viewBobbing = true,
 		.anaglyph = false,
@@ -146,7 +147,10 @@ void GameSettingsSetBinding(GameSettings * settings, int binding, int key) {
 }
 
 void GameSettingsToggleSetting(GameSettings * settings, int setting) {
-	if (setting == 0) { settings->music = !settings->music; }
+	if (setting == 0) {
+		settings->music = !settings->music;
+		cs_music_set_volume((float)settings->music);
+	}
 	if (setting == 1) { settings->sound = !settings->sound; }
 	if (setting == 2) { settings->invertMouse = !settings->invertMouse; }
 	if (setting == 3) { settings->showFrameRate = !settings->showFrameRate; }
