@@ -3,7 +3,7 @@
 #include "../Render/LevelRenderer.h"
 #include "../Utilities/Log.h"
 #include "../Utilities/SinTable.h"
-#include "../Particle/PrimedTNT.h"
+#include "../Mods/PrimedTNT.h"
 #include "../Minecraft.h"
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {

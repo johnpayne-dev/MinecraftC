@@ -1,6 +1,8 @@
+#if MINECRAFTC_MODS
+
 #include "PrimedTNT.h"
-#include "SmokeParticle.h"
-#include "TerrainParticle.h"
+#include "../Particle/SmokeParticle.h"
+#include "../Particle/TerrainParticle.h"
 #include "../Utilities/SinTable.h"
 #include "../Utilities/OpenGL.h"
 #include "../Level/Level.h"
@@ -101,3 +103,5 @@ void PrimedTNTRender(PrimedTNT * tnt, TextureManager * textures, float dt) {
 	glPopMatrix();
 	glPopMatrix();
 }
+
+#endif

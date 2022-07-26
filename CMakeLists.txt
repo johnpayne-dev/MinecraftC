@@ -28,6 +28,8 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/GUI/LevelNameScreen.h
 	MinecraftC/GUI/LoadLevelScreen.c
 	MinecraftC/GUI/LoadLevelScreen.h
+	MinecraftC/GUI/ModsScreen.c
+	MinecraftC/GUI/ModsScreen.h
 	MinecraftC/GUI/OptionsScreen.c
 	MinecraftC/GUI/OptionsScreen.h
 	MinecraftC/GUI/PauseScreen.c
@@ -83,8 +85,8 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Level/Level.c
 	MinecraftC/Level/Level.h
 	MinecraftC/Level/NextTickListEntry.h
-	MinecraftC/Particle/PrimedTNT.c
-	MinecraftC/Particle/PrimedTNT.h
+	MinecraftC/Mods/PrimedTNT.c
+	MinecraftC/Mods/PrimedTNT.h
 	MinecraftC/Particle/Particle.c
 	MinecraftC/Particle/Particle.h
 	MinecraftC/Particle/ParticleManager.c
@@ -171,6 +173,7 @@ add_definitions(
 	-DSDL_DYNAMIC_API=0
 	-DSDL_VIDEO_OPENGL_EGL=0
 	-DSDL_VIDEO_RENDER_OGL_ES2=0
+	-DMINECRAFTC_MODS
 	)
 
 if(APPLE)

@@ -1,5 +1,6 @@
 #include "OptionsScreen.h"
 #include "ControlsScreen.h"
+#include "ModsScreen.h"
 #include "Screen.h"
 #include "../Minecraft.h"
 
@@ -16,9 +17,15 @@ void OptionsScreenOnOpen(OptionsScreen * screen) {
 		screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 		ButtonCreateSize(&screen->buttons[i], i, screen->width / 2 - 155 + i % 2 * 160, screen->height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, GameSettingsGetSetting(screen->options.settings, i));
 	}
-	
+#if MINECRAFTC_MODS
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 100, screen->width / 2 - 100, screen->height / 6 + 108, "Controls...");
+	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 150, screen->width / 2 - 100, screen->height / 6 + 132, "Mods...");
+#else
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 100, screen->width / 2 - 100, screen->height / 6 + 132, "Controls...");
+#endif
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 200, screen->width / 2 - 100, screen->height / 6 + 168, "Done");
 }
@@ -34,6 +41,13 @@ void OptionsScreenOnButtonClicked(OptionsScreen * screen, Button * button) {
 			ControlsScreenCreate(controls, screen, screen->options.settings);
 			MinecraftSetCurrentScreen(screen->minecraft, controls);
 		}
+#if MINECRAFTC_MODS
+		if (button->id == 150) {
+			ModsScreen * mods = malloc(sizeof(ModsScreen));
+			ModsScreenCreate(mods, screen, &screen->minecraft->settings);
+			MinecraftSetCurrentScreen(screen->minecraft, mods);
+		}
+#endif
 		if (button->id == 200) {
 			MinecraftSetCurrentScreen(screen->minecraft, screen->options.parent);
 		}

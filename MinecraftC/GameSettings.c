@@ -35,6 +35,10 @@ static void Load(GameSettings * settings) {
 				if (strcmp(line, keyName) == 0) { settings->bindings[i]->key = StringToInt(value); }
 				StringFree(keyName);
 			}
+#if MINECRAFTC_MODS
+			if (strcmp(line, "explodingTNT") == 0) { settings->explodingTNT = strcmp(value, "true") == 0; }
+			if (strcmp(line, "raytracing") == 0) { settings->raytracing = strcmp(value, "true") == 0; }
+#endif
 			StringFree(value);
 			StringFree(line);
 		}
@@ -99,6 +103,15 @@ static void Save(GameSettings * settings) {
 		SDL_RWwrite(file, line, StringLength(line), 1);
 		StringFree(keyName);
 	}
+#if MINECRAFTC_MODS
+	StringSet(&line, settings->explodingTNT ? "true\n" : "false\n");
+	StringConcatFront("explodingTNT:", &line);
+	SDL_RWwrite(file, line, StringLength(line), 1);
+	
+	StringSet(&line, settings->raytracing ? "true\n" : "false\n");
+	StringConcatFront("raytracing:", &line);
+	SDL_RWwrite(file, line, StringLength(line), 1);
+#endif
 	StringFree(line);
 	SDL_RWclose(file);
 }
@@ -125,6 +138,9 @@ void GameSettingsCreate(GameSettings * settings, Minecraft * minecraft) {
 		.loadLocationKey = (KeyBinding){ .name = "Load location", .key = SDL_SCANCODE_R },
 		.bindings = ListCreate(sizeof(KeyBinding *)),
 		.settingsCount = 8,
+#if MINECRAFTC_MODS
+		.modsCount = 2,
+#endif
 		.minecraft = minecraft,
 	};
 	settings->file = StringCreate(minecraft->workingDirectory);
@@ -165,6 +181,10 @@ void GameSettingsToggleSetting(GameSettings * settings, int setting) {
 		settings->limitFramerate = !settings->limitFramerate;
 		SDL_GL_SetSwapInterval(settings->limitFramerate ? 1 : 0);
 	}
+#if MINECRAFTC_MODS
+	if (setting == 8) { settings->explodingTNT = !settings->explodingTNT; }
+	if (setting == 9) { settings->raytracing = !settings->raytracing; }
+#endif
 	Save(settings);
 }
 
@@ -205,6 +225,16 @@ String GameSettingsGetSetting(GameSettings * settings, int setting) {
 			string = StringCreate("Limit framerate: ");
 			StringConcat(&string, settings->limitFramerate ? "ON" : "OFF");
 			break;
+#if MINECRAFTC_MODS
+		case 8:
+			string = StringCreate("Exploding TNT: ");
+			StringConcat(&string, settings->explodingTNT ? "ON" : "OFF");
+			break;
+		case 9:
+			string = StringCreate("Raytracing: ");
+			StringConcat(&string, settings->raytracing ? "ON" : "OFF");
+			break;
+#endif
 		default:
 			string = StringCreate("Error");
 			break;

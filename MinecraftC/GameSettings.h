@@ -30,6 +30,11 @@ typedef struct GameSettings {
 	KeyBinding saveLocationKey;
 	KeyBinding loadLocationKey;
 	List(KeyBinding *) bindings;
+#if MINECRAFTC_MODS
+	bool explodingTNT;
+	bool raytracing;
+	int modsCount;
+#endif
 	struct Minecraft * minecraft;
 	String file;
 	int settingsCount;

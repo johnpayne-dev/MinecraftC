@@ -17,7 +17,7 @@
 #include "Render/ShapeRenderer.h"
 #include "Level/Generator/LevelGenerator.h"
 #include "Particle/WaterDropParticle.h"
-#include "Particle/PrimedTNT.h"
+#include "Mods/PrimedTNT.h"
 
 static void CheckGLError(Minecraft * minecraft, char * msg) {
 	int error = glGetError();
@@ -158,9 +158,11 @@ static void OnMouseClicked(Minecraft * minecraft, int button) {
 	}
 	
 	if (!minecraft->selected.null) {
+#if MINECRAFTC_MODS
 		if (minecraft->selected.entityPosition == 1 && button == SDL_BUTTON_LEFT && minecraft->selected.entity->type == EntityTypePrimedTNT) {
 			PrimedTNTOnHit(minecraft->selected.entity);
 		}
+#endif
 		if (minecraft->selected.entityPosition == 0) {
 			int vx = minecraft->selected.x;
 			int vy = minecraft->selected.y;
@@ -183,7 +185,7 @@ static void OnMouseClicked(Minecraft * minecraft, int button) {
 						if (block->sound.type != TileSoundTypeNone) {
 							LevelPlaySoundAt(level, (char *)block->sound.name, vx, vy, vz, (TileSoundGetVolume(block->sound) + 1.0) / 2.0, TileSoundGetPitch(block->sound) * 0.8);
 						}
-						BlockSpawnBreakParticles(block, level, vx, vy, vz, &minecraft->particleManager);
+						BlockSpawnBreakParticles(block, level, vx, vy, vz, &minecraft->particleManager, &minecraft->settings);
 					}
 				}
 			} else {

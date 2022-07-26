@@ -257,8 +257,12 @@ void BlockUpdate(Block * block, Level * level, int x, int y, int z, RandomGenera
 	if (IsLiquidBlock(block->type)) { LiquidBlockUpdate(block, level, x, y, z, random); return; }
 }
 
-void BlockSpawnBreakParticles(Block * block, Level * level, int x, int y, int z, ParticleManager * particles) {
-	if (block->type == BlockTypeTNT) { TNTBlockSpawnBreakParticles(block, level, x, y, z, particles); }
+void BlockSpawnBreakParticles(Block * block, Level * level, int x, int y, int z, ParticleManager * particles, GameSettings * settings) {
+#if MINECRAFTC_MODS
+	if (block->type == BlockTypeTNT && settings->explodingTNT) {
+		TNTBlockSpawnBreakParticles(block, level, x, y, z, particles);
+	}
+#endif
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 4; k++) {
