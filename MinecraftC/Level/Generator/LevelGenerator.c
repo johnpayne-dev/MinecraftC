@@ -8,6 +8,7 @@
 #include "../../Utilities/SinTable.h"
 #include "../Tile/Block.h"
 #include "../Level.h"
+#include "../../Minecraft.h"
 
 void LevelGeneratorCreate(LevelGenerator * generator, ProgressBarDisplay * progressBar) {
 	*generator = (LevelGenerator) {
@@ -165,6 +166,12 @@ void LevelGeneratorGenerate(LevelGenerator * generator, int width, int depth, Le
 			if (NoiseCompute(&n3, x, y) / 8.0 > 0.0) { v2 = v1; }
 			float m = fmaxf(v1, v2) / 2.0;
 			if (m < 0.0) { m *= 0.8; }
+#if MINECRAFTC_MODS
+			if (generator->progressBar->minecraft->settings.largerWorldGen) {
+				float dist = sqrtf((x / (float)w - 0.5) * (x / (float)w - 0.5) + (y / (float)d - 0.5) * (y / (float)d - 0.5));
+				m -= powf(fminf(dist * 2.0, 1.0), 10.0) * 10.0;
+			}
+#endif
 			heights[x + y * w] = m;
 		}
 	}

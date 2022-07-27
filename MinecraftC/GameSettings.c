@@ -38,6 +38,7 @@ static void Load(GameSettings * settings) {
 #if MINECRAFTC_MODS
 			if (strcmp(line, "explodingTNT") == 0) { settings->explodingTNT = strcmp(value, "true") == 0; }
 			if (strcmp(line, "raytracing") == 0) { settings->raytracing = strcmp(value, "true") == 0; }
+			if (strcmp(line, "largerWorldGen") == 0) { settings->largerWorldGen = strcmp(value, "true") == 0; }
 #endif
 			StringFree(value);
 			StringFree(line);
@@ -111,6 +112,10 @@ static void Save(GameSettings * settings) {
 	StringSet(&line, settings->raytracing ? "true\n" : "false\n");
 	StringConcatFront("raytracing:", &line);
 	SDL_RWwrite(file, line, StringLength(line), 1);
+	
+	StringSet(&line, settings->largerWorldGen ? "true\n" : "false\n");
+	StringConcatFront("largerWorldGen:", &line);
+	SDL_RWwrite(file, line, StringLength(line), 1);
 #endif
 	StringFree(line);
 	SDL_RWclose(file);
@@ -139,7 +144,7 @@ void GameSettingsCreate(GameSettings * settings, Minecraft * minecraft) {
 		.bindings = ListCreate(sizeof(KeyBinding *)),
 		.settingsCount = 8,
 #if MINECRAFTC_MODS
-		.modsCount = 2,
+		.modsCount = 3,
 #endif
 		.minecraft = minecraft,
 	};
@@ -184,6 +189,7 @@ void GameSettingsToggleSetting(GameSettings * settings, int setting) {
 #if MINECRAFTC_MODS
 	if (setting == 8) { settings->explodingTNT = !settings->explodingTNT; }
 	if (setting == 9) { settings->raytracing = !settings->raytracing; }
+	if (setting == 10) { settings->largerWorldGen = !settings->largerWorldGen; }
 #endif
 	Save(settings);
 }
@@ -233,6 +239,10 @@ String GameSettingsGetSetting(GameSettings * settings, int setting) {
 		case 9:
 			string = StringCreate("Raytracing: ");
 			StringConcat(&string, settings->raytracing ? "ON" : "OFF");
+			break;
+		case 10:
+			string = StringCreate("Larger world gen: ");
+			StringConcat(&string, settings->largerWorldGen ? "ON" : "OFF");
 			break;
 #endif
 		default:
