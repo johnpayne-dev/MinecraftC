@@ -15,6 +15,7 @@ void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 		.skyColor = 0x99CCFFFF,
 		.fogColor = 0xffffffff,
 		.cloudColor = 0xffffffff,
+		.progressBar = progressBar,
 	};
 	RandomGeneratorCreate(&level->random, time(NULL));
 	level->randomValue = (int)RandomGeneratorInteger(&level->random);
@@ -92,6 +93,8 @@ void LevelRegenerate(Level * level, int size) {
 }
 
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
+	free(level->blocks);
+	free(level->lightBlockers);
 	level->width = w;
 	level->depth = d;
 	level->height = h;
@@ -107,7 +110,33 @@ void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
 	}
 	level->tickList = ListClear(level->tickList);
 	LevelFindSpawn(level);
+#if MINECRAFTC_MODS
+	if (level->progressBar->minecraft->settings.raytracing) {
+		LevelDestroyOctree(level);
+		LevelCreateOctree(level);
+	}
+#endif
 }
+
+#if MINECRAFTC_MODS
+void LevelCreateOctree(Level * level) {
+	ProgressBarDisplaySetText(level->progressBar, "Creating octree..");
+	OctreeCreate(&level->octree, level);
+	for (int x = 0; x < level->width; x++) {
+		ProgressBarDisplaySetProgress(level->progressBar, x * 100 / (level->width - 1));
+		for (int y = 0; y < level->depth; y++) {
+			for (int z = 0; z < level->height; z++) {
+				BlockType tile = LevelGetTile(level, x, y, z);
+				if (tile != BlockTypeNone) { OctreeSet(&level->octree, x, y, z, tile); }
+			}
+		}
+	}
+}
+
+void LevelDestroyOctree(Level * level) {
+	OctreeDestroy(&level->octree);
+}
+#endif
 
 void LevelFindSpawn(Level * level) {
 	int i = 0;

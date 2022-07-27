@@ -17,7 +17,6 @@ void ModsScreenOnOpen(ModsScreen * screen) {
 		String text = GameSettingsGetSetting(screen->mods.settings, screen->mods.settings->settingsCount + i);
 		ButtonCreateSize(&screen->buttons[i], i, screen->width / 2 - 155 + i % 2 * 160, screen->height / 6 + 24 * (i / 2 + 1) - 24, 150, 20, text);
 	}
-	screen->buttons[1].active = false;
 	Button button;
 	ButtonCreate(&button, 200, screen->width / 2 - 100, screen->height / 6 + 168, "Done");
 	screen->buttons = ListPush(screen->buttons, &button);

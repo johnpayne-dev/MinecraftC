@@ -188,7 +188,14 @@ void GameSettingsToggleSetting(GameSettings * settings, int setting) {
 	}
 #if MINECRAFTC_MODS
 	if (setting == 8) { settings->explodingTNT = !settings->explodingTNT; }
-	if (setting == 9) { settings->raytracing = !settings->raytracing; }
+	if (setting == 9) {
+		settings->raytracing = !settings->raytracing;
+		if (settings->raytracing) {
+			LevelCreateOctree(&settings->minecraft->level);
+		} else {
+			LevelDestroyOctree(&settings->minecraft->level);
+		}
+	}
 	if (setting == 10) { settings->largerWorldGen = !settings->largerWorldGen; }
 #endif
 	Save(settings);
