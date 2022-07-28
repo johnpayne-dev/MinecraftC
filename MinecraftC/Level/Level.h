@@ -33,7 +33,7 @@ typedef struct Level {
 	ParticleManager * particleEngine;
 	LevelGenerator generator;
 	ProgressBarDisplay * progressBar;
-#ifdef MINECRAFTC_MODS
+#if MINECRAFTC_MODS
 	Octree octree;
 #endif
 } Level;
@@ -43,7 +43,7 @@ void LevelRegenerate(Level * level, int size);
 bool LevelLoad(Level * level, char * filePath);
 bool LevelSave(Level * level, char * filePath, char * name);
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks);
-#ifdef MINECRAFTC_MODS
+#if MINECRAFTC_MODS
 void LevelCreateOctree(Level * level);
 void LevelDestroyOctree(Level * level);
 #endif

@@ -3,6 +3,7 @@
 #include "GameSettings.h"
 #include "Minecraft.h"
 #include "Utilities/Log.h"
+#include "Mods/OctreeRenderer.h"
 
 static void Load(GameSettings * settings) {
 	SDL_RWops * file = SDL_RWFromFile(settings->file, "r");
@@ -191,9 +192,15 @@ void GameSettingsToggleSetting(GameSettings * settings, int setting) {
 	if (setting == 9) {
 		settings->raytracing = !settings->raytracing;
 		if (settings->raytracing) {
-			LevelCreateOctree(&settings->minecraft->level);
+			if (OctreeRendererInitialize(settings->minecraft->width, settings->minecraft->height)) {
+				LevelCreateOctree(&settings->minecraft->level);
+				OctreeRendererSetOctree(&settings->minecraft->level.octree);
+			} else {
+				settings->raytracing = false;
+			}
 		} else {
 			LevelDestroyOctree(&settings->minecraft->level);
+			OctreeRendererDestroy();
 		}
 	}
 	if (setting == 10) { settings->largerWorldGen = !settings->largerWorldGen; }

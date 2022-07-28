@@ -33,7 +33,8 @@ void OctreeCreate(Octree * tree, struct Level * level) {
 	//  = (8^log2(size) - 1) / 7
 	//  = (size^3 - 1) / 7
 	tree->size = pow2i(tree->depth);
-	tree->masks = malloc((tree->size * tree->size * tree->size - 1) / 7);
+	tree->maskCount = (tree->size * tree->size * tree->size - 1) / 7;
+	tree->masks = calloc(tree->maskCount, 1);
 }
 
 static bool Reset(Octree * tree, int startIndex, int maskOffset, int baseX, int baseY, int baseZ, int size, int depth, int x, int y, int z) {
@@ -75,9 +76,6 @@ void OctreeSet(Octree * tree, int x, int y, int z, BlockType tile) {
 			baseY += ((bit >> 1) & 1) * (size / 2);
 			baseZ += ((bit >> 2) & 1) * (size / 2);
 			size /= 2;
-			if (depth == tree->depth - 1) {
-				LevelSetTile(tree->level, x, y, z, tile);
-			}
 		}
 	}
 }

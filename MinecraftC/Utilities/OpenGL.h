@@ -3,6 +3,9 @@
 #if defined(__APPLE__)
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glu.h>
+	#include <OpenGL/CGLDevice.h>
+	#include <OpenGL/CGLTypes.h>
+	#include <OpenGL/CGLCurrent.h>
 #elif defined(_WIN32)
 	#include <Windows.h>
 	#include <gl/GL.h>

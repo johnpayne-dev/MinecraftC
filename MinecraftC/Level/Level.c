@@ -5,6 +5,7 @@
 #include "../Utilities/SinTable.h"
 #include "../Mods/PrimedTNT.h"
 #include "../Minecraft.h"
+#include "../Mods/OctreeRenderer.h"
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 	*level = (Level) {
@@ -114,6 +115,7 @@ void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
 	if (level->progressBar->minecraft->settings.raytracing) {
 		LevelDestroyOctree(level);
 		LevelCreateOctree(level);
+		OctreeRendererSetOctree(&level->octree);
 	}
 #endif
 }
@@ -240,6 +242,11 @@ bool LevelSetTileNoNeighborChange(Level * level, int x, int y, int z, BlockType 
 	if (tile != BlockTypeNone) { BlockOnAdded(&Blocks.table[tile], level, x, y, z); }
 	LevelCalculateLightDepths(level, x, z, 1, 1);
 	if (level->renderer != NULL) { LevelRendererQueueChunks(level->renderer, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1); }
+#if MINECRAFTC_MODS
+	if (level->progressBar->minecraft->settings.raytracing) {
+		OctreeSet(&level->octree, x, y, z, tile);
+	}
+#endif
 	return true;
 }
 

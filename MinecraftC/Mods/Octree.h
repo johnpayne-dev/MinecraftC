@@ -7,6 +7,7 @@ typedef struct Octree {
 	struct Level * level;
 	int depth;
 	int size;
+	int maskCount;
 	uint8_t * masks;
 } Octree;
 

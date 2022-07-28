@@ -18,6 +18,7 @@
 #include "Level/Generator/LevelGenerator.h"
 #include "Particle/WaterDropParticle.h"
 #include "Mods/PrimedTNT.h"
+#include "Mods/OctreeRenderer.h"
 
 static void CheckGLError(Minecraft * minecraft, char * msg) {
 	int error = glGetError();
@@ -79,6 +80,11 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	GameSettingsCreate(&minecraft->settings, minecraft);
 	SDL_GL_SetSwapInterval(minecraft->settings.limitFramerate ? 1 : 0);
 	cs_music_set_volume((float)minecraft->settings.music);
+#if MINECRAFTC_MODS
+	if (minecraft->settings.raytracing && !OctreeRendererInitialize(minecraft->frameWidth, minecraft->frameHeight)) {
+		minecraft->settings.raytracing = false;
+	}
+#endif
 	TextureManagerCreate(&minecraft->textureManager, &minecraft->settings);
 	AnimatedTexture * lavaTexture = malloc(sizeof(AnimatedTexture));
 	LavaTextureCreate(lavaTexture);
@@ -838,7 +844,24 @@ void MinecraftRun(Minecraft * minecraft) {
 			
 			if (i == 1) { glColorMask(true, true, true, true); }
 		}
-		
+#if MINECRAFTC_MODS
+		if (minecraft->settings.raytracing) {
+			OctreeRendererEnqueue();
+			RendererEnableGUIMode(renderer);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, OctreeRenderer.textureID);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glColor4f(1.0, 1.0, 1.0, 0.8);
+			ShapeRendererBegin();
+			ShapeRendererVertexUV(0.0, minecraft->height, 0.0, 0.0, 0.0);
+			ShapeRendererVertexUV(minecraft->width, minecraft->height, 0.0, 2.0, 0.0);
+			ShapeRendererVertexUV(minecraft->width, 0.0, 0.0, 2.0, 2.0);
+			ShapeRendererVertexUV(0.0, 0.0, 0.0, 0.0, 2.0);
+			ShapeRendererEnd();
+			glDisable(GL_BLEND);
+		}
+#endif
 		HUDScreenRender(&minecraft->hud, delta, mx, my);
 		
 		if (minecraft->currentScreen != NULL) { GUIScreenRender(minecraft->currentScreen, mx, my); }
@@ -881,6 +904,11 @@ void MinecraftPause(Minecraft * minecraft) {
 }
 
 void MinecraftDestroy(Minecraft * minecraft) {
+#if MINECRAFTC_MODS
+	if (minecraft->settings.raytracing) {
+		OctreeRendererDestroy();
+	}
+#endif
 	StringFree(minecraft->debug);
 }
 

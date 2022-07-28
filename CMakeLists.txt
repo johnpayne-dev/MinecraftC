@@ -85,6 +85,10 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Level/Level.c
 	MinecraftC/Level/Level.h
 	MinecraftC/Level/NextTickListEntry.h
+	MinecraftC/Mods/Octree.c
+	MinecraftC/Mods/Octree.h
+	MinecraftC/Mods/OctreeRenderer.c
+	MinecraftC/Mods/OctreeRenderer.h
 	MinecraftC/Mods/PrimedTNT.c
 	MinecraftC/Mods/PrimedTNT.h
 	MinecraftC/Particle/Particle.c
@@ -133,6 +137,7 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Utilities/List.h
 	MinecraftC/Utilities/Log.c
 	MinecraftC/Utilities/Log.h
+	MinecraftC/Utilities/OpenCL.h
 	MinecraftC/Utilities/OpenGL.h
 	MinecraftC/Utilities/Random.c
 	MinecraftC/Utilities/Random.h
@@ -156,6 +161,7 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/SessionData.h
 	MinecraftC/Timer.c
 	MinecraftC/Timer.h
+	Resources/Shaders/Raytracer.cl
 	)
 
 if(MSVC)
@@ -196,6 +202,7 @@ if(APPLE)
 		"-framework GameController"
 		"-framework IOKit"
 		"-framework Metal"
+		"-framework OpenCL"
 		"-framework OpenGL"
 		)
 elseif(WIN32)

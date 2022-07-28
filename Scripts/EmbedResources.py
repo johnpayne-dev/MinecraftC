@@ -28,7 +28,7 @@ def embed_png(filePath, outPath):
 	
 	image.close()
 
-def embed_ogg(filePath, outPath):
+def embed_file(filePath, outPath):
 	input, output = open(filePath, 'rb'), open(outPath, 'w')
 	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace('/', '_')
 	output.write(f'static const unsigned char Resource_{cName}[] = {{')
@@ -45,4 +45,6 @@ for subdir, dirs, files in os.walk(RESOURCE_PATH):
 		if filePath.endswith('.png'):
 			embed_png(filePath, filePath[:-4] + '.h')
 		elif filePath.endswith('.ogg'):
-			embed_ogg(filePath, filePath[:-4] + '.h')
+			embed_file(filePath, filePath[:-4] + '.h')
+		elif filePath.endswith('.cl'):
+			embed_file(filePath, filePath[:-3] + '.h')
