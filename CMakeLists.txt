@@ -85,6 +85,7 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Level/Level.c
 	MinecraftC/Level/Level.h
 	MinecraftC/Level/NextTickListEntry.h
+	MinecraftC/Mods/Matrix.h
 	MinecraftC/Mods/Raytracer.c
 	MinecraftC/Mods/Raytracer.h
 	MinecraftC/Mods/PrimedTNT.c

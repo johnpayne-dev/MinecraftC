@@ -876,6 +876,47 @@ void MinecraftRun(Minecraft * minecraft) {
 			glVertex2f(-1.0, 1.0);
 			glEnd();
 			glDisable(GL_BLEND);
+			
+			glEnable(GL_CULL_FACE);
+			glMatrixMode(GL_PROJECTION);
+			gluPerspective(70.0, (float)minecraft->width / (float)minecraft->height, 0.05, 512.0f);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			if (minecraft->settings.viewBobbing) {
+				RendererApplyBobbing(renderer, delta);
+			}
+			HeldBlock held = renderer->heldBlock;
+			float heldPos = held.lastPosition + (held.position - held.lastPosition) * delta;
+			glPushMatrix();
+			glRotatef(rotx, 1.0, 0.0, 0.0);
+			glRotatef(roty, 0.0, 1.0, 0.0);
+			RendererSetLighting(renderer, true);
+			glPopMatrix();
+			glPushMatrix();
+			if (held.moving) {
+				float a = (held.offset + delta) / 7.0;
+				glTranslatef(-tsin(sqrt(a) * M_PI) * 0.4, tsin(sqrt(a) * M_PI * 2.0) * 0.2, -tsin(a * M_PI) * 0.2);
+			}
+			glTranslatef(0.7 * 0.8, -0.65 * 0.8 - (1.0 - heldPos) * 0.6, -0.9 * 0.8);
+			glRotatef(45.0, 0.0, 1.0, 0.0);
+			glEnable(GL_NORMALIZE);
+			if (held.moving) {
+				float a = (held.offset + delta) / 7.0;
+				glRotatef(tsin(sqrt(a) * M_PI) * 80.0, 0.0, 1.0, 0.0);
+				glRotatef(-tsin(a * a * M_PI), 1.0, 0.0, 0.0);
+			}
+			float brightness = LevelGetBrightness(&minecraft->level, player->x, player->y, player->z);
+			glColor4f(brightness, brightness, brightness, 1.0);
+			if (held.block != NULL) {
+				glScalef(0.4, 0.4, 0.4);
+				glTranslatef(-0.5, -0.5, -0.5);
+				glBindTexture(GL_TEXTURE_2D, TextureManagerLoad(&minecraft->textureManager, "Terrain.png"));
+				BlockRenderPreview(held.block);
+			}
+			glDisable(GL_NORMALIZE);
+			glPopMatrix();
+			RendererSetLighting(renderer, false);
 		}
 #endif
 		HUDScreenRender(&minecraft->hud, delta, mx, my);

@@ -1,6 +1,7 @@
 #if MINECRAFTC_MODS
 
 #include "Raytracer.h"
+#include "Matrix.h"
 #include "../Utilities/OpenGL.h"
 #include "../Level/Level.h"
 #include "../Utilities/Log.h"
@@ -175,14 +176,18 @@ void RaytracerEnqueue(float dt, float time, bool doBobbing) {
 	float x = player->xo + (player->x - player->xo) * dt;
 	float y = player->yo + (player->y - player->yo) * dt;
 	float z = player->zo + (player->z - player->zo) * dt;
-	float matrix[16] = {
-		cosf(b), 0.0, -sinf(b), 0.0,
-		sinf(a) * sinf(b), cosf(a), sinf(a) * cosf(b), 0.0,
-		cosf(a) * sinf(b), -sinf(a), cosf(a) * cosf(b), 0.0,
-		x, y, z, 1.0
-	};
+	Matrix4x4 camera = Matrix4x4Multiply(Matrix4x4FromTranslate(x, y, z), Matrix4x4FromEulerAngles(b, a, 0.0));
 	if (doBobbing) {
-		
+		float walk = player->walkDistance - player->oldWalkDistance;
+		walk = player->walkDistance + walk * dt;
+		float bob = (player->player.oldBobbing + (player->player.bobbing - player->player.oldBobbing) * dt) * M_PI / 180.0f;
+		float tilt = (player->player.oldTilt + (player->player.tilt - player->player.oldTilt) * dt) * M_PI / 180.0f;
+		Matrix4x4 bobbing = Matrix4x4Identity;
+		bobbing = Matrix4x4Multiply(Matrix4x4FromAxisAngle(0.0, 0.0, 1.0, -sin(walk * M_PI) * bob * 3.0), bobbing);
+		bobbing = Matrix4x4Multiply(Matrix4x4FromAxisAngle(1.0, 0.0, 0.0, -fabs(cos(walk * M_PI + 0.2) * bob) * 5.0), bobbing);
+		bobbing = Matrix4x4Multiply(Matrix4x4FromAxisAngle(1.0, 0.0, 0.0, -tilt), bobbing);
+		bobbing = Matrix4x4Multiply(Matrix4x4FromTranslate(-sin(walk * M_PI) * bob * 0.5, fabs(cos(walk * M_PI) * bob), 0.0), bobbing);
+		camera = Matrix4x4Multiply(camera, bobbing);
 	}
 	
 	glFinish();
@@ -195,7 +200,7 @@ void RaytracerEnqueue(float dt, float time, bool doBobbing) {
 		Raytracer.iteration = 0;
 	}
 	
-	error = clSetKernelArg(Raytracer.traceKernel, 6, sizeof(matrix), &matrix);
+	error = clSetKernelArg(Raytracer.traceKernel, 6, sizeof(camera), &camera);
 	error |= clSetKernelArg(Raytracer.traceKernel, 8, sizeof(int), &(int){ EntityIsUnderWater(player) });
 	error |= clSetKernelArg(Raytracer.traceKernel, 9, sizeof(float), &time);
 	if (error < 0) {
