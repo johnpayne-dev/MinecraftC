@@ -5,7 +5,7 @@
 #include "../Utilities/SinTable.h"
 #include "../Mods/PrimedTNT.h"
 #include "../Minecraft.h"
-#include "../Mods/OctreeRenderer.h"
+#include "../Mods/Raytracer.h"
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size) {
 	*level = (Level) {
@@ -62,6 +62,11 @@ bool LevelLoad(Level * level, char * filePath) {
 	level->player->xRot = prx;
 	level->player->yRot = pry;
 	SDL_RWclose(file);
+#if MINECRAFTC_MODS
+	if (level->progressBar->minecraft->settings.raytracing) {
+		RaytracerReload();
+	}
+#endif
 	return true;
 }
 
@@ -91,6 +96,11 @@ bool LevelSave(Level * level, char * filePath, char * name) {
 void LevelRegenerate(Level * level, int size) {
 	LevelDestroy(level);
 	LevelCreate(level, level->generator.progressBar, size);
+#if MINECRAFTC_MODS
+	if (level->progressBar->minecraft->settings.raytracing) {
+		RaytracerReload();
+	}
+#endif
 }
 
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
@@ -113,30 +123,28 @@ void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks) {
 	LevelFindSpawn(level);
 #if MINECRAFTC_MODS
 	if (level->progressBar->minecraft->settings.raytracing) {
-		LevelDestroyOctree(level);
-		LevelCreateOctree(level);
-		OctreeRendererSetOctree(&level->octree);
+		LevelDestroyDistanceField(level);
+		LevelCreateDistanceField(level);
 	}
 #endif
 }
 
 #if MINECRAFTC_MODS
-void LevelCreateOctree(Level * level) {
-	ProgressBarDisplaySetText(level->progressBar, "Creating octree..");
-	OctreeCreate(&level->octree, level);
+void LevelCreateDistanceField(Level * level) {
+	level->distanceField = malloc(level->width * level->height * level->depth);
+	ProgressBarDisplaySetText(level->progressBar, "Preparing rays..");
 	for (int x = 0; x < level->width; x++) {
 		ProgressBarDisplaySetProgress(level->progressBar, x * 100 / (level->width - 1));
 		for (int y = 0; y < level->depth; y++) {
 			for (int z = 0; z < level->height; z++) {
-				BlockType tile = LevelGetTile(level, x, y, z);
-				if (tile != BlockTypeNone) { OctreeSet(&level->octree, x, y, z, tile); }
+				level->distanceField[(y * level->height + z) * level->width + x] = LevelGetTile(level, x, y, z) == BlockTypeNone ? 255 : 0;
 			}
 		}
 	}
 }
 
-void LevelDestroyOctree(Level * level) {
-	OctreeDestroy(&level->octree);
+void LevelDestroyDistanceField(Level * level) {
+	free(level->distanceField);
 }
 #endif
 
@@ -244,7 +252,24 @@ bool LevelSetTileNoNeighborChange(Level * level, int x, int y, int z, BlockType 
 	if (level->renderer != NULL) { LevelRendererQueueChunks(level->renderer, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1); }
 #if MINECRAFTC_MODS
 	if (level->progressBar->minecraft->settings.raytracing) {
-		OctreeSet(&level->octree, x, y, z, tile);
+		if (tile == BlockTypeNone) {
+			uint8_t min = 255;
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					for (int k = -1; k <= 1; k++) {
+						if (y + j < 0 || y + j >= level->depth || x + i < 0 || x + i >= level->width || z + k < 0 || z + k >= level->height || (i == j && j == k)) {
+							continue;
+						}
+						uint8_t d = level->distanceField[((y + j) * level->height + z + k) * level->width + x + i];
+						min = d + 1 < min ? d + 1 : min;
+					}
+				}
+			}
+			level->distanceField[(y * level->height + z) * level->width + x] = min;
+		} else {
+			level->distanceField[(y * level->height + z) * level->width + x] = 0;
+			Raytracer.iteration = 0;
+		}
 	}
 #endif
 	return true;
@@ -589,6 +614,11 @@ Entity * LevelFindPlayer(Level * level) {
 void LevelDestroy(Level * level) {
 	ListFree(level->entities);
 	ListFree(level->tickList);
-	if (level->lightBlockers != NULL) { free(level->lightBlockers); }
-	if (level->blocks != NULL) { free(level->blocks); }
+	free(level->lightBlockers);
+	free(level->blocks);
+#if MINECRAFTC_MODS
+	if (level->progressBar->minecraft->settings.raytracing) {
+		LevelDestroyDistanceField(level);
+	}
+#endif
 }

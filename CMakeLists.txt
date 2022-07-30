@@ -85,10 +85,8 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Level/Level.c
 	MinecraftC/Level/Level.h
 	MinecraftC/Level/NextTickListEntry.h
-	MinecraftC/Mods/Octree.c
-	MinecraftC/Mods/Octree.h
-	MinecraftC/Mods/OctreeRenderer.c
-	MinecraftC/Mods/OctreeRenderer.h
+	MinecraftC/Mods/Raytracer.c
+	MinecraftC/Mods/Raytracer.h
 	MinecraftC/Mods/PrimedTNT.c
 	MinecraftC/Mods/PrimedTNT.h
 	MinecraftC/Particle/Particle.c
@@ -161,6 +159,7 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/SessionData.h
 	MinecraftC/Timer.c
 	MinecraftC/Timer.h
+	Resources/Shaders/DistanceField.cl
 	Resources/Shaders/Raytracer.cl
 	)
 

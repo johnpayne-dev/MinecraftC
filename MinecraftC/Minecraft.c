@@ -18,7 +18,7 @@
 #include "Level/Generator/LevelGenerator.h"
 #include "Particle/WaterDropParticle.h"
 #include "Mods/PrimedTNT.h"
-#include "Mods/OctreeRenderer.h"
+#include "Mods/Raytracer.h"
 
 static void CheckGLError(Minecraft * minecraft, char * msg) {
 	int error = glGetError();
@@ -80,11 +80,6 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	GameSettingsCreate(&minecraft->settings, minecraft);
 	SDL_GL_SetSwapInterval(minecraft->settings.limitFramerate ? 1 : 0);
 	cs_music_set_volume((float)minecraft->settings.music);
-#if MINECRAFTC_MODS
-	if (minecraft->settings.raytracing && !OctreeRendererInitialize(minecraft->frameWidth, minecraft->frameHeight)) {
-		minecraft->settings.raytracing = false;
-	}
-#endif
 	TextureManagerCreate(&minecraft->textureManager, &minecraft->settings);
 	AnimatedTexture * lavaTexture = malloc(sizeof(AnimatedTexture));
 	LavaTextureCreate(lavaTexture);
@@ -95,6 +90,11 @@ void MinecraftCreate(Minecraft * minecraft, int width, int height, bool fullScre
 	FontRendererCreate(&minecraft->font, &minecraft->settings, "Default.png", &minecraft->textureManager);
 	glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
 	LevelCreate(&minecraft->level, &minecraft->progressBar, 1);
+#if MINECRAFTC_MODS
+	if (minecraft->settings.raytracing && !RaytracerInitialize(&minecraft->textureManager, &minecraft->level, minecraft->frameWidth, minecraft->frameHeight)) {
+		minecraft->settings.raytracing = false;
+	}
+#endif
 	PlayerCreate(&minecraft->player, &minecraft->level);
 	EntityResetPosition(&minecraft->player);
 	minecraft->level.player = &minecraft->player;
@@ -389,6 +389,11 @@ void MinecraftRun(Minecraft * minecraft) {
 				glViewport(0, 0, minecraft->frameWidth, minecraft->frameHeight);
 				HUDScreenDestroy(&minecraft->hud);
 				HUDScreenCreate(&minecraft->hud, minecraft, minecraft->width, minecraft->height);
+#if MINECRAFTC_MODS
+				if (minecraft->settings.raytracing) {
+					RaytracerResize(minecraft->frameWidth, minecraft->frameHeight);
+				}
+#endif
 				if (minecraft->currentScreen != NULL) {
 					int w = minecraft->width * 240 / minecraft->height;
 					int h = minecraft->height * 240 / minecraft->height;
@@ -500,8 +505,12 @@ void MinecraftRun(Minecraft * minecraft) {
 		if (renderer->entity != NULL) {
 			minecraft->selected = (MovingObjectPosition){ .entityPosition = 1, .entity = renderer->entity };
 		}
-	
+		
+#if MINECRAFTC_MODS
+		for (int i = 0; i < 2 && !minecraft->settings.raytracing; i++) {
+#else
 		for (int i = 0; i < 2; i++) {
+#endif
 			if (minecraft->settings.anaglyph) {
 				if (i == 0) { glColorMask(false, true, true, false); }
 				else { glColorMask(true, false, false, false); }
@@ -846,19 +855,26 @@ void MinecraftRun(Minecraft * minecraft) {
 		}
 #if MINECRAFTC_MODS
 		if (minecraft->settings.raytracing) {
-			OctreeRendererEnqueue();
-			RendererEnableGUIMode(renderer);
+			RaytracerEnqueue(delta, timer->lastHR, minecraft->settings.viewBobbing);
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
 			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, OctreeRenderer.textureID);
+			glBindTexture(GL_TEXTURE_2D, Raytracer.textureID);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glColor4f(1.0, 1.0, 1.0, 0.8);
-			ShapeRendererBegin();
-			ShapeRendererVertexUV(0.0, minecraft->height, 0.0, 0.0, 0.0);
-			ShapeRendererVertexUV(minecraft->width, minecraft->height, 0.0, 2.0, 0.0);
-			ShapeRendererVertexUV(minecraft->width, 0.0, 0.0, 2.0, 2.0);
-			ShapeRendererVertexUV(0.0, 0.0, 0.0, 0.0, 2.0);
-			ShapeRendererEnd();
+			glBegin(GL_QUADS);
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+			glTexCoord2f(0.0, 0.0);
+			glVertex2f(-1.0, -1.0);
+			glTexCoord2f(1.0, 0.0);
+			glVertex2f(1.0, -1.0);
+			glTexCoord2f(1.0, 1.0);
+			glVertex2f(1.0, 1.0);
+			glTexCoord2f(0.0, 1.0);
+			glVertex2f(-1.0, 1.0);
+			glEnd();
 			glDisable(GL_BLEND);
 		}
 #endif
@@ -906,7 +922,7 @@ void MinecraftPause(Minecraft * minecraft) {
 void MinecraftDestroy(Minecraft * minecraft) {
 #if MINECRAFTC_MODS
 	if (minecraft->settings.raytracing) {
-		OctreeRendererDestroy();
+		RaytracerDestroy();
 	}
 #endif
 	StringFree(minecraft->debug);

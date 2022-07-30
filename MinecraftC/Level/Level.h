@@ -10,7 +10,6 @@
 #include "../GUI/FontRenderer.h"
 #include "../Entity.h"
 #include "Generator/LevelGenerator.h"
-#include "../Mods/Octree.h"
 
 typedef struct Level {
 	int width, height, depth;
@@ -34,7 +33,7 @@ typedef struct Level {
 	LevelGenerator generator;
 	ProgressBarDisplay * progressBar;
 #if MINECRAFTC_MODS
-	Octree octree;
+	uint8_t * distanceField;
 #endif
 } Level;
 
@@ -44,8 +43,8 @@ bool LevelLoad(Level * level, char * filePath);
 bool LevelSave(Level * level, char * filePath, char * name);
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks);
 #if MINECRAFTC_MODS
-void LevelCreateOctree(Level * level);
-void LevelDestroyOctree(Level * level);
+void LevelCreateDistanceField(Level * level);
+void LevelDestroyDistanceField(Level * level);
 #endif
 void LevelFindSpawn(Level * level);
 void LevelCalculateLightDepths(Level * level, int x0, int y0, int x1, int y1);
