@@ -28,6 +28,8 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/GUI/LevelNameScreen.h
 	MinecraftC/GUI/LoadLevelScreen.c
 	MinecraftC/GUI/LoadLevelScreen.h
+	MinecraftC/GUI/ModsScreen.c
+	MinecraftC/GUI/ModsScreen.h
 	MinecraftC/GUI/OptionsScreen.c
 	MinecraftC/GUI/OptionsScreen.h
 	MinecraftC/GUI/PauseScreen.c
@@ -83,8 +85,11 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Level/Level.c
 	MinecraftC/Level/Level.h
 	MinecraftC/Level/NextTickListEntry.h
-	MinecraftC/Particle/PrimedTNT.c
-	MinecraftC/Particle/PrimedTNT.h
+	MinecraftC/Mods/Matrix.h
+	MinecraftC/Mods/Raytracer.c
+	MinecraftC/Mods/Raytracer.h
+	MinecraftC/Mods/PrimedTNT.c
+	MinecraftC/Mods/PrimedTNT.h
 	MinecraftC/Particle/Particle.c
 	MinecraftC/Particle/Particle.h
 	MinecraftC/Particle/ParticleManager.c
@@ -131,6 +136,7 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/Utilities/List.h
 	MinecraftC/Utilities/Log.c
 	MinecraftC/Utilities/Log.h
+	MinecraftC/Utilities/OpenCL.h
 	MinecraftC/Utilities/OpenGL.h
 	MinecraftC/Utilities/Random.c
 	MinecraftC/Utilities/Random.h
@@ -154,6 +160,8 @@ set(MINECRAFTC_SOURCES
 	MinecraftC/SessionData.h
 	MinecraftC/Timer.c
 	MinecraftC/Timer.h
+	Resources/Shaders/DistanceField.cl
+	Resources/Shaders/Raytracer.cl
 	)
 
 if(MSVC)
@@ -172,6 +180,9 @@ add_definitions(
 	-DSDL_VIDEO_OPENGL_EGL=0
 	-DSDL_VIDEO_RENDER_OGL_ES2=0
 	)
+if(MINECRAFTC_MODS)
+	add_definitions(-DMINECRAFTC_MODS)
+endif()
 
 if(APPLE)
 	set(SOURCES
@@ -195,12 +206,25 @@ if(APPLE)
 		"-framework Metal"
 		"-framework OpenGL"
 		)
+	if (MINECRAFTC_MODS)
+		set(LIBRARIES ${LIBRARIES} "-framework OpenCL")
+	endif()
 elseif(WIN32)
 	set(SOURCES
 		${MINECRAFTC_SOURCES}
 		${SDL2_COMMON_SOURCES}
 		${SDL2_WINDOWS_SOURCES}
 		Resources/App/AppIcon.rc
+		External/OpenCL-ICD-Loader/loader/icd.c
+		External/OpenCL-ICD-Loader/loader/icd_dispatch.c
+		External/OpenCL-ICD-Loader/loader/icd_dispatch_generated.c
+		External/OpenCL-ICD-Loader/loader/windows/icd_windows.c
+		External/OpenCL-ICD-Loader/loader/windows/icd_windows_apppackage.cpp
+		External/OpenCL-ICD-Loader/loader/windows/icd_windows_dxgk.c
+		External/OpenCL-ICD-Loader/loader/windows/icd_windows_envvars.c
+		External/OpenCL-ICD-Loader/loader/windows/icd_windows_hkr.c
+		External/OpenCL-ICD-Loader/loader/windows/OpenCL.def
+		External/OpenCL-ICD-Loader/loader/windows/OpenCL.rc
 		)
 	set(LIBRARIES
 		opengl32
@@ -209,9 +233,19 @@ elseif(WIN32)
 		Winmm
 		Version
 		Imm32
+		RuntimeObject
+		Cfgmgr32
 		)
 elseif(UNIX)
-	set(SOURCES ${MINECRAFTC_SOURCES})
+	set(SOURCES
+		${MINECRAFTC_SOURCES}
+		External/OpenCL-ICD-Loader/loader/icd.c
+		External/OpenCL-ICD-Loader/loader/icd_dispatch.c
+		External/OpenCL-ICD-Loader/loader/icd_dispatch_generated.c
+		External/OpenCL-ICD-Loader/loader/linux/icd_linux.c
+		External/OpenCL-ICD-Loader/loader/linux/icd_linux_envvars.c
+		External/OpenCL-ICD-Loader/loader/linux/icd_exports.map
+		)
 	set(FLAGS ${FLAGS} "-I/usr/include/SDL2" "-D_GNU_SOURCE=1" "-D_REENTRANT")
 	set(LIBRARIES
 		m
@@ -231,5 +265,8 @@ target_include_directories(MinecraftC PRIVATE
 	External/SDL/include
 	External/cute_headers
 	External/stb
+	External/OpenCL-Headers
+	External/OpenCL-ICD-Loader/loader
 	)
+	
 target_link_libraries(MinecraftC ${LIBRARIES})

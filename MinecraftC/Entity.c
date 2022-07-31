@@ -2,7 +2,7 @@
 #include "Level/Level.h"
 #include "Player/Player.h"
 #include "Utilities/SinTable.h"
-#include "Particle/PrimedTNT.h"
+#include "Mods/PrimedTNT.h"
 
 void EntityCreate(Entity * entity, Level * level) {
 	*entity = (struct Entity) {
@@ -84,7 +84,9 @@ void EntityTurn(Entity * entity, float rx, float ry) {
 
 void EntityTick(Entity * entity) {
 	if (entity->type == EntityTypeParticle) { ParticleTick(entity); return; }
+#if MINECRAFTC_MODS
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTTick(entity); return; }
+#endif
 	
 	entity->oldWalkDistance = entity->walkDistance;
 	entity->xo = entity->x;
@@ -272,10 +274,14 @@ void EntityPlaySound(Entity * entity, char * name, float volume, float pitch) {
 }
 
 bool EntityIsPickable(Entity * entity) {
+#if MINECRAFTC_MODS
 	if (entity->type == EntityTypePrimedTNT) { return PrimedTNTIsPickable(entity); }
+#endif
 	return false;
 }
 
 void EntityRender(Entity * entity, TextureManager * textures, float t) {
+#if MINECRAFTC_MODS
 	if (entity->type == EntityTypePrimedTNT) { PrimedTNTRender(entity, textures, t); return; }
+#endif
 }

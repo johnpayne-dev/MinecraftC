@@ -16,6 +16,9 @@ typedef enum GUIScreenType {
 	GUIScreenTypeOptions,
 	GUIScreenTypePause,
 	GUIScreenTypeSaveLevel,
+#if MINECRAFTC_MODS
+	GUIScreenTypeMods,
+#endif
 } GUIScreenType;
 
 typedef struct GUIScreen {
@@ -60,6 +63,13 @@ typedef struct GUIScreen {
 			char * title;
 			GameSettings * settings;
 		} options;
+#if MINECRAFTC_MODS
+		struct ModsScreenData {
+			struct GUIScreen * parent;
+			char * title;
+			GameSettings * settings;
+		} mods;
+#endif
 	};
 } GUIScreen;
 

@@ -1,4 +1,6 @@
 #pragma once
+#if MINECRAFTC_MODS
+
 #include <stdbool.h>
 #include "../Render/TextureManager.h"
 
@@ -17,3 +19,5 @@ void PrimedTNTOnHit(PrimedTNT * tnt);
 bool PrimedTNTIsPickable(PrimedTNT * tnt);
 void PrimedTNTTick(PrimedTNT * tnt);
 void PrimedTNTRender(PrimedTNT * tnt, TextureManager * textures, float t);
+
+#endif

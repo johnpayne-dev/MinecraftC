@@ -1,3 +1,15 @@
 [submodule "External/SDL"]
 	path = External/SDL
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "External/OpenCL-Headers"]
+	path = External/OpenCL-Headers
+	url = https://github.com/KhronosGroup/OpenCL-Headers
+[submodule "External/OpenCL-ICD-Loader"]
+	path = External/OpenCL-ICD-Loader
+	url = https://github.com/KhronosGroup/OpenCL-ICD-Loader
+[submodule "External/stb"]
+	path = External/stb
+	url = https://github.com/nothings/stb.git
+[submodule "External/cute_headers"]
+	path = External/cute_headers
+	url = https://github.com/johnpayne-dev/cute_headers.git

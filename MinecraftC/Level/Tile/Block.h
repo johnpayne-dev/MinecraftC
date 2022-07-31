@@ -100,7 +100,7 @@ AABB BlockGetCollisionAABB(Block * block, int x, int y, int z);
 bool BlockIsOpaque(Block * block);
 bool BlockIsSolid(Block * block);
 void BlockUpdate(Block * block, struct Level * level, int x, int y, int z, RandomGenerator * random);
-void BlockSpawnBreakParticles(Block * block, struct Level * level, int x, int y, int z, ParticleManager * particles);
+void BlockSpawnBreakParticles(Block * block, struct Level * level, int x, int y, int z, ParticleManager * particles, GameSettings * settings);
 LiquidType BlockGetLiquidType(Block * block);
 void BlockOnNeighborChanged(Block * block, struct Level * level, int x, int y, int z, BlockType tile);
 void BlockOnPlaced(Block * block, struct Level * level, int x, int y, int z);

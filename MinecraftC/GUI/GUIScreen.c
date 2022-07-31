@@ -5,6 +5,7 @@
 #include "ControlsScreen.h"
 #include "ErrorScreen.h"
 #include "GenerateLevelScreen.h"
+#include "ModsScreen.h"
 #include "LevelNameScreen.h"
 #include "LoadLevelScreen.h"
 #include "OptionsScreen.h"
@@ -28,6 +29,9 @@ void GUIScreenRender(GUIScreen * screen, int mx, int my) {
 	if (screen->type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenRender(screen, mx, my); }
 	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenRender(screen, mx, my); }
 	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenRender(screen, mx, my); return; }
+#if MINECRAFTC_MODS
+	if (screen->type == GUIScreenTypeMods) { ModsScreenRender(screen, mx, my); }
+#endif
 	if (screen->type == GUIScreenTypeOptions) { OptionsScreenRender(screen, mx, my); }
 	if (screen->type == GUIScreenTypePause) { PauseScreenRender(screen, mx, my); }
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenRender(screen, mx, my); return; }
@@ -84,6 +88,9 @@ void GUIScreenOnButtonClicked(GUIScreen * screen, Button * button) {
 	if (screen->type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenOnButtonClicked(screen, button); return; }
 	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenOnButtonClicked(screen, button); return; }
 	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnButtonClicked(screen, button); return; }
+#if MINECRAFTC_MODS
+	if (screen->type == GUIScreenTypeMods) { ModsScreenOnButtonClicked(screen, button); }
+#endif
 	if (screen->type == GUIScreenTypeOptions) { OptionsScreenOnButtonClicked(screen, button); return; }
 	if (screen->type == GUIScreenTypePause) { PauseScreenOnButtonClicked(screen, button); return; }
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnButtonClicked(screen, button); return; }
@@ -106,6 +113,9 @@ void GUIScreenOnOpen(GUIScreen * screen) {
 	if (screen->type == GUIScreenTypeGenerateLevel) { GenerateLevelScreenOnOpen(screen); return; }
 	if (screen->type == GUIScreenTypeLevelName) { LevelNameScreenOnOpen(screen); return; }
 	if (screen->type == GUIScreenTypeLoadLevel) { LoadLevelScreenOnOpen(screen); return; }
+#if MINECRAFTC_MODS
+	if (screen->type == GUIScreenTypeMods) { ModsScreenOnOpen(screen); }
+#endif
 	if (screen->type == GUIScreenTypeOptions) { OptionsScreenOnOpen(screen); return; }
 	if (screen->type == GUIScreenTypePause) { PauseScreenOnOpen(screen); return; }
 	if (screen->type == GUIScreenTypeSaveLevel) { LoadLevelScreenOnOpen(screen); return; }

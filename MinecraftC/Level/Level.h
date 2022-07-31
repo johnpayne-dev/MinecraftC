@@ -31,6 +31,10 @@ typedef struct Level {
 	List(Entity *) entities;
 	ParticleManager * particleEngine;
 	LevelGenerator generator;
+	ProgressBarDisplay * progressBar;
+#if MINECRAFTC_MODS
+	uint8_t * distanceField;
+#endif
 } Level;
 
 void LevelCreate(Level * level, ProgressBarDisplay * progressBar, int size);
@@ -38,6 +42,10 @@ void LevelRegenerate(Level * level, int size);
 bool LevelLoad(Level * level, char * filePath);
 bool LevelSave(Level * level, char * filePath, char * name);
 void LevelSetData(Level * level, int w, int d, int h, uint8_t * blocks);
+#if MINECRAFTC_MODS
+void LevelCreateDistanceField(Level * level);
+void LevelDestroyDistanceField(Level * level);
+#endif
 void LevelFindSpawn(Level * level);
 void LevelCalculateLightDepths(Level * level, int x0, int y0, int x1, int y1);
 void LevelSetRenderer(Level * level, struct LevelRenderer * listener);

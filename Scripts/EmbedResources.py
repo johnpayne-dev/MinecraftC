@@ -5,7 +5,7 @@ import sys
 RESOURCE_PATH = os.path.realpath(__file__ + '/../../Resources')
 
 def embed_png(filePath, outPath):
-	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace('/', '_')
+	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace(os.sep, '_')
 	
 	image = Image.open(filePath).convert('RGBA')
 	pixels = image.load()
@@ -28,9 +28,9 @@ def embed_png(filePath, outPath):
 	
 	image.close()
 
-def embed_ogg(filePath, outPath):
+def embed_file(filePath, outPath):
 	input, output = open(filePath, 'rb'), open(outPath, 'w')
-	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace('/', '_')
+	cName = filePath[len(RESOURCE_PATH) + 1:filePath.rfind('.')].replace(os.sep, '_')
 	output.write(f'static const unsigned char Resource_{cName}[] = {{')
 	for i, byte in enumerate(input.read()):
 		if i % 16 == 0: output.write('\n\t')
@@ -39,10 +39,19 @@ def embed_ogg(filePath, outPath):
 	input.close()
 	output.close()
 
-for subdir, dirs, files in os.walk(RESOURCE_PATH):
-	for fileName in files:
-		filePath = subdir + os.sep + fileName
-		if filePath.endswith('.png'):
-			embed_png(filePath, filePath[:-4] + '.h')
-		elif filePath.endswith('.ogg'):
-			embed_ogg(filePath, filePath[:-4] + '.h')
+if len(sys.argv) == 2:
+	for subdir, dirs, files in os.walk(RESOURCE_PATH):
+		for fileName in files:
+			filePath = subdir + os.sep + fileName
+			if filePath.endswith(sys.argv[1]):
+				embed_file(filePath, filePath[:-len(sys.argv[1])] + '.h')
+else:
+	for subdir, dirs, files in os.walk(RESOURCE_PATH):
+		for fileName in files:
+			filePath = subdir + os.sep + fileName
+			if filePath.endswith('.png'):
+				embed_png(filePath, filePath[:-4] + '.h')
+			elif filePath.endswith('.ogg'):
+				embed_file(filePath, filePath[:-4] + '.h')
+			elif filePath.endswith('.cl'):
+				embed_file(filePath, filePath[:-3] + '.h')

@@ -15,12 +15,18 @@ void GenerateLevelScreenOnOpen(GenerateLevelScreen * screen) {
 	ButtonCreate(&screen->buttons[1], 1, screen->width / 2 - 100, screen->height / 4 + 24, "Normal");
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
 	ButtonCreate(&screen->buttons[2], 2, screen->width / 2 - 100, screen->height / 4 + 48, "Huge");
+#if MINECRAFTC_MODS
+	if (screen->minecraft->settings.largerWorldGen) {
+		screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
+		ButtonCreate(&screen->buttons[3], 3, screen->width / 2 - 100, screen->height / 4 + 72, "Extra huge");
+	}
+#endif
 	screen->buttons = ListPush(screen->buttons, &(Button){ 0 });
-	ButtonCreate(&screen->buttons[3], 3, screen->width / 2 - 100, screen->height / 4 + 120, "Cancel");
+	ButtonCreate(&screen->buttons[ListLength(screen->buttons) - 1], 100, screen->width / 2 - 100, screen->height / 4 + 120, "Cancel");
 }
 
 void GenerateLevelScreenOnButtonClicked(GenerateLevelScreen * screen, Button * button) {
-	if (button->id == 3) {
+	if (button->id == 100) {
 		MinecraftSetCurrentScreen(screen->minecraft, screen->generateLevel.parent);
 	} else {
 		MinecraftRegenerateLevel(screen->minecraft, button->id);

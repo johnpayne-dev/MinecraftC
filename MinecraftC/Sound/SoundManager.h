@@ -1,8 +1,8 @@
 #pragma once
+#include "../Utilities/Random.h"
 #define STB_VORBIS_HEADER_ONLY
 #include <stb_vorbis.c>
 #include <cute_sound.h>
-#include "../Utilities/Random.h"
 
 typedef struct SoundManager {
 	uint64_t lastMusic;

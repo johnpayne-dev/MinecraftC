@@ -2,7 +2,7 @@
 #include "Physics/AABB.h"
 #include "Render/TextureManager.h"
 #include "Player/Player.h"
-#include "Particle/PrimedTNT.h"
+#include "Mods/PrimedTNT.h"
 #include "Particle/Particle.h"
 
 typedef enum EntityType {
@@ -39,8 +39,10 @@ typedef struct Entity {
 	EntityType type;
 	union {
 		PlayerData player;
-		PrimedTNTData tnt;
 		ParticleData particle;
+#if MINECRAFTC_MODS
+		PrimedTNTData tnt;
+#endif
 	};
 } Entity;
 
