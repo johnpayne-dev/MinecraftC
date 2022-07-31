@@ -1,10 +1,4 @@
-#include <stb_vorbis.c>
-#define CUTE_SOUND_SCALAR_MODE
-#define CUTE_SOUND_IMPLEMENTATION
-#define CUTE_SOUND_FORCE_SDL
-#include <cute_sound.h>
 #include <string.h>
-#include "Minecraft.h"
 #include "GUI/PauseScreen.h"
 #include "GUI/ChatInputScreen.h"
 #include "GUI/BlockSelectScreen.h"
@@ -19,6 +13,12 @@
 #include "Particle/WaterDropParticle.h"
 #include "Mods/PrimedTNT.h"
 #include "Mods/Raytracer.h"
+#include <stb_vorbis.c>
+#define CUTE_SOUND_SCALAR_MODE
+#define CUTE_SOUND_IMPLEMENTATION
+#define CUTE_SOUND_FORCE_SDL
+#include <cute_sound.h>
+#include "Minecraft.h"
 
 static void CheckGLError(Minecraft * minecraft, char * msg) {
 	int error = glGetError();
