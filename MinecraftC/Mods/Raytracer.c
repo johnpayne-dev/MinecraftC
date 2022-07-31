@@ -151,8 +151,7 @@ void RaytracerReload() {
 	int error;
 	Raytracer.distanceFieldBuffer = clCreateBuffer(Raytracer.context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, Raytracer.level->width * Raytracer.level->height * Raytracer.level->depth, Raytracer.level->distanceField, &error);
 	if (error < 0) {
-		LogError("Failed to create buffer: %i\n", error);
-		return false;
+		LogFatal("Failed to create buffer: %i\n", error);
 	}
 	Raytracer.blockBuffer = clCreateBuffer(Raytracer.context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, Raytracer.level->width * Raytracer.level->height * Raytracer.level->depth, Raytracer.level->blocks, &error);
 	if (error < 0) {
@@ -192,7 +191,7 @@ void RaytracerEnqueue(float dt, float time, bool doBobbing) {
 	
 	glFinish();
 	int error = clSetKernelArg(Raytracer.iteratekernel, 1, sizeof(uint8_t), &(uint8_t){ Raytracer.iteration++ });
-	error |= clEnqueueNDRangeKernel(Raytracer.queue, Raytracer.iteratekernel, 3, NULL, (size_t []){ Raytracer.level->width, Raytracer.level->depth, Raytracer.level->height }, (size_t []){ 1, 1, 1}, 0, NULL, NULL);
+	error |= clEnqueueNDRangeKernel(Raytracer.queue, Raytracer.iteratekernel, 3, NULL, (size_t []){ Raytracer.level->width, Raytracer.level->depth, Raytracer.level->height }, NULL, 0, NULL, NULL);
 	if (error < 0) {
 		LogFatal("Failed to enqueue octree renderer: %i\n", error);
 	}
@@ -210,9 +209,7 @@ void RaytracerEnqueue(float dt, float time, bool doBobbing) {
 	if (error < 0) {
 		LogFatal("Failed to aquire gl texture: %i\n", error);
 	}
-	int groupSize = 50;
-	int w = Raytracer.width, h = Raytracer.height;
-	error = clEnqueueNDRangeKernel(Raytracer.queue, Raytracer.traceKernel, 2, NULL, (size_t[]){ w + (groupSize - w % groupSize) % groupSize, h + (groupSize - w % groupSize) % groupSize }, (size_t[]){ groupSize, 1 }, 0, NULL, NULL);
+	error = clEnqueueNDRangeKernel(Raytracer.queue, Raytracer.traceKernel, 2, NULL, (size_t[]){ Raytracer.width, Raytracer.height }, NULL, 0, NULL, NULL);
 	if (error < 0) {
 		LogFatal("Failed to enqueue octree renderer: %i\n", error);
 	}
