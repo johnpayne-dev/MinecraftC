@@ -137,8 +137,8 @@ bool ShouldDiscardTransparency(uchar tile) {
 }
 
 float GetTileReflectiveness(uchar tile, float4 color) {
-	if (tile == BlockTypeGlass && color.w == 0.0f) { return 0.1f; }
-	if (tile == BlockTypeWater || tile == BlockTypeStillWater) { return 0.1f; }
+	if (tile == BlockTypeGlass && color.w == 0.0f) { return 0.15f; }
+	if (tile == BlockTypeWater || tile == BlockTypeStillWater) { return 0.15f; }
 	return 0.0f;
 }
 
@@ -210,7 +210,7 @@ float4 BedrockColor(float3 hit, __read_only image2d_t terrain) {
 }
 
 float3 BGColor(float3 ray) {
-	float t = 1.0f - (1.0f - ray.y) * (1.0f - ray.y) * (1.0f - ray.y) * (1.0f - ray.y);
+	float t = clamp(1.0f - pow(1.0f - ray.y, 4.0f), 0.0f, 1.0f);
 	return t * (float3){ 0.63f, 0.8f, 1.0f } + (1.0f - t) * (float3){ 1.0f, 1.0f, 1.0f };
 }
 
@@ -413,9 +413,8 @@ float3 TraceShadows(__global uchar * distanceField, __global uchar * blocks, __r
 }
 
 float4 TraceFog(float3 ray, float dist) {
-	//float w = 1.0f - exp(-dist / 512.0f );
-	float w = clamp(dist / 512.0f, 0.0f, 1.0f);
-	float4 fog = (float4){ 1.0f, 1.0f, 1.0f, w };
+	float w = pow(clamp(0.14f * log(dist + 1.0f), 0.0f, 1.0f), 2.0f);
+	float4 fog = (float4){ BGColor(ray), w };
 	return fog;
 }
 
