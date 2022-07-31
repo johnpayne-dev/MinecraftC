@@ -39,12 +39,19 @@ def embed_file(filePath, outPath):
 	input.close()
 	output.close()
 
-for subdir, dirs, files in os.walk(RESOURCE_PATH):
-	for fileName in files:
-		filePath = subdir + os.sep + fileName
-		if filePath.endswith('.png'):
-			embed_png(filePath, filePath[:-4] + '.h')
-		elif filePath.endswith('.ogg'):
-			embed_file(filePath, filePath[:-4] + '.h')
-		elif filePath.endswith('.cl'):
-			embed_file(filePath, filePath[:-3] + '.h')
+if len(sys.argv) == 2:
+	for subdir, dirs, files in os.walk(RESOURCE_PATH):
+		for fileName in files:
+			filePath = subdir + os.sep + fileName
+			if filePath.endswith(sys.argv[1]):
+				embed_file(filePath, filePath[:-len(sys.argv[1])] + '.h')
+else:
+	for subdir, dirs, files in os.walk(RESOURCE_PATH):
+		for fileName in files:
+			filePath = subdir + os.sep + fileName
+			if filePath.endswith('.png'):
+				embed_png(filePath, filePath[:-4] + '.h')
+			elif filePath.endswith('.ogg'):
+				embed_file(filePath, filePath[:-4] + '.h')
+			elif filePath.endswith('.cl'):
+				embed_file(filePath, filePath[:-3] + '.h')

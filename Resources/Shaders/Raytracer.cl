@@ -110,10 +110,10 @@ constant float TileSideBrightness[6] = { 0.5f, 1.0f, 0.8f, 0.8f, 0.6f, 0.6f };
 constant float3 TileSideNormal[6] = {
 	{ 0.0f, -1.0f, 0.0f },
 	{ 0.0f, 1.0f, 0.0f },
-	{ 0.0f, 0.0f, -1.0f },
-	{ 0.0f, 0.0f, 1.0f, },
-	{ -1.0f, 0.0f, 0.0f },
-	{ 1.0f, 0.0f, 0.0f }
+	{ 0.0f, 0.0f, 1.0f },
+	{ 0.0f, 0.0f, -1.0f, },
+	{ 1.0f, 0.0f, 0.0f },
+	{ -1.0f, 0.0f, 0.0f }
 };
 
 const sampler_t TerrainSampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_REPEAT | CLK_FILTER_NEAREST;
@@ -177,12 +177,8 @@ float3 MatrixTransformPoint(float16 l, float3 r) {
 }
 
 bool RayPlaneIntersection(float3 ray, float3 origin, float3 normal, float3 center, float * dist) {
-	float d = dot(normal, ray);
-	if (fabs(d) > EPSILON) {
-		*dist = dot(center - origin, normal) / d;
-		return *dist >= 0.0f;
-	}
-	return false;
+	*dist = dot(center - origin, normal) / dot(normal, ray);
+	return *dist >= 0.0f;
 }
 
 void RayBox(float3 r, float3 o, float3 bmin, float3 bmax, float * enter, float * exit) {
@@ -219,29 +215,28 @@ bool RayBlockIntersection(__global uchar * blocks, __read_only image2d_t terrain
 	float3 dimensions = { 1.0f, 1.0f, 1.0f };
 	*tile = blocks[(voxel.y * levelSize + voxel.z) * levelSize + voxel.x];
 	if (*tile == BlockTypeWater || *tile == BlockTypeStillWater) {
-		uchar above = blocks[((voxel.y + 1) * levelSize + voxel.z) * levelSize + voxel.x];
-		if (above != BlockTypeWater && above != BlockTypeStillWater) {
-			dimensions.y -= 0.1f;
-			float waterExit;
-			if (inWater) {
-				RayBox(ray, origin, convert_float3(voxel), convert_float3(voxel) + dimensions, &waterExit, enter);
-				float2 uv;
-				int side;
-				GetTileUV(voxel, dimensions, origin + ray * *enter, &side, &uv);
-				if (side != 1) {
-					return false;
-				}
-				if (*enter < waterExit || *enter < 0.0f) {
-					return false;
-				}
-			} else {
-				RayBox(ray, origin, convert_float3(voxel), convert_float3(voxel) + dimensions, enter, &waterExit);
-				if (waterExit < *enter || waterExit < 0.0f) {
-					return false;
-				}
+		if (!inWater) {
+			uchar above = blocks[((voxel.y + 1) * levelSize + voxel.z) * levelSize + voxel.x];
+			if (above != BlockTypeWater && above != BlockTypeStillWater) {
+				dimensions.y -= 0.1f;
 			}
-		} else if (inWater) {
-			return false;
+			float waterExit;
+			RayBox(ray, origin, convert_float3(voxel), convert_float3(voxel) + dimensions, enter, &waterExit);
+			if (waterExit < *enter || waterExit < 0.0f) {
+				return false;
+			}
+			*exit = *enter + EPSILON;
+		} else {
+			int3 nextVoxel = convert_int3(origin + ray * (*exit + EPSILON));
+			if (!PointInBounds(convert_float3(nextVoxel), levelSize)) {
+				return false;
+			}
+			uchar nextTile = blocks[(nextVoxel.y * levelSize + nextVoxel.z) * levelSize + nextVoxel.x];
+			if (nextTile != BlockTypeNone) {
+				return false;
+			}
+			*enter = *exit;
+			*exit = *exit + EPSILON;
 		}
 	} else if (*tile == BlockTypeLava || *tile == BlockTypeStillLava) {
 		uchar above = blocks[((voxel.y + 1) * levelSize + voxel.z) * levelSize + voxel.x];
@@ -262,7 +257,7 @@ bool RayBlockIntersection(__global uchar * blocks, __read_only image2d_t terrain
 			return false;
 		}
 	} else if (*tile == BlockTypeGlass) {
-		int3 prevVoxel = convert_int3(origin + ray * *enter - sign(ray) * EPSILON);
+		int3 prevVoxel = convert_int3(origin + ray * (*enter - EPSILON));
 		uchar prevTile = blocks[(prevVoxel.y * levelSize + prevVoxel.z) * levelSize + prevVoxel.x];
 		if (prevTile == BlockTypeGlass) {
 			return false;
@@ -348,9 +343,9 @@ bool RayWorldIntersection(__global uchar * distanceField, __global uchar * block
 
 bool RaySceneIntersection(__global uchar * distanceField, __global uchar * blocks, __read_only image2d_t terrain, float3 ray, float3 origin, int levelSize, bool inWater, uchar * tile, float * enter, float * exit, float4 * color, float3 * normal) {
 	if (!RayWorldIntersection(distanceField, blocks, terrain, ray, origin, levelSize, inWater, tile, enter, exit, color, normal)) {
-		if (RayPlaneIntersection(ray, origin, (float3){ 0.0f, 1.0f, 0.0f }, (float3){ 0.0f, 32.0f - 0.1f, 0.0f }, enter)) {
+		if (RayPlaneIntersection(ray, origin, (float3){ 0.0f, 1.0f, 0.0f }, (float3){ 0.0f, inWater ? 32.0f : 31.9f, 0.0f }, enter)) {
 			float3 hit = origin + ray * *enter;
-			if (hit.x > levelSize - 1.0f || hit.z > levelSize - 1.0f || hit.x < 1.0f || hit.z < 1.0f) {
+			if (hit.x > levelSize || hit.z > levelSize || hit.x < 0.0f || hit.z < 0.0f) {
 				*exit = *enter + 1.0f;
 				*tile = BlockTypeWater;
 				*color = WaterColor(hit, terrain);
@@ -365,6 +360,7 @@ bool RaySceneIntersection(__global uchar * distanceField, __global uchar * block
 			*normal = (float3){ 0.0f, 1.0f, 0.0f };
 			return true;
 		}
+		RayBox(ray, origin, (float3){ 0.0f, 0.0f, 0.0f }, (float3){ levelSize, 64.0f, levelSize }, enter, exit);
 		return false;
 	} else {
 		return true;
@@ -389,11 +385,6 @@ float3 TraceShadows(__global uchar * distanceField, __global uchar * blocks, __r
 			shadowColor.w *= 1.0f - hitColor.w;
 			
 			if (tile == BlockTypeWater || tile == BlockTypeStillWater) {
-				if (inWater) {
-					waterDist += enter;
-				} else {
-					exit = enter;
-				}
 				inWater = !inWater;
 			}
 			if (exit < MIN_RAY_STEP) {
@@ -440,11 +431,6 @@ float3 TraceReflections(__global uchar * distanceField, __global uchar * blocks,
 			reflectionColor.w *= 1.0f - hitColor.w;
 			
 			if (tile == BlockTypeWater || tile == BlockTypeStillWater) {
-				if (inWater) {
-					waterDist += enter;
-				} else {
-					exit = enter;
-				}
 				inWater = !inWater;
 			}
 			if (exit < MIN_RAY_STEP) {
@@ -507,7 +493,7 @@ __kernel void trace(int levelSize, __global uchar * distanceField, __global ucha
 			fragColor.xyz += fog.xyz * fog.w * fragColor.w;
 			fragColor.w *= 1.0f - fog.w;
 			float reflectiveness = GetTileReflectiveness(tile, color);
-			if (reflectiveness > 0.0f && !(inWater && (tile == BlockTypeWater || tile == BlockTypeStillWater))) {
+			if (reflectiveness > 0.0f && dot(ray, normal) < 0.0f) {
 				float3 reflectionDir = normalize(ray - 2.0f * dot(ray, normal) * normal);
 				float3 rColor = TraceReflections(distanceField, blocks, terrain, reflectionDir, origin + ray * enter + reflectionDir * EPSILON, levelSize, inWater, lightDir, color.xyz);
 				fragColor.xyz += rColor * reflectiveness * fragColor.w;
@@ -517,9 +503,6 @@ __kernel void trace(int levelSize, __global uchar * distanceField, __global ucha
 			fragColor.w *= 1.0f - color.w;
 			
 			if (tile == BlockTypeWater || tile == BlockTypeStillWater) {
-				if (!inWater) {
-					exit = enter;
-				}
 				inWater = !inWater;
 			}
 			if (exit < MIN_RAY_STEP) {
