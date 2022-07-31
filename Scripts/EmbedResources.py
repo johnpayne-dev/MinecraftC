@@ -5,7 +5,7 @@ import sys
 RESOURCE_PATH = os.path.realpath(__file__ + '/../../Resources')
 
 def embed_png(filePath, outPath):
-	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace('/', '_')
+	cName = filePath[len(RESOURCE_PATH) + 1:-4].replace(os.sep, '_')
 	
 	image = Image.open(filePath).convert('RGBA')
 	pixels = image.load()
@@ -30,7 +30,7 @@ def embed_png(filePath, outPath):
 
 def embed_file(filePath, outPath):
 	input, output = open(filePath, 'rb'), open(outPath, 'w')
-	cName = filePath[len(RESOURCE_PATH) + 1:filePath.rfind('.')].replace('/', '_')
+	cName = filePath[len(RESOURCE_PATH) + 1:filePath.rfind('.')].replace(os.sep, '_')
 	output.write(f'static const unsigned char Resource_{cName}[] = {{')
 	for i, byte in enumerate(input.read()):
 		if i % 16 == 0: output.write('\n\t')

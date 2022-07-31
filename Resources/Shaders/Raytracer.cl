@@ -474,7 +474,7 @@ __kernel void trace(int levelSize, __global uchar * distanceField, __global ucha
 	float2 uv = (float2){ 1.0f - 2.0f * (float)x / width, 2.0f * (float)y / height - 1.0f };
 	uv.x *= (float)width / height;
 	if (isUnderWater) {
-		uv.y += sin(uv.x * (10.0 + sin(time)) + time) / (135.0f + 10.0f * sin(time));
+		uv.y += sin(uv.x * (10.0f + sin(time)) + time) / (135.0f + 10.0f * sin(time));
 	};
 
 	float fov = 70.0f;
@@ -499,7 +499,7 @@ __kernel void trace(int levelSize, __global uchar * distanceField, __global ucha
 	int i = 0;
 	while (color.w < 1.0f && i < 64) {
 		if (RaySceneIntersection(distanceField, blocks, terrain, ray, origin, levelSize, inWater, &tile, &enter, &exit, &color, &normal)) {
-			if (inWater && !(tile == BlockTypeWater || tile == BlockTypeStillWater)) {
+			if (inWater) {
 				waterDist += enter;
 				fragColor.w *= (1.0f - min(waterDist / 16.0f, 1.0f));
 			}
@@ -518,9 +518,7 @@ __kernel void trace(int levelSize, __global uchar * distanceField, __global ucha
 			fragColor.w *= 1.0f - color.w;
 			
 			if (tile == BlockTypeWater || tile == BlockTypeStillWater) {
-				if (inWater) {
-					waterDist += enter;
-				} else {
+				if (!inWater) {
 					exit = enter;
 				}
 				inWater = !inWater;
