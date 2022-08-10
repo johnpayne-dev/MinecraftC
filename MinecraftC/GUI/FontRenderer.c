@@ -39,7 +39,7 @@ void FontRendererCreate(FontRenderer * font, GameSettings * settings, char * nam
 
 static void Render(FontRenderer * font, char * str, int x, int y, uint32_t color, bool darken) {
 	if (str != NULL) {
-		if (darken) { color = (color & 0xfcfcfc) >> 2; }
+		if (darken) { color = (((color >> 8) & 0xfcfcfc) >> 2) << 8; }
 		glBindTexture(GL_TEXTURE_2D, font->texture);
 		ShapeRendererBegin();
 		ShapeRendererColor(color);
