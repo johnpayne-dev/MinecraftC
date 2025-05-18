@@ -13,4 +13,5 @@
 #elif defined(__linux)
 	#include <GL/gl.h>
 	#include <GL/glu.h>
+	#include <GL/glx.h>
 #endif
