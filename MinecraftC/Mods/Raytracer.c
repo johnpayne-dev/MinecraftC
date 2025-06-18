@@ -164,8 +164,6 @@ void RaytracerReload() {
 	error |= clSetKernelArg(Raytracer.traceKernel, 2, sizeof(cl_mem), &Raytracer.blockBuffer);
 	if (error < 0) {
 		LogError("Failed to set kernel arguments: %i\n", error);
-		//return false;
-		//What's this doing here?
 	}
 }
 
